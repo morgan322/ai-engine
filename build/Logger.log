@@ -1,0 +1,24 @@
+[2023-09-24 09:09:54] [AI] [debug] /mnt/d/technology/software/ai-engine/src/main.cpp(6): This is a debug message
+[2023-09-24 09:09:54] [AI] [info] /mnt/d/technology/software/ai-engine/src/main.cpp(7): This is an info message: , hello, 123, 3.14159
+[2023-09-24 09:09:54] [AI] [error] /mnt/d/technology/software/ai-engine/src/main.cpp(8): This is an error message: , something went wrong
+[2023-09-24 09:11:01] [AI] [debug] /mnt/d/technology/software/ai-engine/src/main.cpp(6): This is a debug message
+[2023-09-24 09:11:01] [AI] [info] /mnt/d/technology/software/ai-engine/src/main.cpp(7): This is an info message: , hello, 123, 3.14159
+[2023-09-24 09:11:01] [AI] [error] /mnt/d/technology/software/ai-engine/src/main.cpp(8): This is an error message: , something went wrong
+[2023-09-24 09:11:20] [AI] [debug] /mnt/d/technology/software/ai-engine/src/main.cpp(6): This is a debug message
+[2023-09-24 09:11:20] [AI] [info] /mnt/d/technology/software/ai-engine/src/main.cpp(7): This is an info message: , hello, 123, 3.14159
+[2023-09-24 09:11:20] [AI] [error] /mnt/d/technology/software/ai-engine/src/main.cpp(8): This is an error message: , something went wrong
+[2023-09-24 09:11:25] [AI] [debug] /mnt/d/technology/software/ai-engine/src/main.cpp(6): This is a debug message
+[2023-09-24 09:11:25] [AI] [info] /mnt/d/technology/software/ai-engine/src/main.cpp(7): This is an info message: , hello, 123, 3.14159
+[2023-09-24 09:11:25] [AI] [error] /mnt/d/technology/software/ai-engine/src/main.cpp(8): This is an error message: , something went wrong
+[2023-09-24 09:11:26] [AI] [debug] /mnt/d/technology/software/ai-engine/src/main.cpp(6): This is a debug message
+[2023-09-24 09:11:26] [AI] [info] /mnt/d/technology/software/ai-engine/src/main.cpp(7): This is an info message: , hello, 123, 3.14159
+[2023-09-24 09:11:26] [AI] [error] /mnt/d/technology/software/ai-engine/src/main.cpp(8): This is an error message: , something went wrong
+[2023-09-24 09:11:28] [AI] [debug] /mnt/d/technology/software/ai-engine/src/main.cpp(6): This is a debug message
+[2023-09-24 09:11:28] [AI] [info] /mnt/d/technology/software/ai-engine/src/main.cpp(7): This is an info message: , hello, 123, 3.14159
+[2023-09-24 09:11:28] [AI] [error] /mnt/d/technology/software/ai-engine/src/main.cpp(8): This is an error message: , something went wrong
+[2023-09-24 09:11:29] [AI] [debug] /mnt/d/technology/software/ai-engine/src/main.cpp(6): This is a debug message
+[2023-09-24 09:11:29] [AI] [info] /mnt/d/technology/software/ai-engine/src/main.cpp(7): This is an info message: , hello, 123, 3.14159
+[2023-09-24 09:11:29] [AI] [error] /mnt/d/technology/software/ai-engine/src/main.cpp(8): This is an error message: , something went wrong
+[2023-09-24 09:11:31] [AI] [debug] /mnt/d/technology/software/ai-engine/src/main.cpp(6): This is a debug message
+[2023-09-24 09:11:31] [AI] [info] /mnt/d/technology/software/ai-engine/src/main.cpp(7): This is an info message: , hello, 123, 3.14159
+[2023-09-24 09:11:31] [AI] [error] /mnt/d/technology/software/ai-engine/src/main.cpp(8): This is an error message: , something went wrong

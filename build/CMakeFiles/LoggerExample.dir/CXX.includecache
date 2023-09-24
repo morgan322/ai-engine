@@ -1,0 +1,26 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/mnt/d/technology/software/ai-engine/src/Logger.h
+iostream
+-
+fstream
+-
+sstream
+-
+cstdio
+-
+string
+-
+mutex
+-
+
+/mnt/d/technology/software/ai-engine/src/main.cpp
+Logger.h
+/mnt/d/technology/software/ai-engine/src/Logger.h
+
