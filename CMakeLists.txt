@@ -1,43 +1,34 @@
 cmake_minimum_required(VERSION 3.5)
+project(AI_H63 VERSION 0.1.0)
+enable_language(CUDA)
 
-project(CmakeTestProject VERSION 0.1.0)
-
-project(AI_H63) 
-set(CMAKE_CXX_STANDARD 11)
-include_directories(
-    ${CMAKE_SOURCE_DIR}/include
-)
-aux_source_directory(./src dir_src) #指定路径，并产生变量${dir_src}
-add_executable(AI_H63 ${dir_src}) #指定代码目录
-
-# # set(CMAKE_CXX_STANDARD 11)
-# # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-# # # 指定编译器
-# # set(CMAKE_CXX_COMPILER "g++")
-
-# # # 指定 C++ 标准
-# # set(CMAKE_CXX_STANDARD 11)
-
-# # # 指定要编译的源文件和头文件
-# # file(GLOB_RECURSE SOURCE_FILES 
-# #     ${CMAKE_SOURCE_DIR}/src/*.c
-# # )
-
-# # )
-
-# # # 指定生成位置
-# # set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build)
-
-# # # 指定生成可执行文件
-# # add_executable(executable_name ${SOURCE_FILES})
+set(CMAKE_CXX_COMPILIER "/usr/bin/g++")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -O3 -Wno-write-strings")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath -Wl,$ORIGIN")
 
 
 
-# set(SOURCES
-#     ${CMAKE_CURRENT_SOURCE_DIR}/src/main.c
-#     ${CMAKE_CURRENT_SOURCE_DIR}/src/Logger.h
-# )
+# cuda
+include_directories(/usr/local/cuda/include)
+link_directories(/usr/local/cuda/lib64)
+find_package(CUDA REQUIRED)
 
-# include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+# opencv
+find_package(OpenCV REQUIRED)
+include_directories(${OpenCV_INCLUDE_DIRS})
 
-# add_executable(main ${SOURCES})
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(GLIB2 REQUIRED glib-2.0)
+include_directories(${GLIB2_INCLUDE_DIRS})
+link_directories(${GLIB2_LIBRARY_DIRS})
+
+
+
+file(GLOB_RECURSE sources src/modules/*.hpp src/modules/*.cpp src/modules/*.h src/modules/*.cu )
+add_library(engine SHARED ${sources})
+target_include_directories(engine PRIVATE include/ src/modules/ ${OpenCV_INCLUDE_DIRS} ${CUDA_TOOLKIT_ROOT_DIR}/include)
+target_link_libraries(engine nvinfer nvinfer_plugin nvparsers "stdc++fs")
+
+add_executable(${PROJECT_NAME} src/main.cpp)
+target_include_directories(${PROJECT_NAME} PRIVATE src/modules/ include/ )
+target_link_libraries(${PROJECT_NAME} engine ${OpenCV_LIBS} ${GLIB2_LIBRARIES})

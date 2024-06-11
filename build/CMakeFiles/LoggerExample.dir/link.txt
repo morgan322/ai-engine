@@ -1,1 +1,0 @@
-/usr/bin/cc  -std=c99   CMakeFiles/LoggerExample.dir/src/main.c.o  -o LoggerExample 

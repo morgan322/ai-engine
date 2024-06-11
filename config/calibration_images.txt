@@ -1,0 +1,2 @@
+/media/ai/AI/technology/install/yolo-tensorrt/configs/dog.jpg
+/media/ai/AI/technology/install/yolo-tensorrt/configs/person.jpg

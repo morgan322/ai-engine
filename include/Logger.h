@@ -4,7 +4,8 @@
 #include <fstream>
 #include <sstream>
 #include <cstdio>
-#include <string>
+#include <string.h>
+#include <memory>
 #include <mutex>
 
 namespace AI {
@@ -29,9 +30,9 @@ public:
         alarm_level_ = level;
     }
 
-    void setOutputFile(const std::string& filename) {
-        output_file_.open(filename, std::ios::app);
-    }
+    // void setOutputFile(const std::string& filename) {
+    //     output_file_.open(filename, std::ios::app);
+    // }
 
     template <typename... Args>
     void debug(const char* file, int line, const char* func, const Args&... args) {
@@ -81,7 +82,7 @@ private:
             writeArg(ss, args...);
             std::string message = ss.str();
 
-            printf("[%s] [user] [%s] [%s:%d:%s] %s\n", time_buffer, levelStr(level).c_str(),
+            printf("[%s] [AI] [%s] [%s:%d:%s] %s\n", time_buffer, levelStr(level).c_str(),
                    file, line, func, message.c_str());
             if (level >= alarm_level_) {
                 printf(">>>> THIS IS AN ERROR! <<<<\n"); // 打印告警提示
