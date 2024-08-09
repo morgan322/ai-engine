@@ -17,6 +17,11 @@
     ],
     //"C_Cpp.intelliSenseEngine": "Tag Parser",
     "cmake.buildDirectory": "${workspaceRoot}/build",
+    "files.associations": {
+        "iostream": "cpp",
+        "ostream": "cpp",
+        "climits": "cpp"
+    },
    
 
 }
