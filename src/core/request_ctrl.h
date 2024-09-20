@@ -34,6 +34,7 @@
 
 #include "cnis/infer_server.h"
 
+
 namespace infer_server {
 
 class RequestControl {
