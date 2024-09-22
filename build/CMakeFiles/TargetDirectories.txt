@@ -1,4 +1,4 @@
-/home/morgan/ubt/program/demo/ai-engine/build/CMakeFiles/edit_cache.dir
-/home/morgan/ubt/program/demo/ai-engine/build/CMakeFiles/AI_H63.dir
-/home/morgan/ubt/program/demo/ai-engine/build/CMakeFiles/rebuild_cache.dir
-/home/morgan/ubt/program/demo/ai-engine/build/CMakeFiles/engine.dir
+/media/ai/AI/technology/computer/ai-engine/build/CMakeFiles/engine.dir
+/media/ai/AI/technology/computer/ai-engine/build/CMakeFiles/AI_H63.dir
+/media/ai/AI/technology/computer/ai-engine/build/CMakeFiles/edit_cache.dir
+/media/ai/AI/technology/computer/ai-engine/build/CMakeFiles/rebuild_cache.dir
