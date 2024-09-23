@@ -2,6 +2,6 @@
 	path = python/alg/cv/yolov5
 	url = https://github.com/ultralytics/yolov5.git
 	branch = v6.0
-[submodule "yolov5"]
-	path = yolov5
-	url = https://github.com/ultralytics/yolov5.git
+[submodule "3rdparty/easydk"]
+	path = 3rdparty/easydk
+	url = https://github.com/Cambricon/easydk.git
