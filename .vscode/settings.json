@@ -1,0 +1,22 @@
+{
+    "clangd.arguments": [
+        "--background-index",
+        "--compile-commands-dir=${workspaceFolder}/build-nvidia",
+        "-j=12",
+        "--clang-tidy",
+        "--all-scopes-completion",
+        "--completion-style=detailed",
+        "--function-arg-placeholders"
+    ],
+    "cmake.configureArgs": [
+        "-G",
+        "Ninja",
+        "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+        "-DCMAKE_CXX_COMPILER_LAUNCHER=ccache",
+        "-DDOWNLOAD_EXTRACT_TIMESTAMP=true"
+    ],
+    //"C_Cpp.intelliSenseEngine": "Tag Parser",
+    "cmake.buildDirectory": "${workspaceRoot}/build-nvidia",
+   
+
+}

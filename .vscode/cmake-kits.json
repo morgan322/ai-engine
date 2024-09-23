@@ -1,0 +1,30 @@
+[
+    {
+        "name": "aarch64-linux-bm1684",
+        "toolchainFile": "${workspaceRoot}/cmake/toolchains/aarch64_linux_bm1684.toolchain"
+    },
+    {
+        "name": "aarch64-linux-mlu220",
+        "toolchainFile": "${workspaceRoot}/cmake/toolchains/aarch64_linux_mlu220.toolchain"
+    },
+    {
+        "name": "aarch64-linux-jetson",
+        "toolchainFile": "${workspaceRoot}/cmake/toolchains/aarch64_linux_jetson.toolchain"
+    },
+    {
+        "name": "x86_64-intel-gnu",
+        "toolchainFile": "${workspaceRoot}/cmake/toolchains/x86_64_intel_gnu.toolchain"
+    },
+    {
+        "name": "x86_64-nvidia-gnu",
+        "toolchainFile": "${workspaceRoot}/cmake/toolchains/x86_64_nvidia_gnu.toolchain"
+    },
+    {
+        "name": "armv7hf-linux-gnu",
+        "toolchainFile": "${workspaceRoot}/cmake/toolchains/armv7_linux_rv1126.toolchain"
+    },
+    {
+        "name": "aarch64-linux-tx5368",
+        "toolchainFile": "${workspaceRoot}/cmake/toolchains/aarch64_linux_tx5368.toolchain"
+    }
+]
