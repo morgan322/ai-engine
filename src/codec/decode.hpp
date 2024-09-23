@@ -14,6 +14,7 @@
 #include "../basic/basic_module.hpp"
 #include "ffmpeg_demuxer.h"
 #include "framerate_contrller.h"
+#include "ai_decode.h"
 
 namespace ai {
 namespace codec {
@@ -38,13 +39,13 @@ public:
 
   int Process(std::shared_ptr<ai::basic::Frame> frame) override;
 
-  static int GetBufSurface_(CnedkBufSurface **surf, int width, int height,
-                            CnedkBufSurfaceColorFormat fmt, int timeout_ms,
+  static int GetBufSurface_(AIBufSurface **surf, int width, int height,
+                            AIBufSurfaceColorFormat fmt, int timeout_ms,
                             void *userdata) {
     Decode *thiz = reinterpret_cast<Decode *>(userdata);
     return thiz->GetBufSurface(surf, width, height, fmt, timeout_ms);
   }
-  static int OnFrame_(CnedkBufSurface *surf, void *userdata) {
+  static int OnFrame_(AIBufSurface *surf, void *userdata) {
     Decode *thiz = reinterpret_cast<Decode *>(userdata);
     return thiz->OnFrame(surf);
   }
@@ -59,9 +60,9 @@ public:
 
 private:
   int CreateSurfacePool(void **surf_pool, int width, int height);
-  int GetBufSurface(CnedkBufSurface **surf, int width, int height,
-                    CnedkBufSurfaceColorFormat fmt, int timeout_ms);
-  int OnFrame(CnedkBufSurface *surf);
+  int GetBufSurface(AIBufSurface **surf, int width, int height,
+                    AIBufSurfaceColorFormat fmt, int timeout_ms);
+  int OnFrame(AIBufSurface *surf);
   int OnEos();
   int OnError(int errcode);
 
@@ -71,7 +72,7 @@ private:
   uint64_t frame_count_ = 0;
 
 private:
-  CnedkVdecCreateParams params_;
+  AIVdecCreateParams params_;
   std::unique_ptr<FFmpegDemuxer> demuxer_;
   std::unique_ptr<FrController> fr_controller_;
   int width_;

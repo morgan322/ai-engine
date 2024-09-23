@@ -18,8 +18,8 @@
  * THE SOFTWARE.
  *************************************************************************/
 
-#ifndef CNEDK_BUF_SURFACE_UTIL_HPP_
-#define CNEDK_BUF_SURFACE_UTIL_HPP_
+#ifndef AI_BUF_SURFACE_UTIL_HPP_
+#define AI_BUF_SURFACE_UTIL_HPP_
 
 
 #include <cstring>  // for memset
@@ -27,11 +27,9 @@
 #include <mutex>
 #include <utility>
 
-#include "cnrt.h"
+#include "buf_surface.h"
 
-#include "cnedk_buf_surface.h"
-
-namespace cnedk {
+namespace ai {
 
 /**
  * @class IBufDeleter
@@ -51,19 +49,19 @@ class IBufDeleter {
 /**
  * @class BufSurfaceWrapper
  *
- * @brief BufSurfaceWrapper is a class, which provides a wrapper around CnedkBufSurface.
+ * @brief BufSurfaceWrapper is a class, which provides a wrapper around AIBufSurface.
  */
 class BufSurfaceWrapper {
  public:
  /**
    * @brief A constructor to construct a BufSurfaceWrapper object.
    *
-   * @param[in] surf The pointer of a CnedkBufSurface object.
-   * @param[in] owner Whether to transfer ownership of CnedkBufSurface to wrapper.
+   * @param[in] surf The pointer of a AIBufSurface object.
+   * @param[in] owner Whether to transfer ownership of AIBufSurface to wrapper.
    *
    * @return No return value.
    */
-  explicit BufSurfaceWrapper(CnedkBufSurface *surf, bool owner = true) : surf_(surf), owner_(owner) {}
+  explicit BufSurfaceWrapper(AIBufSurface *surf, bool owner = true) : surf_(surf), owner_(owner) {}
   /**
    * @brief A destructor to destruct a BufSurfaceWrapper object.
    *
@@ -75,44 +73,44 @@ class BufSurfaceWrapper {
       delete deleter_, deleter_ = nullptr;
       return;
     }
-    if (owner_ && surf_) CnedkBufSurfaceDestroy(surf_), surf_ = nullptr;
+    if (owner_ && surf_) AIBufSurfaceDestroy(surf_), surf_ = nullptr;
   }
   /**
-   * @brief Gets the pointer of the CnedkBufSurface object.
+   * @brief Gets the pointer of the AIBufSurface object.
    *
-   * @return Returns the pointer of the CnedkBufSurface object.
+   * @return Returns the pointer of the AIBufSurface object.
    */
-  CnedkBufSurface *GetBufSurface() const;
+  AIBufSurface *GetBufSurface() const;
   /**
-   * @brief The wrapper no longer holds a pointer to the CnedkBufSurface object and returns it.
+   * @brief The wrapper no longer holds a pointer to the AIBufSurface object and returns it.
    *
-   * @return Returns the pointer of the CnedkBufSurface object.
+   * @return Returns the pointer of the AIBufSurface object.
    */
-  CnedkBufSurface *BufSurfaceChown();
+  AIBufSurface *BufSurfaceChown();
   /**
-   * @brief Gets parameters of one buffer of the batched buffers in CnedkBufSurface.
+   * @brief Gets parameters of one buffer of the batched buffers in AIBufSurface.
    *
    * @param[in] batch_idx The batch index, indicates where the buffer is located in the batch.
    *
-   * @return Returns the pointer of the CnedkBufSurfaceParams object.
+   * @return Returns the pointer of the AIBufSurfaceParams object.
    */
-  CnedkBufSurfaceParams *GetSurfaceParams(uint32_t batch_idx = 0) const;
+  AIBufSurfaceParams *GetSurfaceParams(uint32_t batch_idx = 0) const;
   /**
-   * @brief Gets the number of filled buffers in CnedkBufSurface.
+   * @brief Gets the number of filled buffers in AIBufSurface.
    *
    * @return Returns the number of filled buffers.
    */
   uint32_t GetNumFilled() const;
   /**
-   * @brief Gets the color format of the batched buffers in CnedkBufSurface.
+   * @brief Gets the color format of the batched buffers in AIBufSurface.
    *
    * @return Returns the color format.
    *
    * @note the batched buffers share the same color_format, width, height and stride.
    */
-  CnedkBufSurfaceColorFormat GetColorFormat() const;
+  AIBufSurfaceColorFormat GetColorFormat() const;
   /**
-   * @brief Gets the width of the batched buffers in CnedkBufSurface.
+   * @brief Gets the width of the batched buffers in AIBufSurface.
    *
    * @return Returns the width.
    *
@@ -120,7 +118,7 @@ class BufSurfaceWrapper {
    */
   uint32_t GetWidth() const;
   /**
-   * @brief Gets the height of the batched buffers in CnedkBufSurface.
+   * @brief Gets the height of the batched buffers in AIBufSurface.
    *
    * @return Returns the height.
    *
@@ -128,7 +126,7 @@ class BufSurfaceWrapper {
    */
   uint32_t GetHeight() const;
   /**
-   * @brief Gets the stride of the batched buffers in CnedkBufSurface.
+   * @brief Gets the stride of the batched buffers in AIBufSurface.
    *
    * @return Returns the stride.
    *
@@ -136,7 +134,7 @@ class BufSurfaceWrapper {
    */
   uint32_t GetStride(uint32_t i) const;
   /**
-   * @brief Gets the plane number of the batched buffers in CnedkBufSurface.
+   * @brief Gets the plane number of the batched buffers in AIBufSurface.
    *
    * @return Returns the plane number.
    *
@@ -144,7 +142,7 @@ class BufSurfaceWrapper {
    */
   uint32_t GetPlaneNum() const;
   /**
-   * @brief Gets the plane bytes of the batched buffers in CnedkBufSurface.
+   * @brief Gets the plane bytes of the batched buffers in AIBufSurface.
    *
    * @return Returns the plane bytes.
    *
@@ -162,9 +160,9 @@ class BufSurfaceWrapper {
    *
    * @return Returns the memory type.
    */
-  CnedkBufSurfaceMemType GetMemType() const;
+  AIBufSurfaceMemType GetMemType() const;
   /**
-   * @brief Gets the plane data of one buffer of the batched buffers in CnedkBufSurface.
+   * @brief Gets the plane data of one buffer of the batched buffers in AIBufSurface.
    *
    * @param[in] plane_idx The plane index, indicates the data of which plane will be returned.
    * @param[in] batch_idx The batch index, indicates where the buffer is located in the batch. Defaults 0.
@@ -173,7 +171,7 @@ class BufSurfaceWrapper {
    */
   void *GetData(uint32_t plane_idx, uint32_t batch_idx = 0);
   /**
-   * @brief Gets the mapped data of one buffer of the batched buffers in CnedkBufSurface.
+   * @brief Gets the mapped data of one buffer of the batched buffers in AIBufSurface.
    *
    * @param[in] plane_idx The plane index, indicates the mapped data of which plane will be returned.
    * @param[in] batch_idx The batch index, indicates where the buffer is located in the batch. Defaults 0.
@@ -182,25 +180,25 @@ class BufSurfaceWrapper {
    */
   void *GetMappedData(uint32_t plane_idx, uint32_t batch_idx = 0);
   /**
-   * @brief Gets the presentation timestamp of the CnedkBufSurface object.
+   * @brief Gets the presentation timestamp of the AIBufSurface object.
    *
    * @return Returns the presentation timestamp.
    *
-   * @note The presentation timestamp is valid when the batch size of the is CnedkBufSurface object 1.
+   * @note The presentation timestamp is valid when the batch size of the is AIBufSurface object 1.
    */
   uint64_t GetPts() const;
   /**
-   * @brief Sets the presentation timestamp of the CnedkBufSurface object.
+   * @brief Sets the presentation timestamp of the AIBufSurface object.
    *
    * @param[in] pts The presentation timestamp.
    *
    * @return No return value.
    *
-   * @note The presentation timestamp is valid when the batch size of the is CnedkBufSurface object 1.
+   * @note The presentation timestamp is valid when the batch size of the is AIBufSurface object 1.
    */
   void SetPts(uint64_t pts);
   /**
-   * @brief Gets the host data of one buffer of the batched buffers in CnedkBufSurface.
+   * @brief Gets the host data of one buffer of the batched buffers in AIBufSurface.
    *        The host data is stored in wrapper.
    *
    * @param[in] plane_idx The plane index, indicates the host data of which plane will be returned.
@@ -208,7 +206,7 @@ class BufSurfaceWrapper {
    *
    * @return Returns the pointer of the host data.
    *
-   * @note For memory with type CNEDK_BUF_MEM_DEVICE, set cpu memory as faked mappedData for convenience.
+   * @note For memory with type AI_BUF_MEM_DEVICE, set cpu memory as faked mappedData for convenience.
    */
   void *GetHostData(uint32_t plane_idx, uint32_t batch_idx = 0);
   /**
@@ -237,32 +235,32 @@ class BufSurfaceWrapper {
    *
    * @note This function is used by infer server only, for mutable-output case, memory will be allocated by magicmind.
    */
-  BufSurfaceWrapper(void *data, size_t len, CnedkBufSurfaceMemType mem_type, int device_id, IBufDeleter *deleter) {
+  BufSurfaceWrapper(void *data, size_t len, AIBufSurfaceMemType mem_type, int device_id, IBufDeleter *deleter) {
     surf_ = &surface_;
     deleter_ = deleter;
-    memset(surf_, 0, sizeof(CnedkBufSurface));
-    memset(&surface_list_, 0, sizeof(CnedkBufSurfaceParams));
+    memset(surf_, 0, sizeof(AIBufSurface));
+    memset(&surface_list_, 0, sizeof(AIBufSurfaceParams));
     surf_->surface_list = &surface_list_;
     surf_->mem_type = mem_type;
     surf_->batch_size = 1;
     surf_->device_id = device_id;
-    surf_->surface_list[0].color_format = CNEDK_BUF_COLOR_FORMAT_TENSOR;
+    surf_->surface_list[0].color_format = AI_BUF_COLOR_FORMAT_TENSOR;
     surf_->surface_list[0].data_ptr = data;
     surf_->surface_list[0].data_size = len;
   }
 
  private:
-  CnedkBufSurfaceParams *GetSurfaceParamsPriv(uint32_t batch_idx = 0) const { return &surf_->surface_list[batch_idx]; }
+  AIBufSurfaceParams *GetSurfaceParamsPriv(uint32_t batch_idx = 0) const { return &surf_->surface_list[batch_idx]; }
 
  private:
   mutable std::mutex mutex_;
-  CnedkBufSurface *surf_ = nullptr;
+  AIBufSurface *surf_ = nullptr;
   bool owner_ = true;
   std::unique_ptr<unsigned char[]> host_data_[128]{{nullptr}};
 
   IBufDeleter *deleter_ = nullptr;
-  CnedkBufSurface surface_;
-  CnedkBufSurfaceParams surface_list_;  // for mutable output case
+  AIBufSurface surface_;
+  AIBufSurfaceParams surface_list_;  // for mutable output case
   uint64_t pts_ = ~(static_cast<uint64_t>(0));  // Only valid when surf_ is nullptr
 };
 
@@ -290,12 +288,12 @@ class BufPool {
   /**
    * @brief Creates pool.
    *
-   * @param[in] params The parameters for creating CnedkBufSurface.
+   * @param[in] params The parameters for creating AIBufSurface.
    * @param[in] block_count The capacity of the pool.
    *
    * @return Returns 0 if this function has run successfully. Otherwise returns -1.
    */
-  int CreatePool(CnedkBufSurfaceCreateParams *params, uint32_t block_count);
+  int CreatePool(AIBufSurfaceCreateParams *params, uint32_t block_count);
   /**
    * @brief Destroys pool.
    *
@@ -323,6 +321,6 @@ class BufPool {
   bool stopped_ = false;
 };
 
-}  // namespace cnedk
+}  // namespace AI
 
-#endif  // CNEDK_BUF_SURFACE_UTIL_HPP_
+#endif  // AI_BUF_SURFACE_UTIL_HPP_
