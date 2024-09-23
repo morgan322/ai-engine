@@ -11,13 +11,13 @@
 
 #include "glog/logging.h"
 
-#include "basic_module.hpp"
+#include "../basic/basic_module.hpp"
 #include "ffmpeg_demuxer.h"
-
+#include "framerate_contrller.h"
 
 namespace ai {
 namespace codec {
-class Decode : public ai::fw::BasicModule {
+class Decode : public ai::basic::BasicModule {
 public:
   Decode(std::string name, int parallelism, int device_id,
                std::string filename, int stream_id, int frame_rate = 30)
@@ -36,7 +36,7 @@ public:
 
   int Close() override;
 
-  int Process(std::shared_ptr<EdkFrame> frame) override;
+  int Process(std::shared_ptr<ai::basic::Frame> frame) override;
 
   static int GetBufSurface_(CnedkBufSurface **surf, int width, int height,
                             CnedkBufSurfaceColorFormat fmt, int timeout_ms,
