@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 project(AI_H63 VERSION 0.1.0)
+set(CMAKE_CUDA_COMPILER "/usr/local/cuda/bin/nvcc")
 enable_language(CUDA)
 
 set(CMAKE_CXX_COMPILIER "/usr/bin/g++")
@@ -24,11 +25,11 @@ link_directories(${GLIB2_LIBRARY_DIRS})
 
 
 
-file(GLOB_RECURSE sources src/modules/*.hpp src/modules/*.cpp src/modules/*.h src/modules/*.cu )
+file(GLOB_RECURSE sources src/model/*.hpp src/model/*.cpp src/model/*.h src/model/*.cu )
 add_library(engine SHARED ${sources})
-target_include_directories(engine PRIVATE include/ src/modules/ ${OpenCV_INCLUDE_DIRS} ${CUDA_TOOLKIT_ROOT_DIR}/include)
+target_include_directories(engine PRIVATE include/ src/model/ ${OpenCV_INCLUDE_DIRS} ${CUDA_TOOLKIT_ROOT_DIR}/include)
 target_link_libraries(engine nvinfer nvinfer_plugin nvparsers "stdc++fs")
 
 add_executable(${PROJECT_NAME} src/main.cpp)
-target_include_directories(${PROJECT_NAME} PRIVATE src/modules/ include/ )
+target_include_directories(${PROJECT_NAME} PRIVATE src/model/ include/ )
 target_link_libraries(${PROJECT_NAME} engine ${OpenCV_LIBS} ${GLIB2_LIBRARIES})
