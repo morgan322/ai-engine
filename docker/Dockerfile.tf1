@@ -1,0 +1,28 @@
+# Dockerfile.tf1
+# docker build -t tf-ssd-image -f Dockerfile.tf1 .
+# docker run --runtime nvidia --rm -it -v ~/tensorflow_train/:/tensorflow_train --shm-size=1g --ulimit memlock=-1 --ulimit stack=67108864 tf-ssd-image
+# protoc object_detection/protos/*.proto --python_out=.
+# python object_detection/builders/model_builder_tf1_test.py
+# python object_detection/model_main.py --logtostderr --train_dir=training/ --pipeline_config_path=object_detection/samples/configs/ssdlite_mobilenet_v2_station.config
+
+# 使用 NVIDIA 的 TensorFlow 1 容器作为基础镜像
+FROM nvcr.io/nvidia/tensorflow:20.10-tf1-py3
+
+# 设置工作目录
+WORKDIR /tensorflow_train/models/research/
+
+# 设置 Ubuntu 软件源为清华大学镜像源
+RUN sed -i 's/archive.ubuntu.com/mirrors.tuna.tsinghua.edu.cn/g' /etc/apt/sources.list
+
+# 安装 protobuf 编译器，并编译 TensorFlow Object Detection API 的 proto 文件
+RUN	apt-get update && \
+    apt-get install -y protobuf-compiler
+
+# 设置 PYTHONPATH 环境变量
+ENV PYTHONPATH=$PYTHONPATH:/tensorflow_train/models/research:/tensorflow_train/models/research/slim
+
+# 使用清华大学的 PyPI 镜像加速 pip 安装
+RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+
+# 安装 TensorFlow Object Detection API、tf_slim 、lvis和 Keras 2.2.5
+RUN pip3 install tensorflow-object-detection-api tf_slim wheel lvis keras==2.2.5 numpy==1.17.0
