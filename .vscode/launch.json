@@ -6,13 +6,13 @@
     "configurations": [
         
         {
-        "name": "nvidia",
+        "name": "test",
         "type": "cppdbg",
         "request": "launch",
         "program": "${command:cmake.launchTargetPath}",
         "args": [],
         "stopAtEntry": false,
-        "cwd": "${workspaceRoot}/build-nvidia/programs",
+        "cwd": "${workspaceRoot}/build",
         
         "environment": [
             {

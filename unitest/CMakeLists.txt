@@ -7,7 +7,7 @@ if(POLICY CMP0054)
 endif()
 
 # ---[ 3rdparty
-set(3RDPARTY_LIBS "")
+set(3RDPARTY_LIBS "../")
 
 # ---[ opencv
 set(OpenCV_FIND_QUIETLY true)
@@ -38,43 +38,44 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/FindGlog.cmake)
 include_directories(${GLOG_INCLUDE_DIRS})
 list(APPEND 3RDPARTY_LIBS ${GLOG_LIBRARIES})
 
-if (PLATFORM MATCHES "MLU370" OR PLATFORM MATCHES "MLU590")
-  find_package(MLU)
-  include_directories(${NEUWARE_INCLUDE_DIR})
-elseif (PLATFORM MATCHES "CE3226")
-  find_package(MPS)
-  include_directories(${MPS_INCLUDE_DIR})
-else()
-  message(FATAL_ERROR "Unsupported PLATFORM: ${PLATFORM}")
-endif()
+# if (PLATFORM MATCHES "MLU370" OR PLATFORM MATCHES "MLU590")
+#   find_package(MLU)
+#   include_directories(${NEUWARE_INCLUDE_DIR})
+# elseif (PLATFORM MATCHES "CE3226")
+#   find_package(MPS)
+#   include_directories(${MPS_INCLUDE_DIR})
+# else()
+#   message(FATAL_ERROR "Unsupported PLATFORM: ${PLATFORM}")
+# endif()
 
-set(EASYDK_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/..)
+set(AI_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/..)
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin/)
 
 # list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../samples/cmake)
 # ---[ FFmpeg
 find_package(FFmpeg REQUIRED)
 if (FFMPEG_FOUND)
-  include_directories(${FFMPEG_INCLUDE_DIR})
+  include_directories(${FFMPEG_INCLUDE_DIRS})
   list(APPEND 3RDPARTY_LIBS ${FFMPEG_LIBRARIES})
   set(HAVE_FFMPEG true)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DHAVE_FFMPEG")
+  add_compile_definitions(HAVE_FFMPEG)  # 使用 add_compile_definitions 替代 set(CMAKE_CXX_FLAGS ...)
   if (WITH_FFMPEG_AVDEVICE)
-     add_definitions(-DHAVE_FFMPEG_AVDEVICE)
+      add_compile_definitions(HAVE_FFMPEG_AVDEVICE)  # 使用 add_compile_definitions
   endif ()
 else ()
-  message(FATAL_ERROR "ffmpeg not found!")
+  message(FATAL_ERROR "FFmpeg not found!")
 endif ()
 
-file(GLOB test_srcs ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
+
+file(GLOB test_srcs ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
                     ${CMAKE_CURRENT_SOURCE_DIR}/src/infer_server/*.cpp
                     ${CMAKE_CURRENT_SOURCE_DIR}/util/*.cpp)
 
-message(STATUS "@@@@@@@@@@@ Target : test_edk")
-add_executable(tests_edk ${test_srcs})
-add_sanitizers(tests_edk)
+message(STATUS "@@@@@@@@@@@ Target : tests_ai")
+add_executable(tests_ai ${test_srcs})
+add_sanitizers(tests_ai)
 
-target_include_directories(tests_edk PRIVATE
+target_include_directories(tests_ai PRIVATE
                            ${OpenCV_INCLUDE_DIRS}
                            ${EASYDK_ROOT_DIR}/include
                            ${EASYDK_ROOT_DIR}/include/infer_server
@@ -82,8 +83,8 @@ target_include_directories(tests_edk PRIVATE
                            ${CMAKE_CURRENT_SOURCE_DIR}/util
                            ${EASYDK_ROOT_DIR}/src/common)
 
-target_link_libraries(tests_edk PRIVATE gtest gtest_main easydk ${CNRT_LIBS} ${3RDPARTY_LIBS} ${MAGICMIND_RUNTIME_LIBS} pthread dl)
-target_compile_options(tests_edk PRIVATE "-Wno-deprecated-declarations")
-target_compile_definitions(tests_edk PRIVATE ${EDK_DEFINITIONS})
+target_link_libraries(tests_ai PRIVATE gtest gtest_main easydk ${CNRT_LIBS} ${3RDPARTY_LIBS} ${MAGICMIND_RUNTIME_LIBS} pthread dl)
+target_compile_options(tests_ai PRIVATE "-Wno-deprecated-declarations")
+target_compile_definitions(tests_ai PRIVATE ${EDK_DEFINITIONS})
 
-install(TARGETS tests_edk RUNTIME DESTINATION bin)
+install(TARGETS tests_ai RUNTIME DESTINATION bin)

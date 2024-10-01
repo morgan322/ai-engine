@@ -12,9 +12,9 @@ int main(int argc, char *argv[]) {
   config_v5.net_type = YOLOV5;
   config_v5.detect_thresh = 0.5;
   config_v5.file_model_cfg = "/media/ai/AI/technology/computer/ai-engine/"
-                             "config/yolov5-6.0/yolov5s.cfg";
+                             "weights/yolov5-6.0/yolov5s.cfg";
   config_v5.file_model_weights = "/media/ai/AI/technology/computer/ai-engine/"
-                                 "config/yolov5-6.0/yolov5s.weights";
+                                 "weights/yolov5-6.0/yolov5s.weights";
   config_v5.calibration_image_list_file_txt =
       "/media/ai/AI/technology/computer/ai-engine/config/"
       "calibration_images.txt";
