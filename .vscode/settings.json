@@ -1,7 +1,7 @@
 {
     "clangd.arguments": [
         "--background-index",
-        "--compile-commands-dir=${workspaceFolder}/build-nvidia",
+        "--compile-commands-dir=${workspaceFolder}/build",
         "-j=12",
         "--clang-tidy",
         "--all-scopes-completion",
@@ -16,7 +16,7 @@
         "-DDOWNLOAD_EXTRACT_TIMESTAMP=true"
     ],
     //"C_Cpp.intelliSenseEngine": "Tag Parser",
-    "cmake.buildDirectory": "${workspaceRoot}/build-nvidia",
+    "cmake.buildDirectory": "${workspaceRoot}/build",
    
 
 }

@@ -33,3 +33,8 @@ target_link_libraries(engine nvinfer nvinfer_plugin nvparsers "stdc++fs")
 add_executable(${PROJECT_NAME} src/main.cpp)
 target_include_directories(${PROJECT_NAME} PRIVATE src/model/ include/ )
 target_link_libraries(${PROJECT_NAME} engine ${OpenCV_LIBS} ${GLIB2_LIBRARIES})
+
+
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin/)
+add_subdirectory(3rdparty/googletest)
+add_subdirectory(unitest)
