@@ -1,0 +1,1 @@
+FROM nvcr.io/nvidia/cuda:11.4.0-cudnn8-devel-ubuntu20.04
