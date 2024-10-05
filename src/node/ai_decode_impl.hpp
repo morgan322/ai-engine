@@ -1,6 +1,6 @@
 
-#ifndef CNEDK_DECODE_IMPL_HPP_
-#define CNEDK_DECODE_IMPL_HPP_
+#ifndef AI_DECODE_IMPL_HPP_
+#define AI_DECODE_IMPL_HPP_
 
 #include "../codec/ai_decode.h"
 

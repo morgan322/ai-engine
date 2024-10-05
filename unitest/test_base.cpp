@@ -43,116 +43,22 @@ std::string GetExePath() {
   return std::string(path).substr(0, result.find_last_of('/') + 1);
 }
 
-int InitPlatform(bool enable_vin, bool enable_vout) {
-  CnedkSensorParams sensor_params[4];
-  memset(sensor_params, 0, sizeof(CnedkSensorParams) * 4);
-
-  CnedkPlatformConfig config;
-  memset(&config, 0, sizeof(config));
-
-  config.codec_id_start = 0;
-
-  CnedkVoutParams vout_params;
-  memset(&vout_params, 0, sizeof(CnedkVoutParams));
-
-  if (enable_vout) {
-    config.vout_params = &vout_params;
-    vout_params.max_input_width = 1920;
-    vout_params.max_input_height = 1080;
-    vout_params.input_format = 0;  // not used at the moment
-  }
-
-  if (enable_vin) {
-    config.sensor_num = 1;
-    config.sensor_params = sensor_params;
-    sensor_params[0].sensor_type = 6;
-    sensor_params[0].mipi_dev = 1;
-    sensor_params[0].bus_id = 0;
-    sensor_params[0].sns_clk_id = 1;
-    sensor_params[0].out_width = 1920;
-    sensor_params[0].out_height = 1080;
-    sensor_params[0].output_format = 0;  // not used at the moment
-  }
-  CnedkPlatformInit(&config);
-  return 0;
-}
-
-static int g_device_id = 0;
-
-static std::string MMVersionForCe3226() {
-  return "v0.13.0";
-}
-static std::string MMVersionForMlu370() {
-  return "v0.13.0";
-}
-static std::string MMVersionForMlu590() {
-  return "v0.14.0";
-}
-
-const std::unordered_map<std::string, std::pair<std::string, std::string>> g_model_info = {
-    {"resnet50_CE3226",
-        {"resnet50_" + MMVersionForCe3226() + "_4b_rgb_uint8.magicmind",
-         "http://video.cambricon.com/models/magicmind/" + MMVersionForCe3226() +
-         "/resnet50_" + MMVersionForCe3226() + "_4b_rgb_uint8.magicmind"}
-    },
-    {"resnet50_MLU370",
-        {"resnet50_" + MMVersionForMlu370() + "_4b_rgb_uint8.magicmind",
-         "http://video.cambricon.com/models/magicmind/" + MMVersionForMlu370() +
-         "/resnet50_" + MMVersionForMlu370() + "_4b_rgb_uint8.magicmind"}
-    },
-    {"resnet50_MLU590",
-        {"resnet50_" + MMVersionForMlu590() + "_4b_rgb_uint8.magicmind",
-         "http://video.cambricon.com/models/magicmind/" + MMVersionForMlu590() +
-         "/resnet50_" + MMVersionForMlu590() + "_4b_rgb_uint8.magicmind"}
-    },
-    {"feature_extract_CE3226",
-        {"feature_extract_" + MMVersionForCe3226() + "_4b_rgb_uint8.magicmind",
-         "http://video.cambricon.com/models/magicmind/" + MMVersionForCe3226() +
-         "/feature_extract_" + MMVersionForCe3226() + "_4b_rgb_uint8.magicmind"}
-    },
-    {"feature_extract_MLU370",
-        {"feature_extract_" + MMVersionForMlu370() + "_4b_rgb_uint8.magicmind",
-         "http://video.cambricon.com/models/magicmind/" + MMVersionForMlu370() +
-         "/feature_extract_" + MMVersionForMlu370() + "_4b_rgb_uint8.magicmind"}
-    },
-    {"feature_extract_MLU590",
-        {"feature_extract_" + MMVersionForMlu590() + "_4b_rgb_uint8.magicmind",
-         "http://video.cambricon.com/models/magicmind/" + MMVersionForMlu590() +
-         "/feature_extract_" + MMVersionForMlu590() + "_4b_rgb_uint8.magicmind"}
-    },
-    {"yolov3_CE3226",
-        {"yolov3_" + MMVersionForCe3226() + "_4b_rgb_uint8.magicmind",
-         "http://video.cambricon.com/models/magicmind/" + MMVersionForCe3226() +
-         "/yolov3_" + MMVersionForCe3226() + "_4b_rgb_uint8.magicmind"}
-    },
-    {"yolov3_MLU370",
-        {"yolov3_" + MMVersionForMlu370() + "_4b_rgb_uint8.magicmind",
-         "http://video.cambricon.com/models/magicmind/" + MMVersionForMlu370() +
-         "/yolov3_" + MMVersionForMlu370() + "_4b_rgb_uint8.magicmind"}
-    },
-    {"yolov3_MLU590",
-        {"yolov3_" + MMVersionForMlu590() + "_4b_rgb_uint8.magicmind",
-         "http://video.cambricon.com/models/magicmind/" + MMVersionForMlu590() +
-         "/yolov3_" + MMVersionForMlu590() + "_4b_rgb_uint8.magicmind"}
-    }
-};
-
-std::string GetModelInfoStr(std::string model_name, std::string info_type) {
-  CnedkPlatformInfo platform_info;
-  CnedkPlatformGetInfo(g_device_id, &platform_info);
-  std::string platform_name(platform_info.name);
-  std::string model_key;
-  if (platform_name.rfind("MLU5", 0) == 0) {
-    model_key = model_name + "_MLU590";
-  } else {
-    model_key = model_name + "_" + platform_name;
-  }
-  if (g_model_info.find(model_key) != g_model_info.end()) {
-    if (info_type == "name") {
-      return g_model_info.at(model_key).first;
-    } else {
-      return g_model_info.at(model_key).second;
-    }
-  }
-  return "";
-}
+// std::string GetModelInfoStr(std::string model_name, std::string info_type) {
+//   CnedkPlatformInfo platform_info;
+//   CnedkPlatformGetInfo(g_device_id, &platform_info);
+//   std::string platform_name(platform_info.name);
+//   std::string model_key;
+//   if (platform_name.rfind("MLU5", 0) == 0) {
+//     model_key = model_name + "_MLU590";
+//   } else {
+//     model_key = model_name + "_" + platform_name;
+//   }
+//   if (g_model_info.find(model_key) != g_model_info.end()) {
+//     if (info_type == "name") {
+//       return g_model_info.at(model_key).first;
+//     } else {
+//       return g_model_info.at(model_key).second;
+//     }
+//   }
+//   return "";
+// }

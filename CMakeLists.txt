@@ -23,8 +23,7 @@ pkg_check_modules(GLIB2 REQUIRED glib-2.0)
 include_directories(${GLIB2_INCLUDE_DIRS})
 link_directories(${GLIB2_LIBRARY_DIRS})
 
-
-
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin/)
 file(GLOB_RECURSE sources src/model/*.hpp src/model/*.cpp src/model/*.h src/model/*.cu )
 add_library(engine SHARED ${sources})
 target_include_directories(engine PRIVATE include/ src/model/ ${OpenCV_INCLUDE_DIRS} ${CUDA_TOOLKIT_ROOT_DIR}/include)
@@ -36,6 +35,6 @@ target_link_libraries(${PROJECT_NAME} engine ${OpenCV_LIBS} ${GLIB2_LIBRARIES})
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_CURRENT_SOURCE_DIR}/cmake/sanitizers)
 find_package(Sanitizers)
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin/)
+
 add_subdirectory(3rdparty/googletest)
 add_subdirectory(unitest)

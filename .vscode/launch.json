@@ -12,7 +12,7 @@
         "program": "${command:cmake.launchTargetPath}",
         "args": [],
         "stopAtEntry": false,
-        "cwd": "${workspaceRoot}/build",
+        "cwd": "${workspaceRoot}/build/bin",
         
         "environment": [
             {

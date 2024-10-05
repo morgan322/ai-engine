@@ -7,7 +7,7 @@ if(POLICY CMP0054)
 endif()
 
 # ---[ 3rdparty
-set(3RDPARTY_LIBS "../")
+# set(3RDPARTY_LIBS "../")
 
 # ---[ opencv
 set(OpenCV_FIND_QUIETLY true)
@@ -38,16 +38,6 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/FindGlog.cmake)
 include_directories(${GLOG_INCLUDE_DIRS})
 list(APPEND 3RDPARTY_LIBS ${GLOG_LIBRARIES})
 
-# if (PLATFORM MATCHES "MLU370" OR PLATFORM MATCHES "MLU590")
-#   find_package(MLU)
-#   include_directories(${NEUWARE_INCLUDE_DIR})
-# elseif (PLATFORM MATCHES "CE3226")
-#   find_package(MPS)
-#   include_directories(${MPS_INCLUDE_DIR})
-# else()
-#   message(FATAL_ERROR "Unsupported PLATFORM: ${PLATFORM}")
-# endif()
-
 set(AI_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/..)
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin/)
 
@@ -66,10 +56,10 @@ else ()
   message(FATAL_ERROR "FFmpeg not found!")
 endif ()
 
+find_package(JPEG REQUIRED)
 
-file(GLOB test_srcs ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
-                    ${CMAKE_CURRENT_SOURCE_DIR}/src/infer_server/*.cpp
-                    ${CMAKE_CURRENT_SOURCE_DIR}/util/*.cpp)
+
+file(GLOB test_srcs ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 
 message(STATUS "@@@@@@@@@@@ Target : tests_ai")
 add_executable(tests_ai ${test_srcs})
@@ -77,13 +67,11 @@ add_sanitizers(tests_ai)
 
 target_include_directories(tests_ai PRIVATE
                            ${OpenCV_INCLUDE_DIRS}
-                           ${EASYDK_ROOT_DIR}/include
-                           ${EASYDK_ROOT_DIR}/include/infer_server
-                           ${EASYDK_ROOT_DIR}/src/infer_server
-                           ${CMAKE_CURRENT_SOURCE_DIR}/util
-                           ${EASYDK_ROOT_DIR}/src/common)
+                           ${CMAKE_CURRENT_SOURCE_DIR}/include
+                           ${CMAKE_CURRENT_SOURCE_DIR}/src/codec
+                           ${EASYDK_ROOT_DIR}/src/platform)
 
-target_link_libraries(tests_ai PRIVATE gtest gtest_main easydk ${CNRT_LIBS} ${3RDPARTY_LIBS} ${MAGICMIND_RUNTIME_LIBS} pthread dl)
+target_link_libraries(tests_ai PRIVATE gtest gtest_main ${3RDPARTY_LIBS} ${JPEG_LIBRARIES} pthread)
 target_compile_options(tests_ai PRIVATE "-Wno-deprecated-declarations")
 target_compile_definitions(tests_ai PRIVATE ${EDK_DEFINITIONS})
 
