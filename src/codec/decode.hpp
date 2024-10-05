@@ -12,16 +12,16 @@
 #include "glog/logging.h"
 
 #include "../basic/basic_module.hpp"
+#include "ai_decode.h"
 #include "ffmpeg_demuxer.h"
 #include "framerate_contrller.h"
-#include "ai_decode.h"
 
 namespace ai {
 namespace codec {
 class Decode : public ai::basic::BasicModule {
 public:
-  Decode(std::string name, int parallelism, int device_id,
-               std::string filename, int stream_id, int frame_rate = 30)
+  Decode(std::string name, int parallelism, int device_id, std::string filename,
+         int stream_id, int frame_rate = 30)
       : BasicModule(name, parallelism) {
     filename_ = filename;
     stream_id_ = stream_id;
@@ -87,3 +87,4 @@ private:
 };
 } // namespace codec
 } // namespace ai
+#endif

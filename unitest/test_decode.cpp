@@ -373,9 +373,9 @@ int TestDecode(std::string file, AIVdecType type, uint32_t frame_w,
   return ret;
 }
 
-// TEST(Decode, Jpeg) {
-//   EXPECT_EQ(TestDecode(jpeg_file, AI_VDEC_TYPE_JPEG, 1920, 1080), 0);
-// }
+TEST(Decode, Jpeg) {
+  EXPECT_EQ(TestDecode(jpeg_file, AI_VDEC_TYPE_JPEG, 1920, 1080), 0);
+}
 
 TEST(Decode, H264) {
   EXPECT_EQ(TestDecode(h264_file, AI_VDEC_TYPE_H264, 1920, 1080), 0);

@@ -1,13 +1,20 @@
 cmake_minimum_required(VERSION 3.5)
-project(AI_H63 VERSION 0.1.0)
-set(CMAKE_CUDA_COMPILER "/usr/local/cuda/bin/nvcc")
-enable_language(CUDA)
+project(adk C CXX)
+
+set(ADK_VERSION_MAJOR 0)
+set(ADK_VERSION_MINOR 1)
+set(ADK_VERSION_PATCH 0)
+set(ADK_VERSION "${ADK_VERSION_MAJOR}.${ADK_VERSION_MINOR}.${ADK_VERSION_PATCH}")
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/adk_config.h.in ${CMAKE_CURRENT_SOURCE_DIR}/include/adk_config.h)
+install(FILES ADK_config.h DESTINATION include)
+
+
 
 set(CMAKE_CXX_COMPILIER "/usr/bin/g++")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -O3 -Wno-write-strings")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath -Wl,$ORIGIN")
-
-
+set(CMAKE_CUDA_COMPILER "/usr/local/cuda/bin/nvcc")
+enable_language(CUDA)
 
 # cuda
 include_directories(/usr/local/cuda/include)
@@ -38,3 +45,6 @@ find_package(Sanitizers)
 
 add_subdirectory(3rdparty/googletest)
 add_subdirectory(unitest)
+
+add_subdirectory(3rdparty/libyuv)
+add_subdirectory(examples)
