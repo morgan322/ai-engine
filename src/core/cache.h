@@ -29,7 +29,7 @@
 #include <mutex>
 #include <utility>
 
-#include "cnis/infer_server.h"
+#include "inference/infer_server.h"
 #include "priority.h"
 #include "request_ctrl.h"
 #include "util/batcher.h"

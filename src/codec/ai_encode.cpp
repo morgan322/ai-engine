@@ -5,10 +5,10 @@
 #include <mutex>   // for call_once
 
 #include "glog/logging.h"
-#include "cnrt.h"
+// #include "cnrt.h"
 
-#include "cnedk_encode_impl.hpp"
-#include "cnedk_platform.h"
+#include "node/ai_encode_impl.hpp"
+#include "platform/ai_platform.h"
 #include "common/utils.hpp"
 
 #ifdef PLATFORM_CE3226
