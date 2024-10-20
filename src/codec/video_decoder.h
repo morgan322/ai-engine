@@ -38,7 +38,7 @@ class VideoDecoderImpl {
   virtual bool Init() = 0;
   virtual bool FeedPacket(const AVPacket* pkt) = 0;
   virtual void FeedEos() = 0;
-  virtual void ReleaseFrame(CnAIBufSurface* frsurfame) = 0;
+  virtual void ReleaseFrame(AIBufSurface* frsurfame) = 0;
   // virtual bool CopyFrameD2H(void *dst, const CnBufSurface& surf) = 0;
   virtual void Destroy() = 0;
 
@@ -62,8 +62,8 @@ class VideoDecoder final : public IDemuxEventHandle {
   void OnEos() override;
   bool Running() override;
   VideoInfo& GetVideoInfo() { return info_; }
-  bool CopyFrameD2H(void *dst, CnAIBufSurface* surf) { return true; }
-  void ReleaseFrame(CnAIBufSurface* surf) { CnAIBufSurfaceDestroy(surf); }
+  bool CopyFrameD2H(void *dst, AIBufSurface* surf) { return true; }
+  void ReleaseFrame(AIBufSurface* surf) { AIBufSurfaceDestroy(surf); }
   void Destroy();
   ~VideoDecoder();
 

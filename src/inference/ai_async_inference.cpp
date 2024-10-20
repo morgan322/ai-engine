@@ -67,7 +67,7 @@ int SampleAsyncInference::Open() {
     preproc_ = std::make_shared<PreprocClassification>();
     postproc_ = std::make_shared<PostprocClassification>();
   } else {
-    LOG(ERROR) << "[EasyDK Samples] [SampleAsyncInference] Open: not support this model";
+    LOG(ERROR) << "[AI Samples] [SampleAsyncInference] Open: not support this model";
     return -1;
   }
 
@@ -109,7 +109,7 @@ int SampleAsyncInference::Process(std::shared_ptr<ai::basic::Frame> frame) {
 
   request->data[0]->SetUserData(frame);
   if (!infer_server_->Request(session_, std::move(request), frame)) {
-    LOG(ERROR) << "[EasyDK Samples] [SampleAsyncInference] Process(): Request infer_server do inference failed";
+    LOG(ERROR) << "[AI Samples] [SampleAsyncInference] Process(): Request infer_server do inference failed";
     return -1;
   }
   return 0;

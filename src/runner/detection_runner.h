@@ -28,11 +28,13 @@
 #include "inference/processor.h"
 #include "inference/infer_server.h"
 #include "utils/osd.h"
-#include "stream_runner.h"
+#include "runner/stream_runner.h"
+#include "module/frame.h"
+#include "platform/ai_platform.h"
 
 struct DetectionFrame {
   AIBufSurface* surf;
-  std::vector<DetectObject> objs;
+  std::vector<ai::module::DetectObject> objs;
 };
 
 class DetectionRunner : public StreamRunner, public infer_server::IPreproc, public infer_server::IPostproc {
@@ -46,7 +48,7 @@ class DetectionRunner : public StreamRunner, public infer_server::IPreproc, publ
 
  private:
   int OnTensorParams(const infer_server::CnPreprocTensorParams *params) override;
-  int OnPreproc(AI::BufSurfWrapperPtr src, AI::BufSurfWrapperPtr dst,
+  int OnPreproc(ai::BufSurfWrapperPtr src, ai::BufSurfWrapperPtr dst,
                 const std::vector<AITransformRect>& src_rects) override;
   int OnPostproc(const std::vector<infer_server::InferData*>& data_vec, const infer_server::ModelIO& model_output,
                  const infer_server::ModelInfo* model_info) override;
@@ -55,7 +57,7 @@ class DetectionRunner : public StreamRunner, public infer_server::IPreproc, publ
   cv::Mat ConvertToMatAndReleaseBuf(AIBufSurface* surf);
   std::unique_ptr<infer_server::InferServer> infer_server_;
   infer_server::Session_t session_;
-  CnOsd osd_;
+  // CnOsd osd_;
   std::unique_ptr<cv::VideoWriter> video_writer_{nullptr};
 
   bool show_;

@@ -70,8 +70,8 @@ enum class DimOrder {
  * @brief Describe data layout on GPU or CPU
  */
 struct DataLayout {
-  DataType dtype; ///< @see DataType
-  DimOrder order; ///< @see DimOrder
+  DataType dtype;  ///< @see DataType
+  DimOrder order;  ///< @see DimOrder
 };
 
 /**
@@ -86,25 +86,25 @@ size_t GetTypeSize(DataType type) noexcept;
  * @brief An enum describes InferServer request return values.
  */
 enum class Status {
-  SUCCESS = 0,         ///< The operation was successful
-  ERROR_READWRITE = 1, ///< Read / Write file failed
-  ERROR_MEMORY = 2,    ///< Memory error, such as out of memory, memcpy failed
-  INVALID_PARAM = 3,   ///< Invalid parameters
-  WRONG_TYPE = 4,      ///< Invalid data type in `any`
-  ERROR_BACKEND = 5,   ///< Error occurred in processor
-  NOT_IMPLEMENTED = 6, ///< Function not implemented
-  TIMEOUT = 7,         ///< Time expired
-  STATUS_COUNT = 8,    ///< Number of status
+  SUCCESS = 0,          ///< The operation was successful
+  ERROR_READWRITE = 1,  ///< Read / Write file failed
+  ERROR_MEMORY = 2,     ///< Memory error, such as out of memory, memcpy failed
+  INVALID_PARAM = 3,    ///< Invalid parameters
+  WRONG_TYPE = 4,       ///< Invalid data type in `any`
+  ERROR_BACKEND = 5,    ///< Error occurred in processor
+  NOT_IMPLEMENTED = 6,  ///< Function not implemented
+  TIMEOUT = 7,          ///< Time expired
+  STATUS_COUNT = 8,     ///< Number of status
 };
 
 /**
  * @brief An enum describes batch strategy
  */
 enum class BatchStrategy {
-  DYNAMIC = 0,        ///< Cross-request batch
-  STATIC = 1,         ///< In-request batch
-  SEQUENCE = 2,       ///< Sequence model, unsupported for now
-  STRATEGY_COUNT = 3, ///< Number of strategy
+  DYNAMIC = 0,         ///< Cross-request batch
+  STATIC = 1,          ///< In-request batch
+  SEQUENCE = 2,        ///< Sequence model, unsupported for now
+  STRATEGY_COUNT = 3,  ///< Number of strategy
 };
 
 /**
@@ -122,9 +122,7 @@ std::string ToString(BatchStrategy strategy) noexcept;
  * @param s BatchStrategy
  * @return std::ostream& ostream
  */
-inline std::ostream &operator<<(std::ostream &os, BatchStrategy s) {
-  return os << ToString(s);
-}
+inline std::ostream& operator<<(std::ostream& os, BatchStrategy s) { return os << ToString(s); }
 
 /**
  * @brief Set current device for this thread
@@ -157,7 +155,7 @@ uint32_t TotalDeviceCount() noexcept;
  * @brief Model interface
  */
 class ModelInfo {
-public:
+ public:
   virtual ~ModelInfo() = default;
 
   // ----------- Observers -----------
@@ -168,7 +166,7 @@ public:
    * @param index index of input
    * @return const Shape& shape of specified input
    */
-  virtual const Shape &InputShape(int index) const noexcept = 0;
+  virtual const Shape& InputShape(int index) const noexcept = 0;
 
   /**
    * @brief Get output shape
@@ -176,12 +174,11 @@ public:
    * @param index index of output
    * @return const Shape& shape of specified output
    */
-  virtual const Shape &OutputShape(int index) const noexcept = 0;
+  virtual const Shape& OutputShape(int index) const noexcept = 0;
   /**
    * @brief Check if output shapes are fixed
    *
-   * @return Returns true if all output shapes are fixed, otherwise returns
-   * false.
+   * @return Returns true if all output shapes are fixed, otherwise returns false.
    */
   virtual bool FixedOutputShape() noexcept = 0;
 
@@ -191,7 +188,7 @@ public:
    * @param index index of input
    * @return const DataLayout& data layout of specified input
    */
-  virtual const DataLayout &InputLayout(int index) const noexcept = 0;
+  virtual const DataLayout& InputLayout(int index) const noexcept = 0;
 
   /**
    * @brief Get output layout on GPU
@@ -199,7 +196,7 @@ public:
    * @param index index of output
    * @return const DataLayout& data layout of specified output
    */
-  virtual const DataLayout &OutputLayout(int index) const noexcept = 0;
+  virtual const DataLayout& OutputLayout(int index) const noexcept = 0;
 
   /**
    * @brief Get number of input
@@ -230,7 +227,7 @@ public:
   virtual std::string GetKey() const noexcept = 0;
 
   // ----------- Observers End -----------
-}; // class ModelInfo
+};  // class ModelInfo
 
 using ModelPtr = std::shared_ptr<ModelInfo>;
 
@@ -246,7 +243,10 @@ struct InferData {
    * @tparam T data type
    * @param v data value
    */
-  template <typename T> void Set(T &&v) { data = std::forward<T>(v); }
+  template <typename T>
+  void Set(T&& v) {
+    data = std::forward<T>(v);
+  }
 
   /**
    * @brief Get data by value
@@ -254,7 +254,8 @@ struct InferData {
    * @tparam T data type
    * @return std::remove_reference<T>::type a copy of data
    */
-  template <typename T> typename std::remove_reference<T>::type Get() const {
+  template <typename T>
+  typename std::remove_reference<T>::type Get() const {
     return any_cast<typename std::remove_reference<T>::type>(data);
   }
 
@@ -273,14 +274,11 @@ struct InferData {
    * @brief Get data by const lvalue reference
    *
    * @tparam T data type
-   * @return std::add_lvalue_reference<typename std::add_const<T>::type>::type
-   * const lvalue reference to data
+   * @return std::add_lvalue_reference<typename std::add_const<T>::type>::type const lvalue reference to data
    */
   template <typename T>
-  typename std::add_lvalue_reference<typename std::add_const<T>::type>::type
-  GetLref() const & {
-    return any_cast<typename std::add_lvalue_reference<
-        typename std::add_const<T>::type>::type>(data);
+  typename std::add_lvalue_reference<typename std::add_const<T>::type>::type GetLref() const& {
+    return any_cast<typename std::add_lvalue_reference<typename std::add_const<T>::type>::type>(data);
   }
 
   /**
@@ -289,7 +287,9 @@ struct InferData {
    * @retval true InferData has value
    * @retval false InferData does not have value
    */
-  bool HasValue() noexcept { return data.has_value(); }
+  bool HasValue() noexcept {
+    return data.has_value();
+  }
 
   /**
    * @brief Set user data for postprocess
@@ -297,7 +297,8 @@ struct InferData {
    * @tparam T data type
    * @param v data value
    */
-  template <typename T> void SetUserData(T &&v) {
+  template <typename T>
+  void SetUserData(T&& v) {
     user_data = std::forward<T>(v);
   }
 
@@ -309,14 +310,17 @@ struct InferData {
    * @tparam T data type
    * @return data
    */
-  template <typename T> T GetUserData() const { return any_cast<T>(user_data); }
+  template <typename T>
+  T GetUserData() const {
+    return any_cast<T>(user_data);
+  }
 
   /// stored data
   any data;
   /// user data passed to postprocessor
   any user_data;
   /// private member
-  RequestControl *ctrl{nullptr};
+  RequestControl* ctrl{nullptr};
   /// private member
   uint32_t index{0};
 };
@@ -343,8 +347,7 @@ struct Package {
   /// private member
   int64_t priority;
 
-  static std::shared_ptr<Package> Create(uint32_t data_num,
-                                         const std::string &tag = "") noexcept {
+  static std::shared_ptr<Package> Create(uint32_t data_num, const std::string& tag = "") noexcept {
     auto ret = std::make_shared<Package>();
     ret->data.reserve(data_num);
     for (uint32_t idx = 0; idx < data_num; ++idx) {
@@ -360,21 +363,20 @@ using PackagePtr = std::shared_ptr<Package>;
  * @brief Processor interface
  */
 class Processor : public BaseObject {
-public:
+ public:
   /**
    * @brief Construct a new Processor object
    *
    * @param type_name type name of derived processor
    */
-  explicit Processor(const std::string &type_name) noexcept
-      : type_name_(type_name) {}
+  explicit Processor(const std::string& type_name) noexcept : type_name_(type_name) {}
 
   /**
    * @brief Get type name of processor
    *
    * @return const std::string& type name
    */
-  const std::string &TypeName() const noexcept { return type_name_; }
+  const std::string& TypeName() const noexcept { return type_name_; }
 
   /**
    * @brief Destroy the Processor object
@@ -403,32 +405,30 @@ public:
    *
    * @return std::shared_ptr<Processor> A new processor
    */
-  virtual std::shared_ptr<Processor> Fork() = 0;
+  virtual std::shared_ptr<Processor> Fork() noexcept = 0;
 
-private:
+ private:
   Processor() = delete;
   friend class TaskNode;
-  std::unique_lock<std::mutex> Lock() noexcept {
-    return std::unique_lock<std::mutex>(process_lock_);
-  }
+  std::unique_lock<std::mutex> Lock() noexcept { return std::unique_lock<std::mutex>(process_lock_); }
   std::string type_name_;
   std::mutex process_lock_;
-}; // class Processor
+};  // class Processor
 
 /**
  * @brief A convenient CRTP template provided `Fork` and `Create` function
  *
  * @tparam T Type of derived class
  */
-template <typename T> class ProcessorForkable : public Processor {
-public:
+template <typename T>
+class ProcessorForkable : public Processor {
+ public:
   /**
    * @brief Construct a new Processor Forkable object
    *
    * @param type_name type name of derived processor
    */
-  explicit ProcessorForkable(const std::string &type_name) noexcept
-      : Processor(type_name) {}
+  explicit ProcessorForkable(const std::string& type_name) noexcept : Processor(type_name) {}
 
   /**
    * @brief Destroy the Processor Forkable object
@@ -440,22 +440,24 @@ public:
    *
    * @return std::shared_ptr<Processor> A new processor
    */
-  std::shared_ptr<Processor>
-  Fork() noexcept(std::is_nothrow_default_constructible<T>::value) override {
-    auto p = std::make_shared<T>();
-    p->CopyParamsFrom(*this);
-    if (p->Init() != Status::SUCCESS)
-      return nullptr;
-    return p;
+  // std::shared_ptr<Processor> Fork() noexcept(std::is_nothrow_default_constructible<T>::value) override {
+  //   auto p = std::make_shared<T>();
+  //   p->CopyParamsFrom(*this);
+  //   if (p->Init() != Status::SUCCESS) return nullptr;
+  //   return p;
+  // }
+  std::shared_ptr<Processor> Fork() noexcept override {
+      auto p = std::make_shared<T>();
+      p->CopyParamsFrom(*this);
+      if (p->Init() != Status::SUCCESS) return nullptr;
+      return p;
   }
-
   /**
    * @brief Create a processor
    *
    * @return std::shared_ptr<T> A new processor
    */
-  static std::shared_ptr<T>
-  Create() noexcept(std::is_nothrow_default_constructible<T>::value) {
+  static std::shared_ptr<T> Create() noexcept(std::is_nothrow_default_constructible<T>::value) {
     return std::make_shared<T>();
   }
 };
@@ -464,7 +466,7 @@ public:
  * @brief Base class of response observer, only used for async Session
  */
 class Observer {
-public:
+ public:
   /**
    * @brief Notify the observer one response
    *
@@ -472,8 +474,7 @@ public:
    * @param data Response data
    * @param user_data User data
    */
-  virtual void Response(Status status, PackagePtr data,
-                        any user_data) noexcept = 0;
+  virtual void Response(Status status, PackagePtr data, any user_data) noexcept = 0;
 
   /**
    * @brief Destroy the Observer object
@@ -509,24 +510,21 @@ struct SessionDesc {
   /**
    * @brief host input data layout, work when input data is on cpu
    *
-   * @note built-in processor will transform data from host input layout into
-   * GPU input layout ( @see ModelInfo::InputLayout(int index) ) automatically
-   * before infer
+   * @note built-in processor will transform data from host input layout into GPU input layout
+   *       ( @see ModelInfo::InputLayout(int index) ) automatically before infer
    */
   NetworkInputFormat model_input_format{NetworkInputFormat::INVALID};
   /**
    * @brief host output data layout
    *
-   * @note built-in processor will transform from GPU output layout ( @see
-   * ModelInfo::OutputLayout(int index) ) into host output layout automatically
-   * after infer
+   * @note built-in processor will transform from GPU output layout ( @see ModelInfo::OutputLayout(int index) )
+   *       into host output layout automatically after infer
    */
   /// preprocessor
   std::shared_ptr<Processor> preproc{nullptr};
   /// postprocessor
   std::shared_ptr<Processor> postproc{nullptr};
-  /// timeout in milliseconds, zero means endless waiting. only work for
-  /// BatchStrategy::DYNAMIC
+  /// timeout in milliseconds, zero means endless waiting. only work for BatchStrategy::DYNAMIC
   uint32_t batch_timeout{100};
   /// Session request priority
   int priority{0};
@@ -575,14 +573,14 @@ struct ThroughoutStatistic {
 /// A structure describes linked session of server
 class Session;
 /// pointer to Session
-using Session_t = Session *;
+using Session_t = Session*;
 
 class InferServerPrivate;
 /**
  * @brief Inference server api class
  */
 class InferServer {
-public:
+ public:
   /**
    * @brief Construct a new Infer Server object
    *
@@ -599,8 +597,7 @@ public:
    * @param observer Response observer
    * @return Session_t a Session
    */
-  Session_t CreateSession(SessionDesc desc,
-                          std::shared_ptr<Observer> observer) noexcept;
+  Session_t CreateSession(SessionDesc desc, std::shared_ptr<Observer> observer) noexcept;
 
   /**
    * @brief Create a synchronous Session
@@ -608,9 +605,7 @@ public:
    * @param desc Session description
    * @return Session_t a Session
    */
-  Session_t CreateSyncSession(SessionDesc desc) noexcept {
-    return CreateSession(desc, nullptr);
-  }
+  Session_t CreateSyncSession(SessionDesc desc) noexcept { return CreateSession(desc, nullptr); }
 
   /**
    * @brief Destroy session
@@ -631,8 +626,7 @@ public:
    * @param user_data user data
    * @param timeout timeout threshold (milliseconds), -1 for endless
    */
-  bool Request(Session_t session, PackagePtr input, any user_data,
-               int timeout = -1) noexcept;
+  bool Request(Session_t session, PackagePtr input, any user_data, int timeout = -1) noexcept;
 
   /**
    * @brief send a inference request and wait for response
@@ -645,8 +639,7 @@ public:
    * @param response output result
    * @param timeout timeout threshold (milliseconds), -1 for endless
    */
-  bool RequestSync(Session_t session, PackagePtr input, Status *status,
-                   PackagePtr response, int timeout = -1) noexcept;
+  bool RequestSync(Session_t session, PackagePtr input, Status* status, PackagePtr response, int timeout = -1) noexcept;
 
   /**
    * @brief Wait task with specified tag done, @see Package::tag
@@ -656,7 +649,7 @@ public:
    * @param session a Session
    * @param tag specified tag
    */
-  void WaitTaskDone(Session_t session, const std::string &tag) noexcept;
+  void WaitTaskDone(Session_t session, const std::string& tag) noexcept;
 
   /**
    * @brief Discard task with specified tag done, @see Package::tag
@@ -665,7 +658,7 @@ public:
    * @param session a Session
    * @param tag specified tag
    */
-  void DiscardTask(Session_t session, const std::string &tag) noexcept;
+  void DiscardTask(Session_t session, const std::string& tag) noexcept;
 
   /**
    * @brief Get model from session
@@ -684,33 +677,28 @@ public:
    * @retval true Succeeded
    * @retval false Model not exist
    */
-  static bool SetModelDir(const std::string &model_dir) noexcept;
+  static bool SetModelDir(const std::string& model_dir) noexcept;
 
   /**
-   * @brief Load model from uri, model won't be loaded again if it is already in
-   * cache
+   * @brief Load model from uri, model won't be loaded again if it is already in cache
    *
-   * @note support download model from remote by HTTP, HTTPS, FTP, while
-   * compiled with flag `WITH_CURL`, use uri such as `../../model_file`, or
-   * "https://someweb/model_file"
+   * @note support download model from remote by HTTP, HTTPS, FTP, while compiled with flag `WITH_CURL`,
+   *       use uri such as `../../model_file`, or "https://someweb/model_file"
    * @param model_uri offline model uri
    * @param in_shapes set input shape when it is mutable
    * @return ModelPtr A model
    */
-  static ModelPtr LoadModel(const std::string &model_uri,
-                            const std::vector<Shape> &in_shapes = {}) noexcept;
+  static ModelPtr LoadModel(const std::string& model_uri, const std::vector<Shape>& in_shapes = {}) noexcept;
 
   /**
-   * @brief Load model from memory, model won't be loaded again if it is already
-   * in cache
+   * @brief Load model from memory, model won't be loaded again if it is already in cache
    *
    * @param ptr serialized model data in memory
    * @param size size of model data in memory
    * @param in_shapes set input shape when it is mutable
    * @return ModelPtr A model
    */
-  static ModelPtr LoadModel(void *ptr, size_t size,
-                            const std::vector<Shape> &in_shapes = {}) noexcept;
+  static ModelPtr LoadModel(void* ptr, size_t size, const std::vector<Shape>& in_shapes = {}) noexcept;
 
   /**
    * @brief Remove model from cache, model won't be destroyed if still in use
@@ -722,8 +710,7 @@ public:
   static bool UnloadModel(ModelPtr model) noexcept;
 
   /**
-   * @brief Clear all the models in cache, model won't be destroyed if still in
-   * use
+   * @brief Clear all the models in cache, model won't be destroyed if still in use
    */
   static void ClearModelCache() noexcept;
 
@@ -734,8 +721,7 @@ public:
    * @param session a session
    * @return std::map<std::string, PerfStatistic> latency statistics
    */
-  std::map<std::string, LatencyStatistic>
-  GetLatency(Session_t session) const noexcept;
+  std::map<std::string, LatencyStatistic> GetLatency(Session_t session) const noexcept;
 
   /**
    * @brief Get the performance statistics
@@ -752,14 +738,13 @@ public:
    * @param tag tag
    * @return ThroughoutStatistic throughout statistic
    */
-  ThroughoutStatistic GetThroughout(Session_t session,
-                                    const std::string &tag) const noexcept;
+  ThroughoutStatistic GetThroughout(Session_t session, const std::string& tag) const noexcept;
 
-private:
+ private:
   InferServer() = delete;
-  InferServerPrivate *priv_;
-}; // class InferServer
+  InferServerPrivate* priv_;
+};  // class InferServer
 
-} // namespace infer_server
+}  // namespace infer_server
 
-#endif // INFER_SERVER_API_H_
+#endif  // INFER_SERVER_API_H_

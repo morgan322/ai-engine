@@ -18,8 +18,8 @@
  * THE SOFTWARE.
  *************************************************************************/
 
-#ifndef EDK_SAMPLES_RUNNER_H_
-#define EDK_SAMPLES_RUNNER_H_
+#ifndef AI_RUNNER_STREAM_RUNNER_H_
+#define AI_RUNNER_STREAM_RUNNER_H_
 
 #include <atomic>
 #include <condition_variable>
@@ -38,7 +38,7 @@
 class StreamRunner : public IDecodeEventHandle {
  public:
   explicit StreamRunner(const std::string& data_path,
-                        const VideoDecoder::DecoderType decode_type = VideoDecoder::EASY_DECODE,
+                        const VideoDecoder::DecoderType decode_type = VideoDecoder::CAMERA,
                         int dev_id = 0);
   virtual ~StreamRunner();
   void Start() { running_.store(true); }
@@ -91,5 +91,5 @@ class StreamRunner : public IDecodeEventHandle {
   std::atomic<bool> in_loop_{false};
 };
 
-#endif  // EDK_SAMPLES_RUNNER_H_
+#endif  // AI_Examples_RUNNER_H_
 
