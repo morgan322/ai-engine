@@ -46,5 +46,5 @@ find_package(Sanitizers)
 add_subdirectory(3rdparty/googletest)
 add_subdirectory(unitest)
 
-add_subdirectory(3rdparty/libyuv)
-add_subdirectory(examples)
+# add_subdirectory(3rdparty/libyuv)
+# add_subdirectory(examples)

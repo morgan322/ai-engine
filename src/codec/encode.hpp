@@ -8,7 +8,7 @@
 
 #include "easy_module.hpp"
 
-#include "cnedk_encode.h"
+#include "ai_encode.h"
 #include "encode_handler_mlu.hpp"
 
 namespace ai {
