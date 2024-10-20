@@ -29,11 +29,11 @@
 #include <string>
 #include <iostream>
 
-#include "../../codec/buf_surface.h"
-#include "../../codec/ai_decode.h"
+#include "codec/buf_surface.h"
+#include "codec/ai_decode.h"
 
-#include "video_decoder.h"
-#include "video_parser.h"
+#include "codec/video_decoder.h"
+#include "codec/video_parser.h"
 
 class StreamRunner : public IDecodeEventHandle {
  public:
@@ -48,7 +48,7 @@ class StreamRunner : public IDecodeEventHandle {
   }
 
   bool RunLoop();
-  virtual void Process(CnedkBufSurface* surf) = 0;
+  virtual void Process(AIBufSurface* surf) = 0;
   void DemuxLoop(const uint32_t repeat_time);
 
   void OnDecodeEos() override {
@@ -59,7 +59,7 @@ class StreamRunner : public IDecodeEventHandle {
     eos_cond_.notify_one();
   }
 
-  void OnDecodeFrame(CnedkBufSurface* surf) override {
+  void OnDecodeFrame(AIBufSurface* surf) override {
     std::unique_lock<std::mutex> lk(mut_);
     frames_.push(surf);
     cond_.notify_one();
@@ -80,7 +80,7 @@ class StreamRunner : public IDecodeEventHandle {
 
   int device_id_ {0};
   std::unique_ptr<VideoParser> parser_;
-  std::queue<CnedkBufSurface*> frames_;
+  std::queue<AIBufSurface*> frames_;
   std::mutex mut_;
   std::condition_variable cond_;
   std::string data_path_;

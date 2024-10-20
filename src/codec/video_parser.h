@@ -18,8 +18,8 @@
  * THE SOFTWARE.
  *************************************************************************/
 
-#ifndef EDK_SAMPLES_VIDEO_PARSER_H_
-#define EDK_SAMPLES_VIDEO_PARSER_H_
+#ifndef AI_CODEC_VIDEO_PARSER_H_
+#define AI_CODEC_VIDEO_PARSER_H_
 
 #include <atomic>
 #include <chrono>
@@ -126,4 +126,4 @@ class VideoParser {
   bool is_rtsp_{false};
 };
 
-#endif  // EDK_SAMPLES_VIDEO_PARSER_H_
+#endif  // AI_CODEC_VIDEO_PARSER_H_

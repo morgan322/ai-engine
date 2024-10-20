@@ -1,25 +1,5 @@
-/*************************************************************************
- * Copyright (C) [2021] by Cambricon, Inc. All rights reserved
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *************************************************************************/
-
-#ifndef EDK_SAMPLES_FFMPEG_DECODER_H_
-#define EDK_SAMPLES_FFMPEG_DECODER_H_
+#ifndef AI_CODEC_VIDEO_DECODER_H_
+#define AI_CODEC_VIDEO_DECODER_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,13 +17,13 @@ extern "C" {
 
 #include <utility>
 
-#include "cnedk_buf_surface.h"
+#include "buf_surface.h"
 
 #include "video_parser.h"
 
 class IDecodeEventHandle {
  public:
-  virtual void OnDecodeFrame(CnedkBufSurface* surf) = 0;
+  virtual void OnDecodeFrame(AIBufSurface* surf) = 0;
   virtual void OnDecodeEos() = 0;
 };
 
@@ -58,7 +38,7 @@ class VideoDecoderImpl {
   virtual bool Init() = 0;
   virtual bool FeedPacket(const AVPacket* pkt) = 0;
   virtual void FeedEos() = 0;
-  virtual void ReleaseFrame(CnedkBufSurface* frsurfame) = 0;
+  virtual void ReleaseFrame(CnAIBufSurface* frsurfame) = 0;
   // virtual bool CopyFrameD2H(void *dst, const CnBufSurface& surf) = 0;
   virtual void Destroy() = 0;
 
@@ -71,9 +51,9 @@ class VideoDecoderImpl {
 class VideoDecoder final : public IDemuxEventHandle {
  public:
   enum DecoderType {
-    EASY_DECODE,
+    CAMERA,
     FFMPEG,
-    FFMPEG_MLU
+    OPENCV
   };
 
   VideoDecoder(StreamRunner* runner, DecoderType type, int device_id);
@@ -82,8 +62,8 @@ class VideoDecoder final : public IDemuxEventHandle {
   void OnEos() override;
   bool Running() override;
   VideoInfo& GetVideoInfo() { return info_; }
-  bool CopyFrameD2H(void *dst, CnedkBufSurface* surf) { return true; }
-  void ReleaseFrame(CnedkBufSurface* surf) { CnedkBufSurfaceDestroy(surf); }
+  bool CopyFrameD2H(void *dst, CnAIBufSurface* surf) { return true; }
+  void ReleaseFrame(CnAIBufSurface* surf) { CnAIBufSurfaceDestroy(surf); }
   void Destroy();
   ~VideoDecoder();
 
@@ -94,4 +74,4 @@ class VideoDecoder final : public IDemuxEventHandle {
   bool send_eos_{false};
 };
 
-#endif  // EDK_SAMPLES_VIDEO_PARSER_H_
+#endif  // AI_SAMPLES_VIDEO_PARSER_H_

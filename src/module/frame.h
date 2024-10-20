@@ -1,5 +1,5 @@
-#ifndef FRAME_HPP_
-#define FRAME_HPP_
+#ifndef FRAME_H_
+#define FRAME_H_
 
 #include <map>
 #include <opencv2/opencv.hpp>
@@ -8,7 +8,7 @@
 
 namespace ai
 {
-  namespace basic
+  namespace module
   {
     struct BoundingBox
     {
@@ -38,9 +38,8 @@ namespace ai
       std::string track_id;
       std::map<std::string, std::string>
           attributes; // add info into bbox, secondary infer classfication
-      cv::Mat frame;
+      cv::Mat img;
     };
-  } // namespace basic
+  } // namespace module
 } // namespace ai
-
 #endif

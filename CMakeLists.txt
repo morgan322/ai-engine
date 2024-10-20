@@ -8,6 +8,7 @@ set(ADK_VERSION "${ADK_VERSION_MAJOR}.${ADK_VERSION_MINOR}.${ADK_VERSION_PATCH}"
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/adk_config.h.in ${CMAKE_CURRENT_SOURCE_DIR}/include/adk_config.h)
 install(FILES ADK_config.h DESTINATION include)
 
+include_directories("${CMAKE_SOURCE_DIR}/src")
 
 
 set(CMAKE_CXX_COMPILIER "/usr/bin/g++")

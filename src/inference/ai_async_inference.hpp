@@ -25,10 +25,10 @@
 #include <string>
 
 #include "infer_server.h"
-#include "../basic/basic_module.hpp"
+#include "module/basic_module.hpp"
 
 
-class SampleAsyncInference : public ai::basic::BasecModule {
+class SampleAsyncInference : public ai::module::BasecModule {
  public:
   SampleAsyncInference(std::string name, int parallelism, int device_id, const std::string& model_path,
                        std::string model_name) : EasyModule(name, parallelism) {

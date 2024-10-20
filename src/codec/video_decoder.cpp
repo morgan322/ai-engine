@@ -1,23 +1,3 @@
-/*************************************************************************
- * Copyright (C) [2021] by Cambricon, Inc. All rights reserved
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *************************************************************************/
-
 #include <glog/logging.h>
 // #include <libyuv.h>
 
@@ -25,10 +5,9 @@
 #include <memory>
 #include <string>
 
-#include "cnrt.h"
 
 #include "video_decoder.h"
-#include "../node/runner/stream_runner.h"
+#include "runner/stream_runner.h"
 
 #include "util/utils.hpp"
 
@@ -37,10 +16,10 @@
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
 
-// ------------------------------- cnDecodeImpl --------------------------------------
-class EasyDecodeImpl : public VideoDecoderImpl {
+// ------------------------------- simple --------------------------------------
+class VideoDecodeImpl : public VideoDecoderImpl {
  public:
-  EasyDecodeImpl(VideoDecoder* interface, IDecodeEventHandle* handle, int device_id)
+  VideoDecodeImpl(VideoDecoder* interface, IDecodeEventHandle* handle, int device_id)
       : VideoDecoderImpl(interface, handle, device_id) {}
   bool Init() override {
     cnrtSetDevice(device_id_);
@@ -50,7 +29,7 @@ class EasyDecodeImpl : public VideoDecoderImpl {
 
     codec_ctx_ = info.codec_ctx;
 
-    CnedkVdecCreateParams create_params;
+    AIVdecCreateParams create_params;
     memset(&create_params, 0, sizeof(create_params));
     create_params.device_id  = device_id_;
 
@@ -65,33 +44,33 @@ class EasyDecodeImpl : public VideoDecoderImpl {
     create_params.OnError = OnError_;
 
     if (AV_CODEC_ID_H264 == info.codec_id) {
-      create_params.type = CNEDK_VDEC_TYPE_H264;
+      create_params.type = AI_VDEC_TYPE_H264;
       p_bsfc_ = av_bitstream_filter_init("h264_mp4toannexb");
     } else if (AV_CODEC_ID_HEVC == info.codec_id) {
-      create_params.type = CNEDK_VDEC_TYPE_H265;
+      create_params.type = AI_VDEC_TYPE_H265;
       p_bsfc_ = av_bitstream_filter_init("hevc_mp4toannexb");
     } else if (AV_CODEC_ID_MJPEG == info.codec_id) {
-      create_params.type = CNEDK_VDEC_TYPE_JPEG;
+      create_params.type = AI_VDEC_TYPE_JPEG;
     } else {
-      LOG(ERROR) << "[EasyDK Samples] [EasyDecodeImpl] Init(): Unsupported codec id: " << info.codec_id;
+      LOG(ERROR) << "[AI Codec] [VideoDecodeImpl] Init(): Unsupported codec id: " << info.codec_id;
       return false;
     }
 
     if (IsEdgePlatform(device_id_)) {
-      create_params.color_format = CNEDK_BUF_COLOR_FORMAT_NV21;
+      create_params.color_format = AI_BUF_COLOR_FORMAT_NV21;
     } else {
-      create_params.color_format = CNEDK_BUF_COLOR_FORMAT_NV12;
+      create_params.color_format = AI_BUF_COLOR_FORMAT_NV12;
     }
 
     if (CreateSurfacePool(&surf_pool_, create_params.max_width, create_params.max_height) < 0) {
-      LOG(ERROR) << "[EasyDK Samples] [EasyDecodeImpl] Init(): Create BufSurface pool failed ";
+      LOG(ERROR) << "[AI Codec] [VideoDecodeImpl] Init(): Create BufSurface pool failed ";
       return false;
     }
 
-    VLOG(1) << "[EasyDK Samples] [EasyDecodeImpl] Init(): surf_pool:" << surf_pool_;
+    VLOG(1) << "[AI Codec] [VideoDecodeImpl] Init(): surf_pool:" << surf_pool_;
 
-    if (CnedkVdecCreate(&vdec_, &create_params) < 0) {
-      LOG(ERROR) << "[EasyDK Samples] [EasyDecodeImpl] Init(): Create decoder failed";
+    if (AIVdecCreate(&vdec_, &create_params) < 0) {
+      LOG(ERROR) << "[AI Codec] [VideoDecodeImpl] Init(): Create decoder failed";
       return false;
     }
 
@@ -99,22 +78,22 @@ class EasyDecodeImpl : public VideoDecoderImpl {
   }
 
   int CreateSurfacePool(void** surf_pool, int width, int height) {
-    CnedkBufSurfaceCreateParams create_params;
+    AIBufSurfaceCreateParams create_params;
     memset(&create_params, 0, sizeof(create_params));
     create_params.batch_size = 1;
     create_params.width = width;
     create_params.height = height;
-    create_params.color_format = CNEDK_BUF_COLOR_FORMAT_NV12;
+    create_params.color_format = AI_BUF_COLOR_FORMAT_NV12;
     create_params.device_id = device_id_;
 
     if (IsEdgePlatform(device_id_)) {
-      create_params.mem_type = CNEDK_BUF_MEM_VB_CACHED;
+      create_params.mem_type = AI_BUF_MEM_VB_CACHED;
     } else {
-      create_params.mem_type = CNEDK_BUF_MEM_DEVICE;
+      create_params.mem_type = AI_BUF_MEM_DEVICE;
     }
 
-    if (CnedkBufPoolCreate(surf_pool, &create_params, 16) < 0) {
-      LOG(ERROR) << "[EasyDK Samples] [EasyDecodeImpl] CreateSurfacePool(): Create pool failed";
+    if (AIBufPoolCreate(surf_pool, &create_params, 16) < 0) {
+      LOG(ERROR) << "[AI Codec] [VideoDecodeImpl] CreateSurfacePool(): Create pool failed";
       return -1;
     }
 
@@ -130,15 +109,15 @@ class EasyDecodeImpl : public VideoDecoderImpl {
     }
 
 
-    CnedkVdecStream stream;
+    AIVdecStream stream;
     memset(&stream, 0, sizeof(stream));
 
     stream.bits = parsed_pack->data;
     stream.len = parsed_pack->size;
     stream.pts = parsed_pack->pts;
     bool ret = true;
-    if (CnedkVdecSendStream(vdec_, &stream, 5000) != 0) {
-      LOG(ERROR) << "EasyDK Samples] [EasyDecodeImpl] FeedPacket(): Send stream failed";
+    if (AIVdecSendStream(vdec_, &stream, 5000) != 0) {
+      LOG(ERROR) << "AI Codec] [VideoDecodeImpl] FeedPacket(): Send stream failed";
       ret = false;
     }
     // free packet
@@ -148,14 +127,14 @@ class EasyDecodeImpl : public VideoDecoderImpl {
     return ret;
   }
   void FeedEos() override {
-    CnedkVdecStream stream;
+    AIVdecStream stream;
     stream.bits = nullptr;
     stream.len = 0;
     stream.pts = 0;
-    CnedkVdecSendStream(vdec_, &stream, 5000);
+    AIVdecSendStream(vdec_, &stream, 5000);
   }
-  void ReleaseFrame(CnedkBufSurface* surf) override {
-    CnedkBufSurfaceDestroy(surf);
+  void ReleaseFrame(AIBufSurface* surf) override {
+    AIBufSurfaceDestroy(surf);
   }
 
   void Destroy() {
@@ -164,52 +143,52 @@ class EasyDecodeImpl : public VideoDecoderImpl {
       p_bsfc_ = nullptr;
     }
     if (vdec_) {
-      CnedkVdecDestroy(vdec_);
+      AIVdecDestroy(vdec_);
       vdec_ = nullptr;
     }
 
     if (surf_pool_) {
-      CnedkBufPoolDestroy(surf_pool_);
+      AIBufPoolDestroy(surf_pool_);
       surf_pool_ = nullptr;
     }
   }
 
-  static int GetBufSurface_(CnedkBufSurface **surf,
-                            int width, int height, CnedkBufSurfaceColorFormat fmt,
+  static int GetBufSurface_(AIBufSurface **surf,
+                            int width, int height, AIBufSurfaceColorFormat fmt,
                             int timeout_ms, void*userdata) {
-    EasyDecodeImpl *thiz =  reinterpret_cast<EasyDecodeImpl*>(userdata);
+    VideoDecodeImpl *thiz =  reinterpret_cast<VideoDecodeImpl*>(userdata);
     return thiz->GetBufSurface(surf, width, height, fmt, timeout_ms);
   }
 
-  static int OnFrame_(CnedkBufSurface *surf, void *userdata) {
-    EasyDecodeImpl *thiz =  reinterpret_cast<EasyDecodeImpl*>(userdata);
+  static int OnFrame_(AIBufSurface *surf, void *userdata) {
+    VideoDecodeImpl *thiz =  reinterpret_cast<VideoDecodeImpl*>(userdata);
     return thiz->OnFrame(surf);
   }
 
   static int OnDecodeEos_(void *userdata) {
-    EasyDecodeImpl *thiz = reinterpret_cast<EasyDecodeImpl*>(userdata);
+    VideoDecodeImpl *thiz = reinterpret_cast<VideoDecodeImpl*>(userdata);
     return thiz->OnDecodeEos();
   }
 
   static int OnError_(int errCode, void *userdata) {
-    EasyDecodeImpl *thiz = reinterpret_cast<EasyDecodeImpl*>(userdata);
+    VideoDecodeImpl *thiz = reinterpret_cast<VideoDecodeImpl*>(userdata);
     return thiz->OnError(errCode);
   }
 
-  int GetBufSurface(CnedkBufSurface **surf,
-                    int width, int height, CnedkBufSurfaceColorFormat fmt,
+  int GetBufSurface(AIBufSurface **surf,
+                    int width, int height, AIBufSurfaceColorFormat fmt,
                     int timeout_ms) {
     int count = timeout_ms + 1;
     int retry_cnt = 1;
     while (1) {
-      int ret = CnedkBufSurfaceCreateFromPool(surf, surf_pool_);
+      int ret = AIBufSurfaceCreateFromPool(surf, surf_pool_);
       if (ret == 0) {
         return 0;
       }
       count -= retry_cnt;
-      VLOG(3) << "EasyDK Samples] [EasyDecodeImpl] GetBufSurface(): retry, remaining times: " << count;
+      VLOG(3) << "AI Codec] [VideoDecodeImpl] GetBufSurface(): retry, remaining times: " << count;
       if (count <= 0) {
-        LOG(ERROR) << "EasyDK Samples] [EasyDecodeImpl] GetBufSurface(): Maximum number of attempts reached: "
+        LOG(ERROR) << "AI Codec] [VideoDecodeImpl] GetBufSurface(): Maximum number of attempts reached: "
                    << timeout_ms;
         return -1;
       }
@@ -220,7 +199,7 @@ class EasyDecodeImpl : public VideoDecoderImpl {
     return 0;
   }
 
-  int OnFrame(CnedkBufSurface *surf) {
+  int OnFrame(AIBufSurface *surf) {
     handle_->OnDecodeFrame(surf);
     return 0;
   }
@@ -234,8 +213,8 @@ class EasyDecodeImpl : public VideoDecoderImpl {
     return 0;
   }
 
-  ~EasyDecodeImpl() {
-    EasyDecodeImpl::Destroy();
+  ~VideoDecodeImpl() {
+    VideoDecodeImpl::Destroy();
   }
 
  private:
@@ -255,12 +234,12 @@ class EasyDecodeImpl : public VideoDecoderImpl {
 //     VideoInfo& info = interface_->GetVideoInfo();
 //     AVCodec *dec = avcodec_find_decoder(info.codec_id);
 //     if (!dec) {
-//       LOG(ERROR) << "[EasyDK Samples] [FFmpegDecodeImpl] avcodec_find_decoder failed";
+//       LOG(ERROR) << "[AI Codec] [FFmpegDecodeImpl] avcodec_find_decoder failed";
 //       return false;
 //     }
 //     decode_ = avcodec_alloc_context3(dec);
 //     if (!decode_) {
-//       LOG(ERROR) << "[EasyDK Samples] [FFmpegDecodeImpl] avcodec_alloc_context3 failed";
+//       LOG(ERROR) << "[AI Codec] [FFmpegDecodeImpl] avcodec_alloc_context3 failed";
 //       return false;
 //     }
 //     // av_codec_set_pkt_timebase(instance_, st->time_base);
@@ -272,12 +251,12 @@ class EasyDecodeImpl : public VideoDecoderImpl {
 //       decode_->extradata = extradata;
 //     }
 //     if (avcodec_open2(decode_, dec, NULL) < 0) {
-//       LOG(ERROR) << "[EasyDK Samples] [FFmpegDecodeImpl] Failed to open codec";
+//       LOG(ERROR) << "[AI Codec] [FFmpegDecodeImpl] Failed to open codec";
 //       return false;
 //     }
 //     av_frame_ = av_frame_alloc();
 //     if (!av_frame_) {
-//       LOG(ERROR) << "[EasyDK Samples] [FFmpegDecodeImpl] Could not alloc frame";
+//       LOG(ERROR) << "[AI Codec] [FFmpegDecodeImpl] Could not alloc frame";
 //       return false;
 //     }
 //     eos_got_.store(0);
@@ -288,7 +267,7 @@ class EasyDecodeImpl : public VideoDecoderImpl {
 //     int got_frame = 0;
 //     int ret = avcodec_decode_video2(decode_, av_frame_, &got_frame, pkt);
 //     if (ret < 0) {
-//       LOG(ERROR) << "[EasyDK Samples] [FFmpegDecodeImpl] avcodec_decode_video2 failed, data ptr, size:"
+//       LOG(ERROR) << "[AI Codec] [FFmpegDecodeImpl] avcodec_decode_video2 failed, data ptr, size:"
 //                  << pkt->data << ", " << pkt->size;
 //       return false;
 //     }
@@ -303,7 +282,7 @@ class EasyDecodeImpl : public VideoDecoderImpl {
 //     packet.size = 0;
 //     packet.data = NULL;
 
-//     LOG(INFO) << "[EasyDK Samples] [FFmpegDecodeImpl] Sent EOS packet to decoder";
+//     LOG(INFO) << "[AI Codec] [FFmpegDecodeImpl] Sent EOS packet to decoder";
 //     eos_sent_.store(1);
 //     // flush all frames ...
 //     int got_frame = 0;
@@ -323,7 +302,7 @@ class EasyDecodeImpl : public VideoDecoderImpl {
 //     }
 //   }
 //   bool CopyFrameD2H(void *dst, const edk::CnFrame &frame) override {
-//     return edk::EasyDecode::CopyFrameD2H(dst, frame);
+//     return edk::VideoDecode::CopyFrameD2H(dst, frame);
 //   }
 //   void Destroy() {
 //     if (av_frame_) {
@@ -389,7 +368,7 @@ class EasyDecodeImpl : public VideoDecoderImpl {
 //         break;
 //       }
 //       default: {
-//         LOG(ERROR) << "[EasyDK Samples] [FFmpegDecodeImpl] ProcessFrame() Unsupported pixel format: "
+//         LOG(ERROR) << "[AI Codec] [FFmpegDecodeImpl] ProcessFrame() Unsupported pixel format: "
 //                    << decode_->pix_fmt;
 //         return false;
 //       }
@@ -429,7 +408,7 @@ class EasyDecodeImpl : public VideoDecoderImpl {
 //   for (format = pix_fmts; *format != -1; format++) {
 //     if (*format == hw_pix_fmt) return *format;
 //   }
-//   LOG(ERROR) << "[EasyDK Samples] [FFmpegMluDecodeImpl] Failed to get HW surface format. ";
+//   LOG(ERROR) << "[AI Codec] [FFmpegMluDecodeImpl] Failed to get HW surface format. ";
 //   return AV_PIX_FMT_NONE;
 // }
 // #endif
@@ -462,7 +441,7 @@ class EasyDecodeImpl : public VideoDecoderImpl {
 //     }
 
 //     if (!dec) {
-//       LOG(ERROR) << "[EasyDK Samples] [FFmpegMluDecodeImpl] avcodec_find_decoder failed";
+//       LOG(ERROR) << "[AI Codec] [FFmpegMluDecodeImpl] avcodec_find_decoder failed";
 //       return false;
 //     }
 // #ifdef FFMPEG_MLU_OUTPUT_ON_MLU
@@ -470,7 +449,7 @@ class EasyDecodeImpl : public VideoDecoderImpl {
 //     for (int i = 0;; i++) {
 //       const AVCodecHWConfig *config = avcodec_get_hw_config(dec, i);
 //       if (!config) {
-//         LOG(ERROR)<< "[EasyDK Samples] [FFmpegMluDecodeImpl] Decoder " << dec->name
+//         LOG(ERROR)<< "[AI Codec] [FFmpegMluDecodeImpl] Decoder " << dec->name
 //                   << " doesn't support device type " << av_hwdevice_get_type_name(dev_type);
 //         return -1;
 //       }
@@ -482,13 +461,13 @@ class EasyDecodeImpl : public VideoDecoderImpl {
 // #endif
 //     decode_ = avcodec_alloc_context3(dec);
 //     if (!decode_) {
-//       LOG(ERROR) << "[EasyDK Samples] [FFmpegMluDecodeImpl] Failed to do avcodec_alloc_context3";
+//       LOG(ERROR) << "[AI Codec] [FFmpegMluDecodeImpl] Failed to do avcodec_alloc_context3";
 //       return false;
 //     }
 //     // av_codec_set_pkt_timebase(instance_, st->time_base);
 
 //     if (avcodec_parameters_to_context(decode_, info.codecpar) != 0) {
-//         LOG(ERROR) << "[EasyDK Samples] [FFmpegMluDecodeImpl] Copy codec context failed";
+//         LOG(ERROR) << "[AI Codec] [FFmpegMluDecodeImpl] Copy codec context failed";
 //         return false;
 //     }
 
@@ -502,19 +481,19 @@ class EasyDecodeImpl : public VideoDecoderImpl {
 //     AVBufferRef *hw_device_ctx = nullptr;
 //     snprintf(dev_idx_des, sizeof(device_id_), "%d", device_id_);
 //     if (av_hwdevice_ctx_create(&hw_device_ctx, dev_type, dev_idx_des, NULL, 0) < 0) {
-//       LOG(ERROR) << "[EasyDK Samples] [FFmpegMluDecodeImpl] Failed to create specified HW device.";
+//       LOG(ERROR) << "[AI Codec] [FFmpegMluDecodeImpl] Failed to create specified HW device.";
 //       return false;
 //     }
 //     decode_->hw_device_ctx = av_buffer_ref(hw_device_ctx);
 // #endif
 
 //     if (avcodec_open2(decode_, dec,  &decoder_opts) < 0) {
-//       LOG(ERROR) << "[EasyDK Samples] [FFmpegMluDecodeImpl] Failed to open codec";
+//       LOG(ERROR) << "[AI Codec] [FFmpegMluDecodeImpl] Failed to open codec";
 //       return false;
 //     }
 //     av_frame_ = av_frame_alloc();
 //     if (!av_frame_) {
-//       LOG(ERROR) << "[EasyDK Samples] [FFmpegMluDecodeImpl] Could not alloc frame";
+//       LOG(ERROR) << "[AI Codec] [FFmpegMluDecodeImpl] Could not alloc frame";
 //       return false;
 //     }
 //     eos_got_.store(0);
@@ -524,7 +503,7 @@ class EasyDecodeImpl : public VideoDecoderImpl {
 //   bool FeedPacket(const AVPacket* pkt) override {
 //     int ret = avcodec_send_packet(decode_, pkt);
 //     if (ret < 0) {
-//       LOG(ERROR) << "[EasyDK Samples] [FFmpegMluDecodeImpl] avcodec_send_packet failed, data ptr, size:"
+//       LOG(ERROR) << "[AI Codec] [FFmpegMluDecodeImpl] avcodec_send_packet failed, data ptr, size:"
 //                  << pkt->data << ", " << pkt->size;
 //       return false;
 //     }
@@ -540,7 +519,7 @@ class EasyDecodeImpl : public VideoDecoderImpl {
 //     packet.size = 0;
 //     packet.data = NULL;
 
-//     LOG(INFO) << "[EasyDK Samples] [FFmpegMluDecodeImpl] Sent EOS packet to decoder";
+//     LOG(INFO) << "[AI Codec] [FFmpegMluDecodeImpl] Sent EOS packet to decoder";
 //     eos_sent_.store(1);
 //     avcodec_send_packet(decode_, &packet);
 //     // flush all frames ...
@@ -561,7 +540,7 @@ class EasyDecodeImpl : public VideoDecoderImpl {
 //     }
 //   }
 //   bool CopyFrameD2H(void *dst, const edk::CnFrame &frame) override {
-//     return edk::EasyDecode::CopyFrameD2H(dst, frame);
+//     return edk::VideoDecode::CopyFrameD2H(dst, frame);
 //   }
 //   void Destroy() {
 //     if (av_frame_) {
@@ -592,7 +571,7 @@ class EasyDecodeImpl : public VideoDecoderImpl {
 //         cn_frame.pformat = edk::PixelFmt::NV21;
 //         break;
 //       default:
-//         LOG(ERROR) << "[EasyDK Samples] [FFmpegMluDecodeImpl] ProcessFrame() Unsupported pixel format: "
+//         LOG(ERROR) << "[AI Codec] [FFmpegMluDecodeImpl] ProcessFrame() Unsupported pixel format: "
 //                      << decode_->sw_pix_fmt;
 //         return false;
 //     }
@@ -635,7 +614,7 @@ class EasyDecodeImpl : public VideoDecoderImpl {
 VideoDecoder::VideoDecoder(StreamRunner* runner, DecoderType type, int device_id) : runner_(runner) {
   switch (type) {
     case EASY_DECODE:
-      impl_ = new EasyDecodeImpl(this, runner, device_id);
+      impl_ = new VideoDecodeImpl(this, runner, device_id);
       break;
 //     case FFMPEG:
 //       impl_ = new FFmpegDecodeImpl(this, runner, device_id);
@@ -646,7 +625,7 @@ VideoDecoder::VideoDecoder(StreamRunner* runner, DecoderType type, int device_id
 //       break;
 // #endif
     default:
-      LOG(FATAL) << "[EasyDK Samples] [VideoDecoder] Unsupported decoder type";
+      LOG(FATAL) << "[AI Codec] [VideoDecoder] Unsupported decoder type";
   }
 }
 
@@ -665,7 +644,7 @@ bool VideoDecoder::OnPacket(const AVPacket* packet) {
 
 void VideoDecoder::OnEos() {
   if (send_eos_ == false) {
-    LOG(INFO) << "[EasyDK Samples] [VideoDecoder] OnEos(): Feed EOS";
+    LOG(INFO) << "[AI Codec] [VideoDecoder] OnEos(): Feed EOS";
     impl_->FeedEos();
     send_eos_ = true;
   }

@@ -1,0 +1,28 @@
+重试中。
+
+--2024-10-20 14:56:36--  (尝试次数： 8)  http://video.cambricon.com/models/labels/label_map_coco.txt
+正在连接 video.cambricon.com (video.cambricon.com)|182.92.212.157|:80... 失败：连接超时。
+重试中。
+
+--2024-10-20 14:59:00--  (尝试次数： 9)  http://video.cambricon.com/models/labels/label_map_coco.txt
+正在连接 video.cambricon.com (video.cambricon.com)|182.92.212.157|:80... 失败：连接超时。
+重试中。
+
+--2024-10-20 15:01:25--  (尝试次数：10)  http://video.cambricon.com/models/labels/label_map_coco.txt
+正在连接 video.cambricon.com (video.cambricon.com)|182.92.212.157|:80... 失败：连接超时。
+重试中。
+
+--2024-10-20 15:03:50--  (尝试次数：11)  http://video.cambricon.com/models/labels/label_map_coco.txt
+正在连接 video.cambricon.com (video.cambricon.com)|182.92.212.157|:80... 失败：连接超时。
+重试中。
+
+--2024-10-20 15:06:13--  (尝试次数：12)  http://video.cambricon.com/models/labels/label_map_coco.txt
+正在连接 video.cambricon.com (video.cambricon.com)|182.92.212.157|:80... 失败：连接超时。
+重试中。
+
+--2024-10-20 15:08:36--  (尝试次数：13)  http://video.cambricon.com/models/labels/label_map_coco.txt
+正在连接 video.cambricon.com (video.cambricon.com)|182.92.212.157|:80... 失败：连接超时。
+重试中。
+
+--2024-10-20 15:11:00--  (尝试次数：14)  http://video.cambricon.com/models/labels/label_map_coco.txt
+正在连接 video.cambricon.com (video.cambricon.com)|182.92.212.157|:80... 

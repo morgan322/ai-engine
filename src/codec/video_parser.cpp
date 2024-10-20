@@ -45,7 +45,7 @@ namespace detail {
 static int InterruptCallBack(void* ctx) {
   VideoParser* parser = reinterpret_cast<VideoParser*>(ctx);
   if (parser->CheckTimeout()) {
-    VLOG(4) << "[EasyDK Samples] [VideoParser] Rtsp: Get interrupt and timeout";
+    VLOG(4) << "[AI E写] [VideoParser] Rtsp: Get interrupt and timeout";
     return 1;
   }
   return 0;
@@ -91,13 +91,13 @@ bool VideoParser::Open(const char *url, bool save_file) {
   // open input
   int ret_code = avformat_open_input(&p_format_ctx_, url, NULL, &options_);
   if (0 != ret_code) {
-    LOG(ERROR) << "[EasyDK Samples] [VideoParser] Open(): Can not open input stream: " << url;
+    LOG(ERROR) << "[AI codec] [VideoParser] Open(): Can not open input stream: " << url;
     return false;
   }
   // find video stream information
   ret_code = avformat_find_stream_info(p_format_ctx_, NULL);
   if (ret_code < 0) {
-    LOG(ERROR) << "[EasyDK Samples] [VideoParser] Open(): Can not find stream information.";
+    LOG(ERROR) << "[AI Codec] [VideoParser] Open(): Can not find stream information.";
     return false;
   }
   video_index_ = -1;
@@ -114,7 +114,7 @@ bool VideoParser::Open(const char *url, bool save_file) {
     }
   }
   if (video_index_ == -1) {
-    LOG(ERROR) << "[EasyDK Samples] [VideoParser] Open(): Can not find a video stream.";
+    LOG(ERROR) << "[AI Codec] [VideoParser] Open(): Can not find a video stream.";
     return false;
   }
 
@@ -161,7 +161,7 @@ bool VideoParser::Open(const char *url, bool save_file) {
 #endif
   info_.extra_data = std::vector<uint8_t>(extradata, extradata + extradata_size);
 
-  LOG(INFO) << "[EasyDK Samples] [VideoParser] Open(): Format name is " << p_format_ctx_->iformat->name;
+  LOG(INFO) << "[AI Codec] [VideoParser] Open(): Format name is " << p_format_ctx_->iformat->name;
   if (strstr(p_format_ctx_->iformat->name, "mp4") || strstr(p_format_ctx_->iformat->name, "flv") ||
       strstr(p_format_ctx_->iformat->name, "matroska") || strstr(p_format_ctx_->iformat->name, "h264") ||
       strstr(p_format_ctx_->iformat->name, "rtsp")) {
@@ -172,7 +172,7 @@ bool VideoParser::Open(const char *url, bool save_file) {
       // info_.codec_type = edk::CodecType::H265;
       if (save_file) saver_.reset(new detail::FileSaver("out.h265"));
     } else {
-      LOG(ERROR) << "[EasyDK Samples] [VideoParser] Open(): Unsupported codec id: " << codec_id;
+      LOG(ERROR) << "[AI Codec] [VideoParser] Open(): Unsupported codec id: " << codec_id;
       return false;
     }
   }
@@ -188,7 +188,7 @@ bool VideoParser::Open(const char *url, bool save_file) {
 
 void VideoParser::Close() {
   if (!have_video_source_.load()) return;
-  LOG(INFO) << "[EasyDK Samples] [VideoParser] Close(): Clear FFMpeg resources";
+  LOG(INFO) << "[AI Codec] [VideoParser] Close(): Clear FFMpeg resources";
   if (p_format_ctx_) {
     avformat_close_input(&p_format_ctx_);
     avformat_free_context(p_format_ctx_);
@@ -209,7 +209,7 @@ int VideoParser::ParseLoop(uint32_t frame_interval) {
 
   while (handler_->Running()) {
     if (!have_video_source_.load()) {
-      LOG(ERROR) << "[EasyDK Samples] [VideoParser] ParseLoop(): Video source has not been init";
+      LOG(ERROR) << "[AI Codec] [VideoParser] ParseLoop(): Video source has not been init";
       return -1;
     }
 
@@ -230,11 +230,11 @@ int VideoParser::ParseLoop(uint32_t frame_interval) {
 
     // filter non-key-frame in head
     if (first_frame_) {
-      VLOG(1) << "[EasyDK Samples] [VideoParser] ParseLoop(): Check first frame";
+      VLOG(1) << "[AI Codec] [VideoParser] ParseLoop(): Check first frame";
       if (packet_.flags & AV_PKT_FLAG_KEY) {
         first_frame_ = false;
       } else {
-        LOG(WARNING) << "[EasyDK Samples] [VideoParser]ParseLoop():  Skip first not-key-frame";
+        LOG(WARNING) << "[AI Codec] [VideoParser]ParseLoop():  Skip first not-key-frame";
         av_packet_unref(&packet_);
         continue;
       }
@@ -244,7 +244,7 @@ int VideoParser::ParseLoop(uint32_t frame_interval) {
     auto vstream = p_format_ctx_->streams[video_index_];
     // find pts information
     if (AV_NOPTS_VALUE == packet_.pts) {
-      VLOG(5) << "[EasyDK Samples] [VideoParser] ParseLoop(): Didn't find pts informations,"
+      VLOG(5) << "[AI Codec] [VideoParser] ParseLoop(): Didn't find pts informations,"
               << " use ordered numbers instead.";
       packet_.pts = frame_index_++;
     } else {
