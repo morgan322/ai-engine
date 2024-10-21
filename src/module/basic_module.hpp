@@ -10,7 +10,7 @@
 
 namespace ai
 {
-  namespace basic
+  namespace module
   {
     class BasicModule
     {
@@ -21,12 +21,12 @@ namespace ai
       ~BasicModule() = default;
 
       void
-      SetProcessDoneCallback(std::function<int(std::shared_ptr<ai::basic::Frame>)> callback)
+      SetProcessDoneCallback(std::function<int(std::shared_ptr<ai::module::Frame>)> callback)
       {
         callback_ = callback;
       }
 
-      virtual int Transmit(std::shared_ptr<ai::basic::Frame> frame) final
+      virtual int Transmit(std::shared_ptr<ai::module::Frame> frame) final
       { // NOLINT
         if (callback_)
           return callback_(frame);
@@ -39,13 +39,13 @@ namespace ai
 
     public:
       virtual int Open() = 0;
-      virtual int Process(std::shared_ptr<ai::basic::Frame> frame) = 0;
+      virtual int Process(std::shared_ptr<ai::module::Frame> frame) = 0;
       virtual int Close() = 0;
 
     private:
       std::string module_name_ = "";
       int parallelism_ = 1;
-      std::function<int(std::shared_ptr<ai::basic::Frame>)> callback_;
+      std::function<int(std::shared_ptr<ai::module::Frame>)> callback_;
       std::shared_ptr<BasicModule> next_module_ = nullptr;
     };
 

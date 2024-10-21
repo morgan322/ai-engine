@@ -25,8 +25,8 @@
 #include <string>
 #include <vector>
 
-#include "cnedk_transform.h"
-#include "../codec/buf_surface_util.hpp"
+#include "codec/ai_transform.h"
+#include "codec/buf_surface_util.hpp"
 #include "infer_server.h"
 #include "shape.h"
 
@@ -123,7 +123,7 @@ struct CNInferBoundingBox {
 };
 
 struct PreprocInput {
-  cnedk::BufSurfWrapperPtr surf = nullptr;
+  ai::BufSurfWrapperPtr surf = nullptr;
   bool has_bbox = false;
   CNInferBoundingBox bbox;
 };

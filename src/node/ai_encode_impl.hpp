@@ -21,7 +21,7 @@
 #ifndef AI_ENCODE_IMPL_HPP_
 #define AI_ENCODE_IMPL_HPP_
 
-#include "../codec/ai_encoder.h"
+#include "codec/ai_encoder.h"
 
 namespace ai {
 namespace node {

@@ -6,15 +6,15 @@
 #include <memory>
 #include <string>
 
-#include "easy_module.hpp"
+#include "module/basic_module.hpp"
 
-#include "cnedk_encode.h"
-#include "encode_handler_mlu.hpp"
+#include "ai_encode.h"
+#include "codec/encode_handler_cpu.hpp"
 
 namespace ai {
 namespace codec {
 
-class Encode : public ai::basic::BasicModule {
+class Encode : public ai::module::BasicModule {
 public:
   explicit Encode(std::string name, int parallelism, int device_id,
                   std::string filename)
@@ -29,14 +29,14 @@ public:
 
   int Close() override;
 
-  int Process(std::shared_ptr<ai::basic::Frame> frame) override;
+  int Process(std::shared_ptr<ai::module::Frame> frame) override;
 
 private:
   int device_id_;
-  VEncHandlerParam param_;
+  // VEncHandlerParam param_;
   std::mutex venc_mutex_;
   std::string filename_;
-  std::map<int, std::shared_ptr<VencMluHandler>> ivenc_;
+  // std::map<int, std::shared_ptr<VencMluHandler>> ivenc_;
 };
 
 } // namespace codec

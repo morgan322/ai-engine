@@ -30,12 +30,14 @@
 #include <utility>
 #include <vector>
 
-#include "edk_config.h"
+#include "adk_config.h"
 #include "shape.h"
-#include "../utils/any.h"
-#include "../utils/base_object.h"
+#include "utils/any.h"
+#include "utils/base_object.h"
 
 namespace infer_server {
+
+enum class InferType { kAsync, kSync };
 
 /**
  * @brief Enumeration to specify data type of model input and output
@@ -403,7 +405,7 @@ class Processor : public BaseObject {
    *
    * @return std::shared_ptr<Processor> A new processor
    */
-  virtual std::shared_ptr<Processor> Fork() = 0;
+  virtual std::shared_ptr<Processor> Fork() noexcept = 0;
 
  private:
   Processor() = delete;
@@ -438,13 +440,18 @@ class ProcessorForkable : public Processor {
    *
    * @return std::shared_ptr<Processor> A new processor
    */
-  std::shared_ptr<Processor> Fork() noexcept(std::is_nothrow_default_constructible<T>::value) override {
-    auto p = std::make_shared<T>();
-    p->CopyParamsFrom(*this);
-    if (p->Init() != Status::SUCCESS) return nullptr;
-    return p;
+  // std::shared_ptr<Processor> Fork() noexcept(std::is_nothrow_default_constructible<T>::value) override {
+  //   auto p = std::make_shared<T>();
+  //   p->CopyParamsFrom(*this);
+  //   if (p->Init() != Status::SUCCESS) return nullptr;
+  //   return p;
+  // }
+  std::shared_ptr<Processor> Fork() noexcept override {
+      auto p = std::make_shared<T>();
+      p->CopyParamsFrom(*this);
+      if (p->Init() != Status::SUCCESS) return nullptr;
+      return p;
   }
-
   /**
    * @brief Create a processor
    *

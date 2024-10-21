@@ -2,7 +2,7 @@
 #ifndef AI_DECODE_IMPL_HPP_
 #define AI_DECODE_IMPL_HPP_
 
-#include "../codec/ai_decode.h"
+#include "codec/ai_decode.h"
 
 namespace ai
 {
