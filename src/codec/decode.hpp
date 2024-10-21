@@ -59,9 +59,9 @@ public:
   }
 
 private:
-  int CreateSurfacePool(void **surf_pool, int width, int height);
-  int GetBufSurface(AIBufSurface **surf, int width, int height,
-                    AIBufSurfaceColorFormat fmt, int timeout_ms);
+  // int CreateSurfacePool(void **surf_pool, int width, int height);
+  // int GetBufSurface(AIBufSurface **surf, int width, int height,
+  //                   AIBufSurfaceColorFormat fmt, int timeout_ms);
   int OnFrame(AIBufSurface *surf);
   int OnEos();
   int OnError(int errcode);
@@ -79,7 +79,7 @@ private:
   int height_;
   void *vdec_ = nullptr;
   bool eos_send_ = false;
-  void *surf_pool_ = nullptr;
+  // void *surf_pool_ = nullptr;
   int dev_id_ = 0;
   int frame_rate_ = 30;
 

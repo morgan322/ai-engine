@@ -64,7 +64,7 @@ namespace ai
                 {
                     if (AIVdecSendStream(vdec_, &packet, 5000) < 0)
                     {
-                        LOG(ERROR) << "[EasyDK Sample] [Decode] SendData(): Send data failed";
+                        LOG(ERROR) << "[AI] [Decode] SendData(): Send data failed";
                     }
                     else
                     {
@@ -93,10 +93,10 @@ namespace ai
                 AIVdecStream packet;
                 memset(&packet, 0, sizeof(packet));
                 packet.bits = nullptr;
-                if (AIVdecSendStream(vdec_, &packet, 5000))
-                { // send eos;
-                    LOG(ERROR) << "[EasyDK Sample] [Decode] SendData(): Send data failed";
-                }
+                // if (AIVdecSendStream(vdec_, &packet, 5000))
+                // { // send eos;
+                //     LOG(ERROR) << "[AI] [Decode] SendData(): Send data failed";
+                // }
                 eos_send_ = true;
             }
             return 0;
@@ -127,7 +127,7 @@ namespace ai
             int ret = demuxer_->Open(filename_.c_str());
             if (ret < 0)
             {
-                LOG(ERROR) << "[EasyDK Sample] [Decode] Create demuxer failed";
+                LOG(ERROR) << "[AI] [Decode] Create demuxer failed";
                 return -1;
             }
             fr_controller_.reset(new FrController(frame_rate_));
@@ -146,7 +146,7 @@ namespace ai
                 params_.type = AI_VDEC_TYPE_H265;
                 break;
             default:
-                LOG(ERROR) << "[EasyDK Sample] [Decode] Not support codec type";
+                LOG(ERROR) << "[AI] [Decode] Not support codec type";
                 return -1;
                 break;
             }
@@ -168,13 +168,13 @@ namespace ai
             ret = AIVdecCreate(&vdec_, &params_);
             if (ret < 0)
             {
-                LOG(ERROR) << "[EasyDK Sample] [Decode] Create decode failed";
+                LOG(ERROR) << "[AI] [Decode] Create decode failed";
                 return -1;
             }
 
             if (CreateSurfacePool(&surf_pool_, width_, height_) < 0)
             {
-                LOG(ERROR) << "[EasyDK Sample] [Decode] Create Surface pool failed";
+                LOG(ERROR) << "[AI] [Decode] Create Surface pool failed";
                 return -1;
             }
 
@@ -207,7 +207,7 @@ namespace ai
 
             if (AIBufPoolCreate(surf_pool, &create_params, 12) < 0)
             {
-                LOG(ERROR) << "[EasyDK Sample] [Decode] CreateSurfacePool(): Create pool failed";
+                LOG(ERROR) << "[AI] [Decode] CreateSurfacePool(): Create pool failed";
                 return -1;
             }
             return 0;
@@ -215,7 +215,7 @@ namespace ai
 
         int Decode::OnError(int err_code)
         {
-            LOG(ERROR) << "[EasyDK Sample] [Decode] OnError";
+            LOG(ERROR) << "[AI] [Decode] OnError";
             return 0;
         }
 
@@ -248,7 +248,7 @@ namespace ai
 
         int Decode::OnEos()
         {
-            LOG(INFO) << "[EasyDK Sample] [Decode] OnEos" << std::endl;
+            LOG(INFO) << "[AI] [Decode] OnEos" << std::endl;
             std::shared_ptr<ai::basic::Frame> new_frame = std::make_shared<ai::basic::Frame>();
             new_frame->stream_id = stream_id_;
             new_frame->is_eos = true;
@@ -258,27 +258,27 @@ namespace ai
             return 0;
         }
 
-        int Decode::GetBufSurface(AIBufSurface **surf, int width, int height,
-                                  AIBufSurfaceColorFormat fmt, int timeout_ms)
-        {
-            if (surf_pool_)
-            {
-                int retry_time = 50;
-                while (retry_time--)
-                {
-                    if (AIBufSurfaceCreateFromPool(surf, surf_pool_) == 0)
-                    {
-                        break;
-                    }
-                    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-                }
-                if (retry_time < 0)
-                {
-                    LOG(ERROR) << "[EasyDK Sample] [Decode] GetBufSurface(): Get BufSurface from pool failed";
-                    return -1;
-                }
-            }
-            return 0;
-        }
+        // int Decode::GetBufSurface(AIBufSurface **surf, int width, int height,
+        //                           AIBufSurfaceColorFormat fmt, int timeout_ms)
+        // {
+        //     if (surf_pool_)
+        //     {
+        //         int retry_time = 50;
+        //         while (retry_time--)
+        //         {
+        //             if (AIBufSurfaceCreateFromPool(surf, surf_pool_) == 0)
+        //             {
+        //                 break;
+        //             }
+        //             std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        //         }
+        //         if (retry_time < 0)
+        //         {
+        //             LOG(ERROR) << "[AI] [Decode] GetBufSurface(): Get BufSurface from pool failed";
+        //             return -1;
+        //         }
+        //     }
+        //     return 0;
+        // }
     }// namespace codec
 }// namespace ai
