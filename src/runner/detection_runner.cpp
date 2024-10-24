@@ -1,23 +1,3 @@
-/*************************************************************************
- * Copyright (C) [2020] by Cambricon, Inc. All rights reserved
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *************************************************************************/
-
 #include "detection_runner.h"
 
 #include <glog/logging.h>
@@ -60,10 +40,10 @@ class DetectionRunnerObserver : public infer_server::Observer {
   std::function<void(DetectionFrame*, bool)> callback_;
 };
 
-CnedkTransformRect KeepAspectRatio(int src_w, int src_h, int dst_w, int dst_h) {
+AITransformRect KeepAspectRatio(int src_w, int src_h, int dst_w, int dst_h) {
   float src_ratio = static_cast<float>(src_w) / src_h;
   float dst_ratio = static_cast<float>(dst_w) / dst_h;
-  CnedkTransformRect res;
+  AITransformRect res;
   memset(&res, 0, sizeof(res));
   if (src_ratio < dst_ratio) {
     int pad_lenth = dst_w - src_ratio * dst_h;
@@ -119,7 +99,7 @@ DetectionRunner::DetectionRunner(const VideoDecoder::DecoderType& decode_type, i
       return;
     }
 
-    CnedkBufSurface* surf = frame->surf;
+    AIBufSurface* surf = frame->surf;
     std::vector<DetectObject>& detect_objs = frame->objs;
     cv::Mat img = this->ConvertToMatAndReleaseBuf(surf);
     osd_.DrawLabel(img, detect_objs);
@@ -166,23 +146,23 @@ int DetectionRunner::OnTensorParams(const infer_server::CnPreprocTensorParams *p
   return 0;
 }
 
-int DetectionRunner::OnPreproc(cnedk::BufSurfWrapperPtr src, cnedk::BufSurfWrapperPtr dst,
-                               const std::vector<CnedkTransformRect> &src_rects) {
-  CnedkBufSurface* src_buf = src->GetBufSurface();
-  CnedkBufSurface* dst_buf = dst->GetBufSurface();
+int DetectionRunner::OnPreproc(ai::BufSurfWrapperPtr src, ai::BufSurfWrapperPtr dst,
+                               const std::vector<AITransformRect> &src_rects) {
+  AIBufSurface* src_buf = src->GetBufSurface();
+  AIBufSurface* dst_buf = dst->GetBufSurface();
 
   uint32_t batch_size = src->GetNumFilled();
-  std::vector<CnedkTransformRect> src_rect(batch_size);
-  std::vector<CnedkTransformRect> dst_rect(batch_size);
-  CnedkTransformParams params;
+  std::vector<AITransformRect> src_rect(batch_size);
+  std::vector<AITransformRect> dst_rect(batch_size);
+  AITransformParams params;
   memset(&params, 0, sizeof(params));
   params.transform_flag = 0;
   if (src_rects.size()) {
-    params.transform_flag |= CNEDK_TRANSFORM_CROP_SRC;
+    params.transform_flag |= AI_TRANSFORM_CROP_SRC;
     params.src_rect = src_rect.data();
-    memset(src_rect.data(), 0, sizeof(CnedkTransformRect) * batch_size);
+    memset(src_rect.data(), 0, sizeof(AITransformRect) * batch_size);
     for (uint32_t i = 0; i < batch_size; i++) {
-      CnedkTransformRect *src_bbox = &src_rect[i];
+      AITransformRect *src_bbox = &src_rect[i];
       *src_bbox = src_rects[i];
       // validate bbox
       src_bbox->left -= src_bbox->left & 1;
@@ -195,9 +175,9 @@ int DetectionRunner::OnPreproc(cnedk::BufSurfWrapperPtr src, cnedk::BufSurfWrapp
   }
 
   // configure dst_desc
-  CnedkTransformTensorDesc dst_desc;
-  dst_desc.color_format = CNEDK_TRANSFORM_COLOR_FORMAT_RGB;
-  dst_desc.data_type = CNEDK_TRANSFORM_UINT8;
+  AITransformTensorDesc dst_desc;
+  dst_desc.color_format = AI_TRANSFORM_COLOR_FORMAT_RGB;
+  dst_desc.data_type = AI_TRANSFORM_UINT8;
 
   if (params_.input_order == infer_server::DimOrder::NHWC) {
     dst_desc.shape.n = params_.input_shape[0];
@@ -214,11 +194,11 @@ int DetectionRunner::OnPreproc(cnedk::BufSurfWrapperPtr src, cnedk::BufSurfWrapp
     return -1;
   }
 
-  params.transform_flag |= CNEDK_TRANSFORM_CROP_DST;
+  params.transform_flag |= AI_TRANSFORM_CROP_DST;
   params.dst_rect = dst_rect.data();
-  memset(dst_rect.data(), 0, sizeof(CnedkTransformRect) * batch_size);
+  memset(dst_rect.data(), 0, sizeof(AITransformRect) * batch_size);
   for (uint32_t i = 0; i < batch_size; i++) {
-    CnedkTransformRect *dst_bbox = &dst_rect[i];
+    AITransformRect *dst_bbox = &dst_rect[i];
     *dst_bbox = KeepAspectRatio(src_buf->surface_list[i].width, src_buf->surface_list[i].height, dst_desc.shape.w,
                                 dst_desc.shape.h);
     // validate bbox
@@ -232,14 +212,14 @@ int DetectionRunner::OnPreproc(cnedk::BufSurfWrapperPtr src, cnedk::BufSurfWrapp
 
   params.dst_desc = &dst_desc;
 
-  CnedkTransformConfigParams config;
+  AITransformConfigParams config;
   memset(&config, 0, sizeof(config));
-  config.compute_mode = CNEDK_TRANSFORM_COMPUTE_MLU;
-  CnedkTransformSetSessionParams(&config);
+  config.compute_mode = AI_TRANSFORM_COMPUTE_MLU;
+  AITransformSetSessionParams(&config);
 
-  CnedkBufSurfaceMemSet(dst_buf, -1, -1, 0x80);
-  if (CnedkTransform(src_buf, dst_buf, &params) < 0) {
-    LOG(ERROR) << "[EasyDK Samples] [DetectionRunner] OnPreproc(): CnedkTransform failed";
+  AIBufSurfaceMemSet(dst_buf, -1, -1, 0x80);
+  if (AITransform(src_buf, dst_buf, &params) < 0) {
+    LOG(ERROR) << "[EasyDK Samples] [DetectionRunner] OnPreproc(): AITransform failed";
     return -1;
   }
 
@@ -249,8 +229,8 @@ int DetectionRunner::OnPreproc(cnedk::BufSurfWrapperPtr src, cnedk::BufSurfWrapp
 int DetectionRunner::OnPostproc(const std::vector<infer_server::InferData*>& data_vec,
                                 const infer_server::ModelIO& model_output,
                                 const infer_server::ModelInfo* model_info) {
-  cnedk::BufSurfWrapperPtr output0 = model_output.surfs[0];  // data
-  cnedk::BufSurfWrapperPtr output1 = model_output.surfs[1];  // bbox
+  ai::BufSurfWrapperPtr output0 = model_output.surfs[0];  // data
+  ai::BufSurfWrapperPtr output1 = model_output.surfs[1];  // bbox
 
   if (!output0->GetHostData(0)) {
     LOG(ERROR) << "[EasyDK Samples] [DetectionRunner] Postprocess failed, copy data0 to host failed.";
@@ -261,8 +241,8 @@ int DetectionRunner::OnPostproc(const std::vector<infer_server::InferData*>& dat
     return -1;
   }
 
-  CnedkBufSurfaceSyncForCpu(output0->GetBufSurface(), -1, -1);
-  CnedkBufSurfaceSyncForCpu(output1->GetBufSurface(), -1, -1);
+  AIBufSurfaceSyncForCpu(output0->GetBufSurface(), -1, -1);
+  AIBufSurfaceSyncForCpu(output1->GetBufSurface(), -1, -1);
 
   infer_server::DimOrder input_order = model_info->InputLayout(0).order;
   auto s = model_info->InputShape(0);
@@ -327,7 +307,7 @@ int DetectionRunner::OnPostproc(const std::vector<infer_server::InferData*>& dat
   return 0;
 }
 
-cv::Mat DetectionRunner::ConvertToMatAndReleaseBuf(CnedkBufSurface* surf) {
+cv::Mat DetectionRunner::ConvertToMatAndReleaseBuf(AIBufSurface* surf) {
   size_t length = surf->surface_list[0].data_size;
 
   uint8_t* buffer = new uint8_t[length];
@@ -340,16 +320,16 @@ cv::Mat DetectionRunner::ConvertToMatAndReleaseBuf(CnedkBufSurface* surf) {
       reinterpret_cast<void*>(reinterpret_cast<uint64_t>(surf->surface_list[0].data_ptr) + frame_stride * frame_h),
       frame_stride * frame_h / 2, cnrtMemcpyDevToHost);
 
-  CnedkBufSurfaceColorFormat fmt = surf->surface_list[0].color_format;
+  AIBufSurfaceColorFormat fmt = surf->surface_list[0].color_format;
   decoder_->ReleaseFrame(surf);
 
   // alloc memory to store image
   // yuv to bgr
   cv::Mat yuv(frame_h * 3 / 2, frame_stride, CV_8UC1, buffer);
   cv::Mat img;
-  if (fmt == CNEDK_BUF_COLOR_FORMAT_NV12) {
+  if (fmt == AI_BUF_COLOR_FORMAT_NV12) {
     cv::cvtColor(yuv, img, cv::COLOR_YUV2BGR_NV12);
-  } else if (fmt == CNEDK_BUF_COLOR_FORMAT_NV21) {
+  } else if (fmt == AI_BUF_COLOR_FORMAT_NV21) {
     cv::cvtColor(yuv, img, cv::COLOR_YUV2BGR_NV21);
   } else {
     LOG(ERROR) << "[EasyDK Samples] [DetectionRunner] Unsupported pixel format";
@@ -361,7 +341,7 @@ cv::Mat DetectionRunner::ConvertToMatAndReleaseBuf(CnedkBufSurface* surf) {
   return img;
 }
 
-void DetectionRunner::Process(CnedkBufSurface* surf) {
+void DetectionRunner::Process(AIBufSurface* surf) {
   std::string stream = "stream_0";
   if (!surf) {
     infer_server_->WaitTaskDone(session_, stream);
@@ -370,7 +350,7 @@ void DetectionRunner::Process(CnedkBufSurface* surf) {
   infer_server::PackagePtr request = infer_server::Package::Create(1, stream);
   infer_server::PreprocInput tmp;
 
-  tmp.surf = std::make_shared<cnedk::BufSurfaceWrapper>(surf, false);
+  tmp.surf = std::make_shared<AI::BufSurfaceWrapper>(surf, false);
   tmp.has_bbox = false;
   request->data[0]->Set(std::move(tmp));
 
