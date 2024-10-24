@@ -32,7 +32,7 @@
 #include "inference/infer_server.h"
 #include "priority.h"
 #include "request_ctrl.h"
-#include "util/batcher.h"
+#include "utils/batcher.h"
 
 namespace infer_server {
 

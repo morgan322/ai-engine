@@ -29,8 +29,8 @@
 #include <utility>
 #include <vector>
 
-#include "cnis/infer_server.h"
-#include "util/thread_pool.h"
+#include "inference/infer_server.h"
+#include "utils/thread_pool.h"
 
 namespace infer_server {
 

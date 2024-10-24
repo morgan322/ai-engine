@@ -14,7 +14,7 @@
  *
  *************************************************************************/
 
-#include "util/thread_pool.h"
+#include "utils/thread_pool.h"
 
 #include <sys/prctl.h>
 #include <memory>

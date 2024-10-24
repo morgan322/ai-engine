@@ -30,15 +30,15 @@
 
 class SampleAsyncInferenceObserver : public infer_server::Observer {
  public:
-  explicit SampleAsyncInferenceObserver(std::function<void(std::shared_ptr<ai::basic::Frame>, bool)> callback)
+  explicit SampleAsyncInferenceObserver(std::function<void(std::shared_ptr<ai::module::Frame>, bool)> callback)
                           : callback_(callback) {}
   void Response(infer_server::Status status, infer_server::PackagePtr data,
                 infer_server::any user_data) noexcept override {
-    callback_(infer_server::any_cast<std::shared_ptr<ai::basic::Frame>>(user_data), status == infer_server::Status::SUCCESS);
+    callback_(infer_server::any_cast<std::shared_ptr<ai::module::Frame>>(user_data), status == infer_server::Status::SUCCESS);
   }
 
  private:
-  std::function<void(std::shared_ptr<ai::basic::Frame>, bool)> callback_;
+  std::function<void(std::shared_ptr<ai::module::Frame>, bool)> callback_;
 };
 
 int SampleAsyncInference::Open() {
@@ -80,7 +80,7 @@ int SampleAsyncInference::Open() {
   infer_server::SetPostprocHandler(desc.model->GetKey(), postproc_.get());
 
   // set end of frame
-  auto eof_callback_ = [this](std::shared_ptr<ai::basic::Frame> frame, bool valid) {
+  auto eof_callback_ = [this](std::shared_ptr<ai::module::Frame> frame, bool valid) {
     if (!valid) {
       return;
     }
@@ -92,7 +92,7 @@ int SampleAsyncInference::Open() {
   return 0;
 }
 
-int SampleAsyncInference::Process(std::shared_ptr<ai::basic::Frame> frame) {
+int SampleAsyncInference::Process(std::shared_ptr<ai::module::Frame> frame) {
   std::string stream = "stream_0";
   if (frame->is_eos) {
     if (infer_server_) infer_server_->WaitTaskDone(session_, stream);

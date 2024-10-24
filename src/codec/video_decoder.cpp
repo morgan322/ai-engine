@@ -6,6 +6,7 @@
 #include <string>
 
 
+#include "module/frame.h"
 #include "video_decoder.h"
 #include "runner/stream_runner.h"
 
@@ -22,7 +23,7 @@ class VideoDecodeImpl : public VideoDecoderImpl {
   VideoDecodeImpl(VideoDecoder* interface, IDecodeEventHandle* handle, int device_id)
       : VideoDecoderImpl(interface, handle, device_id) {}
   bool Init() override {
-    cnrtSetDevice(device_id_);
+    // cnrtSetDevice(device_id_);
 
     VideoInfo& info = interface_->GetVideoInfo();
     p_bsfc_ = nullptr;
@@ -56,23 +57,23 @@ class VideoDecodeImpl : public VideoDecoderImpl {
       return false;
     }
 
-    if (IsEdgePlatform(device_id_)) {
-      create_params.color_format = AI_BUF_COLOR_FORMAT_NV21;
-    } else {
-      create_params.color_format = AI_BUF_COLOR_FORMAT_NV12;
-    }
+    // if (IsEdgePlatform(device_id_)) {
+    //   create_params.color_format = AI_BUF_COLOR_FORMAT_NV21;
+    // } else {
+    //   create_params.color_format = AI_BUF_COLOR_FORMAT_NV12;
+    // }
 
-    if (CreateSurfacePool(&surf_pool_, create_params.max_width, create_params.max_height) < 0) {
-      LOG(ERROR) << "[AI Codec] [VideoDecodeImpl] Init(): Create BufSurface pool failed ";
-      return false;
-    }
+    // if (CreateSurfacePool(&surf_pool_, create_params.max_width, create_params.max_height) < 0) {
+    //   LOG(ERROR) << "[AI Codec] [VideoDecodeImpl] Init(): Create BufSurface pool failed ";
+    //   return false;
+    // }
 
-    VLOG(1) << "[AI Codec] [VideoDecodeImpl] Init(): surf_pool:" << surf_pool_;
+    // VLOG(1) << "[AI Codec] [VideoDecodeImpl] Init(): surf_pool:" << surf_pool_;
 
-    if (AIVdecCreate(&vdec_, &create_params) < 0) {
-      LOG(ERROR) << "[AI Codec] [VideoDecodeImpl] Init(): Create decoder failed";
-      return false;
-    }
+    // if (AIVdecCreate(&vdec_, &create_params) < 0) {
+    //   LOG(ERROR) << "[AI Codec] [VideoDecodeImpl] Init(): Create decoder failed";
+    //   return false;
+    // }
 
     return true;
   }
@@ -86,16 +87,16 @@ class VideoDecodeImpl : public VideoDecoderImpl {
     create_params.color_format = AI_BUF_COLOR_FORMAT_NV12;
     create_params.device_id = device_id_;
 
-    if (IsEdgePlatform(device_id_)) {
-      create_params.mem_type = AI_BUF_MEM_VB_CACHED;
-    } else {
-      create_params.mem_type = AI_BUF_MEM_DEVICE;
-    }
+    // if (IsEdgePlatform(device_id_)) {
+    //   create_params.mem_type = AI_BUF_MEM_VB_CACHED;
+    // } else {
+    //   create_params.mem_type = AI_BUF_MEM_DEVICE;
+    // }
 
-    if (AIBufPoolCreate(surf_pool, &create_params, 16) < 0) {
-      LOG(ERROR) << "[AI Codec] [VideoDecodeImpl] CreateSurfacePool(): Create pool failed";
-      return -1;
-    }
+    // if (AIBufPoolCreate(surf_pool, &create_params, 16) < 0) {
+    //   LOG(ERROR) << "[AI Codec] [VideoDecodeImpl] CreateSurfacePool(): Create pool failed";
+    //   return -1;
+    // }
 
     return 0;
   }
@@ -117,7 +118,7 @@ class VideoDecodeImpl : public VideoDecoderImpl {
     stream.pts = parsed_pack->pts;
     bool ret = true;
     if (AIVdecSendStream(vdec_, &stream, 5000) != 0) {
-      LOG(ERROR) << "AI Codec] [VideoDecodeImpl] FeedPacket(): Send stream failed";
+      LOG(ERROR) << "[AI Codec] [VideoDecodeImpl] FeedPacket(): Send stream failed";
       ret = false;
     }
     // free packet
@@ -143,12 +144,12 @@ class VideoDecodeImpl : public VideoDecoderImpl {
       p_bsfc_ = nullptr;
     }
     if (vdec_) {
-      AIVdecDestroy(vdec_);
+      // AIVdecDestroy(vdec_);
       vdec_ = nullptr;
     }
 
     if (surf_pool_) {
-      AIBufPoolDestroy(surf_pool_);
+      // AIBufPoolDestroy(surf_pool_);
       surf_pool_ = nullptr;
     }
   }
@@ -224,176 +225,176 @@ class VideoDecodeImpl : public VideoDecoderImpl {
   void* surf_pool_ = nullptr;
 };
 
-// _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
-// // ------------------------------- FFmpegDecodeImpl --------------------------------------
-// class FFmpegDecodeImpl : public VideoDecoderImpl {
-//  public:
-//   FFmpegDecodeImpl(VideoDecoder* interface, IDecodeEventHandle* handle, int device_id)
-//       : VideoDecoderImpl(interface, handle, device_id) {}
-//   bool Init() override {
-//     VideoInfo& info = interface_->GetVideoInfo();
-//     AVCodec *dec = avcodec_find_decoder(info.codec_id);
-//     if (!dec) {
-//       LOG(ERROR) << "[AI Codec] [FFmpegDecodeImpl] avcodec_find_decoder failed";
-//       return false;
-//     }
-//     decode_ = avcodec_alloc_context3(dec);
-//     if (!decode_) {
-//       LOG(ERROR) << "[AI Codec] [FFmpegDecodeImpl] avcodec_alloc_context3 failed";
-//       return false;
-//     }
-//     // av_codec_set_pkt_timebase(instance_, st->time_base);
+_Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
+// ------------------------------- FFmpegDecodeImpl --------------------------------------
+class FFmpegDecodeImpl : public VideoDecoderImpl {
+ public:
+  FFmpegDecodeImpl(VideoDecoder* interface, IDecodeEventHandle* handle, int device_id)
+      : VideoDecoderImpl(interface, handle, device_id) {}
+  bool Init() override {
+    VideoInfo& info = interface_->GetVideoInfo();
+    AVCodec *dec = avcodec_find_decoder(info.codec_id);
+    if (!dec) {
+      LOG(ERROR) << "[AI Codec] [FFmpegDecodeImpl] avcodec_find_decoder failed";
+      return false;
+    }
+    decode_ = avcodec_alloc_context3(dec);
+    if (!decode_) {
+      LOG(ERROR) << "[AI Codec] [FFmpegDecodeImpl] avcodec_alloc_context3 failed";
+      return false;
+    }
+    // av_codec_set_pkt_timebase(instance_, st->time_base);
 
-//     if (!info.extra_data.empty()) {
-//       decode_->extradata_size = info.extra_data.size();
-//       uint8_t* extradata = reinterpret_cast<uint8_t*>(malloc(decode_->extradata_size));
-//       memcpy(extradata, info.extra_data.data(), decode_->extradata_size);
-//       decode_->extradata = extradata;
-//     }
-//     if (avcodec_open2(decode_, dec, NULL) < 0) {
-//       LOG(ERROR) << "[AI Codec] [FFmpegDecodeImpl] Failed to open codec";
-//       return false;
-//     }
-//     av_frame_ = av_frame_alloc();
-//     if (!av_frame_) {
-//       LOG(ERROR) << "[AI Codec] [FFmpegDecodeImpl] Could not alloc frame";
-//       return false;
-//     }
-//     eos_got_.store(0);
-//     eos_sent_.store(0);
-//     return true;
-//   }
-//   bool FeedPacket(const AVPacket* pkt) override {
-//     int got_frame = 0;
-//     int ret = avcodec_decode_video2(decode_, av_frame_, &got_frame, pkt);
-//     if (ret < 0) {
-//       LOG(ERROR) << "[AI Codec] [FFmpegDecodeImpl] avcodec_decode_video2 failed, data ptr, size:"
-//                  << pkt->data << ", " << pkt->size;
-//       return false;
-//     }
-//     if (got_frame) {
-//       ProcessFrame(av_frame_);
-//     }
-//     return true;
-//   }
-//   void FeedEos() override {
-//     AVPacket packet;
-//     av_init_packet(&packet);
-//     packet.size = 0;
-//     packet.data = NULL;
+    if (!info.extra_data.empty()) {
+      decode_->extradata_size = info.extra_data.size();
+      uint8_t* extradata = reinterpret_cast<uint8_t*>(malloc(decode_->extradata_size));
+      memcpy(extradata, info.extra_data.data(), decode_->extradata_size);
+      decode_->extradata = extradata;
+    }
+    if (avcodec_open2(decode_, dec, NULL) < 0) {
+      LOG(ERROR) << "[AI Codec] [FFmpegDecodeImpl] Failed to open codec";
+      return false;
+    }
+    av_frame_ = av_frame_alloc();
+    if (!av_frame_) {
+      LOG(ERROR) << "[AI Codec] [FFmpegDecodeImpl] Could not alloc frame";
+      return false;
+    }
+    eos_got_.store(0);
+    eos_sent_.store(0);
+    return true;
+  }
+  bool FeedPacket(const AVPacket* pkt) override {
+    int got_frame = 0;
+    int ret = avcodec_decode_video2(decode_, av_frame_, &got_frame, pkt);
+    if (ret < 0) {
+      LOG(ERROR) << "[AI Codec] [FFmpegDecodeImpl] avcodec_decode_video2 failed, data ptr, size:"
+                 << pkt->data << ", " << pkt->size;
+      return false;
+    }
+    if (got_frame) {
+      ProcessFrame(av_frame_);
+    }
+    return true;
+  }
+  void FeedEos() override {
+    AVPacket packet;
+    av_init_packet(&packet);
+    packet.size = 0;
+    packet.data = NULL;
 
-//     LOG(INFO) << "[AI Codec] [FFmpegDecodeImpl] Sent EOS packet to decoder";
-//     eos_sent_.store(1);
-//     // flush all frames ...
-//     int got_frame = 0;
-//     do {
-//       avcodec_decode_video2(decode_, av_frame_, &got_frame, &packet);
-//       if (got_frame) ProcessFrame(av_frame_);
-//     } while (got_frame);
+    LOG(INFO) << "[AI Codec] [FFmpegDecodeImpl] Sent EOS packet to decoder";
+    eos_sent_.store(1);
+    // flush all frames ...
+    int got_frame = 0;
+    do {
+      avcodec_decode_video2(decode_, av_frame_, &got_frame, &packet);
+      if (got_frame) ProcessFrame(av_frame_);
+    } while (got_frame);
 
-//     if (handle_) {
-//       handle_->OnEos();
-//     }
-//     eos_got_.store(1);
-//   }
-//   void ReleaseFrame(edk::CnFrame&& frame) override {
-//     for (uint32_t i = 0; i < frame.n_planes; i++) {
-//       mem_op.FreeMlu(frame.ptrs[i]);
-//     }
-//   }
-//   bool CopyFrameD2H(void *dst, const edk::CnFrame &frame) override {
-//     return edk::VideoDecode::CopyFrameD2H(dst, frame);
-//   }
-//   void Destroy() {
-//     if (av_frame_) {
-//       av_frame_free(&av_frame_);
-//       av_frame_ = nullptr;
-//     }
-//     if (decode_) {
-//       avcodec_close(decode_);
-//       avcodec_free_context(&decode_);
-//       decode_ = nullptr;
-//     }
-//   }
+    if (handle_) {
+      handle_->OnEos();
+    }
+    eos_got_.store(1);
+  }
+  // void ReleaseFrame(ai::module::Frame&& frame) override {
+  //   for (uint32_t i = 0; i < frame.n_planes; i++) {
+  //     mem_op.FreeMlu(frame.ptrs[i]);
+  //   }
+  // }
+  // bool CopyFrameD2H(void *dst, const ai::module::Frame &frame) override {
+  //   return ai::VideoDecode::CopyFrameD2H(dst, frame);
+  // }
+  void Destroy() {
+    if (av_frame_) {
+      av_frame_free(&av_frame_);
+      av_frame_ = nullptr;
+    }
+    if (decode_) {
+      avcodec_close(decode_);
+      avcodec_free_context(&decode_);
+      decode_ = nullptr;
+    }
+  }
 
-//   ~FFmpegDecodeImpl() {
-//     FFmpegDecodeImpl::Destroy();
-//   }
+  ~FFmpegDecodeImpl() {
+    FFmpegDecodeImpl::Destroy();
+  }
 
-//  private:
-//   bool ProcessFrame(AVFrame* frame) {
-//     edk::CnFrame cn_frame;
-// #if LIBAVFORMAT_VERSION_INT <= FFMPEG_VERSION_3_1
-//     cn_frame.pts = frame->pkt_pts;
-// #else
-//     cn_frame.pts = frame->pts;
-// #endif
-//     cn_frame.width = frame->width;
-//     cn_frame.height = frame->height;
-//     cn_frame.pformat = edk::PixelFmt::NV12;
-//     cn_frame.n_planes = 2;
-//     cn_frame.strides[0] = frame->linesize[0];
-//     cn_frame.strides[1] = frame->linesize[0];
-//     uint32_t plane_size[2];
-//     plane_size[0] = cn_frame.height * cn_frame.strides[0];
-//     plane_size[1] = cn_frame.height * cn_frame.strides[1] / 2;
-//     cn_frame.frame_size = plane_size[0] + plane_size[1];
-//     uint8_t* cpu_plane[2];
-//     std::unique_ptr<uint8_t[]> dst_y(new uint8_t[cn_frame.frame_size]);
-//     cpu_plane[0] = dst_y.get();
-//     cpu_plane[1] = dst_y.get() + plane_size[0];
-//     switch (decode_->pix_fmt) {
-//       case AV_PIX_FMT_YUV420P:
-//       case AV_PIX_FMT_YUVJ420P: {
-//         libyuv::I420ToNV12(static_cast<uint8_t *>(frame->data[0]), frame->linesize[0],
-//                            static_cast<uint8_t *>(frame->data[1]), frame->linesize[1],
-//                            static_cast<uint8_t *>(frame->data[2]), frame->linesize[2], cpu_plane[0],
-//                            cn_frame.strides[0], cpu_plane[1], cn_frame.strides[1], cn_frame.width, cn_frame.height);
-//         break;
-//       }
-//       case AV_PIX_FMT_YUYV422: {
-//         int tmp_stride = (frame->width + 1) / 2 * 2;
-//         int tmp_height = (frame->height + 1) / 2 * 2;
-//         std::unique_ptr<uint8_t[]> tmp_i420_y(new uint8_t[tmp_stride * tmp_height]);
-//         std::unique_ptr<uint8_t[]> tmp_i420_u(new uint8_t[tmp_stride * tmp_height / 4]);
-//         std::unique_ptr<uint8_t[]> tmp_i420_v(new uint8_t[tmp_stride * tmp_height / 4]);
+ private:
+  bool ProcessFrame(AVFrame* frame) {
+    ai::module::ai_buffer cn_frame;
+#if LIBAVFORMAT_VERSION_INT <= FFMPEG_VERSION_3_1
+    cn_frame.pts = frame->pkt_pts;
+#else
+    cn_frame.pts = frame->pts;
+#endif
+    cn_frame.width = frame->width;
+    cn_frame.height = frame->height;
+    cn_frame.pformat = edk::PixelFmt::NV12;
+    cn_frame.n_planes = 2;
+    cn_frame.strides[0] = frame->linesize[0];
+    cn_frame.strides[1] = frame->linesize[0];
+    uint32_t plane_size[2];
+    plane_size[0] = cn_frame.height * cn_frame.strides[0];
+    plane_size[1] = cn_frame.height * cn_frame.strides[1] / 2;
+    cn_frame.frame_size = plane_size[0] + plane_size[1];
+    uint8_t* cpu_plane[2];
+    std::unique_ptr<uint8_t[]> dst_y(new uint8_t[cn_frame.frame_size]);
+    cpu_plane[0] = dst_y.get();
+    cpu_plane[1] = dst_y.get() + plane_size[0];
+    switch (decode_->pix_fmt) {
+      case AV_PIX_FMT_YUV420P:
+      case AV_PIX_FMT_YUVJ420P: {
+        libyuv::I420ToNV12(static_cast<uint8_t *>(frame->data[0]), frame->linesize[0],
+                           static_cast<uint8_t *>(frame->data[1]), frame->linesize[1],
+                           static_cast<uint8_t *>(frame->data[2]), frame->linesize[2], cpu_plane[0],
+                           cn_frame.strides[0], cpu_plane[1], cn_frame.strides[1], cn_frame.width, cn_frame.height);
+        break;
+      }
+      case AV_PIX_FMT_YUYV422: {
+        int tmp_stride = (frame->width + 1) / 2 * 2;
+        int tmp_height = (frame->height + 1) / 2 * 2;
+        std::unique_ptr<uint8_t[]> tmp_i420_y(new uint8_t[tmp_stride * tmp_height]);
+        std::unique_ptr<uint8_t[]> tmp_i420_u(new uint8_t[tmp_stride * tmp_height / 4]);
+        std::unique_ptr<uint8_t[]> tmp_i420_v(new uint8_t[tmp_stride * tmp_height / 4]);
 
-//         libyuv::YUY2ToI420(static_cast<uint8_t *>(frame->data[0]), frame->linesize[0], tmp_i420_y.get(),
-//                            tmp_stride, tmp_i420_u.get(), tmp_stride / 2, tmp_i420_v.get(), tmp_stride / 2,
-//                            frame->width, frame->height);
+        libyuv::YUY2ToI420(static_cast<uint8_t *>(frame->data[0]), frame->linesize[0], tmp_i420_y.get(),
+                           tmp_stride, tmp_i420_u.get(), tmp_stride / 2, tmp_i420_v.get(), tmp_stride / 2,
+                           frame->width, frame->height);
 
-//         libyuv::I420ToNV12(tmp_i420_y.get(), tmp_stride, tmp_i420_u.get(), tmp_stride/2, tmp_i420_v.get(),
-//             tmp_stride/2, cpu_plane[0], cn_frame.strides[0], cpu_plane[1], cn_frame.strides[1], cn_frame.width,
-//             cn_frame.height);
-//         break;
-//       }
-//       default: {
-//         LOG(ERROR) << "[AI Codec] [FFmpegDecodeImpl] ProcessFrame() Unsupported pixel format: "
-//                    << decode_->pix_fmt;
-//         return false;
-//       }
-//     }
+        libyuv::I420ToNV12(tmp_i420_y.get(), tmp_stride, tmp_i420_u.get(), tmp_stride/2, tmp_i420_v.get(),
+            tmp_stride/2, cpu_plane[0], cn_frame.strides[0], cpu_plane[1], cn_frame.strides[1], cn_frame.width,
+            cn_frame.height);
+        break;
+      }
+      default: {
+        LOG(ERROR) << "[AI Codec] [FFmpegDecodeImpl] ProcessFrame() Unsupported pixel format: "
+                   << decode_->pix_fmt;
+        return false;
+      }
+    }
 
-//     cn_frame.device_id = device_id_;
-//     for (unsigned i = 0; i < cn_frame.n_planes; i++) {
-//       cn_frame.ptrs[i] = mem_op.AllocMlu(plane_size[i]);
-//       mem_op.MemcpyH2D(cn_frame.ptrs[i], cpu_plane[i], plane_size[i]);
-//     }
+    cn_frame.device_id = device_id_;
+    for (unsigned i = 0; i < cn_frame.n_planes; i++) {
+      cn_frame.ptrs[i] = mem_op.AllocMlu(plane_size[i]);
+      mem_op.MemcpyH2D(cn_frame.ptrs[i], cpu_plane[i], plane_size[i]);
+    }
 
-//     // Send cn_frame to handle
-//     if (handle_) {
-//       handle_->OnDecodeFrame(cn_frame);
-//     }
-//     return true;
-//   }
+    // Send cn_frame to handle
+    if (handle_) {
+      handle_->OnDecodeFrame(cn_frame);
+    }
+    return true;
+  }
 
-//   edk::MluMemoryOp mem_op;
-//   AVCodecContext* decode_{nullptr};
-//   AVFrame *av_frame_ = nullptr;
-//   std::atomic<int> eos_got_{0};
-//   std::atomic<int> eos_sent_{0};
-// };
-// _Pragma("GCC diagnostic pop")
+  // edk::MluMemoryOp mem_op;
+  AVCodecContext* decode_{nullptr};
+  AVFrame *av_frame_ = nullptr;
+  std::atomic<int> eos_got_{0};
+  std::atomic<int> eos_sent_{0};
+};
+_Pragma("GCC diagnostic pop")
 
 // ------------------------------- FFmpegMluDecodeImpl --------------------------------------
 // #if LIBAVFORMAT_VERSION_INT == FFMPEG_VERSION_4_2_2
@@ -401,229 +402,229 @@ class VideoDecodeImpl : public VideoDecoderImpl {
 // // comment the following line to output decoding results on mlu
 // #undef FFMPEG_MLU_OUTPUT_ON_MLU
 
-// #ifdef FFMPEG_MLU_OUTPUT_ON_MLU
-// static enum AVPixelFormat hw_pix_fmt;
-// static enum AVPixelFormat get_hw_format(AVCodecContext *ctx, const enum AVPixelFormat *pix_fmts) {
-//   const enum AVPixelFormat *format;
-//   for (format = pix_fmts; *format != -1; format++) {
-//     if (*format == hw_pix_fmt) return *format;
-//   }
-//   LOG(ERROR) << "[AI Codec] [FFmpegMluDecodeImpl] Failed to get HW surface format. ";
-//   return AV_PIX_FMT_NONE;
-// }
+#ifdef FFMPEG_MLU_OUTPUT_ON_MLU
+static enum AVPixelFormat hw_pix_fmt;
+static enum AVPixelFormat get_hw_format(AVCodecContext *ctx, const enum AVPixelFormat *pix_fmts) {
+  const enum AVPixelFormat *format;
+  for (format = pix_fmts; *format != -1; format++) {
+    if (*format == hw_pix_fmt) return *format;
+  }
+  LOG(ERROR) << "[AI Codec] [FFmpegMluDecodeImpl] Failed to get HW surface format. ";
+  return AV_PIX_FMT_NONE;
+}
 // #endif
-// class FFmpegMluDecodeImpl : public VideoDecoderImpl {
-//  public:
-//   FFmpegMluDecodeImpl(VideoDecoder* interface, IDecodeEventHandle* handle, int device_id)
-//       : VideoDecoderImpl(interface, handle, device_id) {}
-//   bool Init() override {
-//     VideoInfo& info = interface_->GetVideoInfo();
-//     AVCodec *dec;
-//     switch (info.codec_id) {
-//       case AV_CODEC_ID_H264:
-//         dec = avcodec_find_decoder_by_name("h264_mludec");
-//         break;
-//       case AV_CODEC_ID_HEVC:
-//         dec = avcodec_find_decoder_by_name("hevc_mludec");
-//         break;
-//       case AV_CODEC_ID_VP8:
-//         dec = avcodec_find_decoder_by_name("vp8_mludec");
-//         break;
-//       case AV_CODEC_ID_VP9:
-//         dec = avcodec_find_decoder_by_name("vp9_mludec");
-//         break;
-//       case AV_CODEC_ID_MJPEG:
-//         dec = avcodec_find_decoder_by_name("mjpeg_mludec");
-//         break;
-//       default:
-//         dec = avcodec_find_decoder(info.codec_id);
-//         break;
-//     }
+class FFmpegMluDecodeImpl : public VideoDecoderImpl {
+ public:
+  FFmpegMluDecodeImpl(VideoDecoder* interface, IDecodeEventHandle* handle, int device_id)
+      : VideoDecoderImpl(interface, handle, device_id) {}
+  bool Init() override {
+    VideoInfo& info = interface_->GetVideoInfo();
+    AVCodec *dec;
+    switch (info.codec_id) {
+      case AV_CODEC_ID_H264:
+        dec = avcodec_find_decoder_by_name("h264_mludec");
+        break;
+      case AV_CODEC_ID_HEVC:
+        dec = avcodec_find_decoder_by_name("hevc_mludec");
+        break;
+      case AV_CODEC_ID_VP8:
+        dec = avcodec_find_decoder_by_name("vp8_mludec");
+        break;
+      case AV_CODEC_ID_VP9:
+        dec = avcodec_find_decoder_by_name("vp9_mludec");
+        break;
+      case AV_CODEC_ID_MJPEG:
+        dec = avcodec_find_decoder_by_name("mjpeg_mludec");
+        break;
+      default:
+        dec = avcodec_find_decoder(info.codec_id);
+        break;
+    }
 
-//     if (!dec) {
-//       LOG(ERROR) << "[AI Codec] [FFmpegMluDecodeImpl] avcodec_find_decoder failed";
-//       return false;
-//     }
-// #ifdef FFMPEG_MLU_OUTPUT_ON_MLU
-//     AVHWDeviceType dev_type = av_hwdevice_find_type_by_name("mlu");
-//     for (int i = 0;; i++) {
-//       const AVCodecHWConfig *config = avcodec_get_hw_config(dec, i);
-//       if (!config) {
-//         LOG(ERROR)<< "[AI Codec] [FFmpegMluDecodeImpl] Decoder " << dec->name
-//                   << " doesn't support device type " << av_hwdevice_get_type_name(dev_type);
-//         return -1;
-//       }
-//       if (config->methods & AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX && config->device_type == dev_type) {
-//         hw_pix_fmt = config->pix_fmt;
-//         break;
-//       }
-//     }
-// #endif
-//     decode_ = avcodec_alloc_context3(dec);
-//     if (!decode_) {
-//       LOG(ERROR) << "[AI Codec] [FFmpegMluDecodeImpl] Failed to do avcodec_alloc_context3";
-//       return false;
-//     }
-//     // av_codec_set_pkt_timebase(instance_, st->time_base);
+    if (!dec) {
+      LOG(ERROR) << "[AI Codec] [FFmpegMluDecodeImpl] avcodec_find_decoder failed";
+      return false;
+    }
+#ifdef FFMPEG_MLU_OUTPUT_ON_MLU
+    AVHWDeviceType dev_type = av_hwdevice_find_type_by_name("mlu");
+    for (int i = 0;; i++) {
+      const AVCodecHWConfig *config = avcodec_get_hw_config(dec, i);
+      if (!config) {
+        LOG(ERROR)<< "[AI Codec] [FFmpegMluDecodeImpl] Decoder " << dec->name
+                  << " doesn't support device type " << av_hwdevice_get_type_name(dev_type);
+        return -1;
+      }
+      if (config->methods & AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX && config->device_type == dev_type) {
+        hw_pix_fmt = config->pix_fmt;
+        break;
+      }
+    }
+#endif
+    decode_ = avcodec_alloc_context3(dec);
+    if (!decode_) {
+      LOG(ERROR) << "[AI Codec] [FFmpegMluDecodeImpl] Failed to do avcodec_alloc_context3";
+      return false;
+    }
+    // av_codec_set_pkt_timebase(instance_, st->time_base);
 
-//     if (avcodec_parameters_to_context(decode_, info.codecpar) != 0) {
-//         LOG(ERROR) << "[AI Codec] [FFmpegMluDecodeImpl] Copy codec context failed";
-//         return false;
-//     }
+    if (avcodec_parameters_to_context(decode_, info.codecpar) != 0) {
+        LOG(ERROR) << "[AI Codec] [FFmpegMluDecodeImpl] Copy codec context failed";
+        return false;
+    }
 
-//     AVDictionary *decoder_opts = nullptr;
-//     av_dict_set_int(&decoder_opts, "device_id", device_id_, 0);
+    AVDictionary *decoder_opts = nullptr;
+    av_dict_set_int(&decoder_opts, "device_id", device_id_, 0);
 
-// #ifdef FFMPEG_MLU_OUTPUT_ON_MLU
-//     decode_->get_format = get_hw_format;
+#ifdef FFMPEG_MLU_OUTPUT_ON_MLU
+    decode_->get_format = get_hw_format;
 
-//     char dev_idx_des[4] = {'\0'};
-//     AVBufferRef *hw_device_ctx = nullptr;
-//     snprintf(dev_idx_des, sizeof(device_id_), "%d", device_id_);
-//     if (av_hwdevice_ctx_create(&hw_device_ctx, dev_type, dev_idx_des, NULL, 0) < 0) {
-//       LOG(ERROR) << "[AI Codec] [FFmpegMluDecodeImpl] Failed to create specified HW device.";
-//       return false;
-//     }
-//     decode_->hw_device_ctx = av_buffer_ref(hw_device_ctx);
-// #endif
+    char dev_idx_des[4] = {'\0'};
+    AVBufferRef *hw_device_ctx = nullptr;
+    snprintf(dev_idx_des, sizeof(device_id_), "%d", device_id_);
+    if (av_hwdevice_ctx_create(&hw_device_ctx, dev_type, dev_idx_des, NULL, 0) < 0) {
+      LOG(ERROR) << "[AI Codec] [FFmpegMluDecodeImpl] Failed to create specified HW device.";
+      return false;
+    }
+    decode_->hw_device_ctx = av_buffer_ref(hw_device_ctx);
+#endif
 
-//     if (avcodec_open2(decode_, dec,  &decoder_opts) < 0) {
-//       LOG(ERROR) << "[AI Codec] [FFmpegMluDecodeImpl] Failed to open codec";
-//       return false;
-//     }
-//     av_frame_ = av_frame_alloc();
-//     if (!av_frame_) {
-//       LOG(ERROR) << "[AI Codec] [FFmpegMluDecodeImpl] Could not alloc frame";
-//       return false;
-//     }
-//     eos_got_.store(0);
-//     eos_sent_.store(0);
-//     return true;
-//   }
-//   bool FeedPacket(const AVPacket* pkt) override {
-//     int ret = avcodec_send_packet(decode_, pkt);
-//     if (ret < 0) {
-//       LOG(ERROR) << "[AI Codec] [FFmpegMluDecodeImpl] avcodec_send_packet failed, data ptr, size:"
-//                  << pkt->data << ", " << pkt->size;
-//       return false;
-//     }
-//     ret = avcodec_receive_frame(decode_, av_frame_);
-//     if (ret >= 0) {
-//       ProcessFrame(av_frame_);
-//     }
-//     return true;
-//   }
-//   void FeedEos() override {
-//     AVPacket packet;
-//     av_init_packet(&packet);
-//     packet.size = 0;
-//     packet.data = NULL;
+    if (avcodec_open2(decode_, dec,  &decoder_opts) < 0) {
+      LOG(ERROR) << "[AI Codec] [FFmpegMluDecodeImpl] Failed to open codec";
+      return false;
+    }
+    av_frame_ = av_frame_alloc();
+    if (!av_frame_) {
+      LOG(ERROR) << "[AI Codec] [FFmpegMluDecodeImpl] Could not alloc frame";
+      return false;
+    }
+    eos_got_.store(0);
+    eos_sent_.store(0);
+    return true;
+  }
+  bool FeedPacket(const AVPacket* pkt) override {
+    int ret = avcodec_send_packet(decode_, pkt);
+    if (ret < 0) {
+      LOG(ERROR) << "[AI Codec] [FFmpegMluDecodeImpl] avcodec_send_packet failed, data ptr, size:"
+                 << pkt->data << ", " << pkt->size;
+      return false;
+    }
+    ret = avcodec_receive_frame(decode_, av_frame_);
+    if (ret >= 0) {
+      ProcessFrame(av_frame_);
+    }
+    return true;
+  }
+  void FeedEos() override {
+    AVPacket packet;
+    av_init_packet(&packet);
+    packet.size = 0;
+    packet.data = NULL;
 
-//     LOG(INFO) << "[AI Codec] [FFmpegMluDecodeImpl] Sent EOS packet to decoder";
-//     eos_sent_.store(1);
-//     avcodec_send_packet(decode_, &packet);
-//     // flush all frames ...
-//     int ret = 0;
-//     do {
-//       ret = avcodec_receive_frame(decode_, av_frame_);
-//       if (ret >= 0) ProcessFrame(av_frame_);
-//     } while (ret >= 0);
+    LOG(INFO) << "[AI Codec] [FFmpegMluDecodeImpl] Sent EOS packet to decoder";
+    eos_sent_.store(1);
+    avcodec_send_packet(decode_, &packet);
+    // flush all frames ...
+    int ret = 0;
+    do {
+      ret = avcodec_receive_frame(decode_, av_frame_);
+      if (ret >= 0) ProcessFrame(av_frame_);
+    } while (ret >= 0);
 
-//     if (handle_) {
-//       handle_->OnEos();
-//     }
-//     eos_got_.store(1);
-//   }
-//   void ReleaseFrame(edk::CnFrame&& frame) override {
-//     for (uint32_t i = 0; i < frame.n_planes; i++) {
-//       mem_op.FreeMlu(frame.ptrs[i]);
-//     }
-//   }
-//   bool CopyFrameD2H(void *dst, const edk::CnFrame &frame) override {
-//     return edk::VideoDecode::CopyFrameD2H(dst, frame);
-//   }
-//   void Destroy() {
-//     if (av_frame_) {
-//       av_frame_free(&av_frame_);
-//       av_frame_ = nullptr;
-//     }
-//     if (decode_) {
-//       avcodec_close(decode_);
-//       avcodec_free_context(&decode_);
-//       decode_ = nullptr;
-//     }
-//   }
-//   ~FFmpegMluDecodeImpl() {
-//     FFmpegMluDecodeImpl::Destroy();
-//   }
+    if (handle_) {
+      handle_->OnEos();
+    }
+    eos_got_.store(1);
+  }
+  void ReleaseFrame(edk::CnFrame&& frame) override {
+    for (uint32_t i = 0; i < frame.n_planes; i++) {
+      mem_op.FreeMlu(frame.ptrs[i]);
+    }
+  }
+  bool CopyFrameD2H(void *dst, const edk::CnFrame &frame) override {
+    return edk::VideoDecode::CopyFrameD2H(dst, frame);
+  }
+  void Destroy() {
+    if (av_frame_) {
+      av_frame_free(&av_frame_);
+      av_frame_ = nullptr;
+    }
+    if (decode_) {
+      avcodec_close(decode_);
+      avcodec_free_context(&decode_);
+      decode_ = nullptr;
+    }
+  }
+  ~FFmpegMluDecodeImpl() {
+    FFmpegMluDecodeImpl::Destroy();
+  }
 
-//  private:
-//   bool ProcessFrame(AVFrame* frame) {
-//     edk::CnFrame cn_frame;
-//     cn_frame.pts = frame->pts;
-//     cn_frame.width = frame->width;
-//     cn_frame.height = frame->height;
-//     switch (decode_->sw_pix_fmt) {
-//       case AV_PIX_FMT_NV12:
-//         cn_frame.pformat = edk::PixelFmt::NV12;
-//         break;
-//       case AV_PIX_FMT_NV21:
-//         cn_frame.pformat = edk::PixelFmt::NV21;
-//         break;
-//       default:
-//         LOG(ERROR) << "[AI Codec] [FFmpegMluDecodeImpl] ProcessFrame() Unsupported pixel format: "
-//                      << decode_->sw_pix_fmt;
-//         return false;
-//     }
-//     cn_frame.n_planes = 2;
-//     cn_frame.strides[0] = frame->linesize[0];
-//     cn_frame.strides[1] = frame->linesize[1];
-//     uint32_t plane_size[2];
-//     plane_size[0] = cn_frame.height * cn_frame.strides[0];
-//     plane_size[1] = cn_frame.height * cn_frame.strides[1] / 2;
-//     cn_frame.frame_size = plane_size[0] + plane_size[1];
-//     cn_frame.device_id = device_id_;
-//     for (unsigned i = 0; i < cn_frame.n_planes; i++) {
-//       cn_frame.ptrs[i] = mem_op.AllocMlu(plane_size[i]);
-// #ifdef FFMPEG_MLU_OUTPUT_ON_MLU
-//       // cn_frame.ptrs[i] = frame->data[i];  // For now, it is not possible to use the mlu data without d2d copy
-//       mem_op.MemcpyD2D(cn_frame.ptrs[i], frame->data[i], plane_size[i]);
-// #else
-//       mem_op.MemcpyH2D(cn_frame.ptrs[i], frame->data[i], plane_size[i]);
-// #endif
-//     }
+ private:
+  bool ProcessFrame(AVFrame* frame) {
+    edk::CnFrame cn_frame;
+    cn_frame.pts = frame->pts;
+    cn_frame.width = frame->width;
+    cn_frame.height = frame->height;
+    switch (decode_->sw_pix_fmt) {
+      case AV_PIX_FMT_NV12:
+        cn_frame.pformat = edk::PixelFmt::NV12;
+        break;
+      case AV_PIX_FMT_NV21:
+        cn_frame.pformat = edk::PixelFmt::NV21;
+        break;
+      default:
+        LOG(ERROR) << "[AI Codec] [FFmpegMluDecodeImpl] ProcessFrame() Unsupported pixel format: "
+                     << decode_->sw_pix_fmt;
+        return false;
+    }
+    cn_frame.n_planes = 2;
+    cn_frame.strides[0] = frame->linesize[0];
+    cn_frame.strides[1] = frame->linesize[1];
+    uint32_t plane_size[2];
+    plane_size[0] = cn_frame.height * cn_frame.strides[0];
+    plane_size[1] = cn_frame.height * cn_frame.strides[1] / 2;
+    cn_frame.frame_size = plane_size[0] + plane_size[1];
+    cn_frame.device_id = device_id_;
+    for (unsigned i = 0; i < cn_frame.n_planes; i++) {
+      cn_frame.ptrs[i] = mem_op.AllocMlu(plane_size[i]);
+#ifdef FFMPEG_MLU_OUTPUT_ON_MLU
+      // cn_frame.ptrs[i] = frame->data[i];  // For now, it is not possible to use the mlu data without d2d copy
+      mem_op.MemcpyD2D(cn_frame.ptrs[i], frame->data[i], plane_size[i]);
+#else
+      mem_op.MemcpyH2D(cn_frame.ptrs[i], frame->data[i], plane_size[i]);
+#endif
+    }
 
-//     // Send cn_frame to handle
-//     if (handle_) {
-//       handle_->OnDecodeFrame(cn_frame);
-//     }
-//     return true;
-//   }
+    // Send cn_frame to handle
+    if (handle_) {
+      handle_->OnDecodeFrame(cn_frame);
+    }
+    return true;
+  }
 
-//   edk::MluMemoryOp mem_op;
-//   AVCodecContext* decode_{nullptr};
-//   AVFrame *av_frame_ = nullptr;
-// #ifdef FFMPEG_MLU_OUTPUT_ON_MLU
-//   AVPixelFormat hw_pix_fmt_;
-// #endif
-//   std::atomic<int> eos_got_{0};
-//   std::atomic<int> eos_sent_{0};
-// };
-// #endif
+  edk::MluMemoryOp mem_op;
+  AVCodecContext* decode_{nullptr};
+  AVFrame *av_frame_ = nullptr;
+#ifdef FFMPEG_MLU_OUTPUT_ON_MLU
+  AVPixelFormat hw_pix_fmt_;
+#endif
+  std::atomic<int> eos_got_{0};
+  std::atomic<int> eos_sent_{0};
+};
+#endif
 
 VideoDecoder::VideoDecoder(StreamRunner* runner, DecoderType type, int device_id) : runner_(runner) {
   switch (type) {
-    case EASY_DECODE:
+    case CAMERA:
       impl_ = new VideoDecodeImpl(this, runner, device_id);
       break;
-//     case FFMPEG:
-//       impl_ = new FFmpegDecodeImpl(this, runner, device_id);
-//       break;
-// #if LIBAVFORMAT_VERSION_INT == FFMPEG_VERSION_4_2_2
-//     case FFMPEG_MLU:
-//       impl_ = new FFmpegMluDecodeImpl(this, runner, device_id);
-//       break;
-// #endif
+    case FFMPEG:
+      impl_ = new FFmpegDecodeImpl(this, runner, device_id);
+      break;
+#if LIBAVFORMAT_VERSION_INT == FFMPEG_VERSION_4_2_2
+    case FFMPEG_MLU:
+      impl_ = new FFmpegMluDecodeImpl(this, runner, device_id);
+      break;
+#endif
     default:
       LOG(FATAL) << "[AI Codec] [VideoDecoder] Unsupported decoder type";
   }

@@ -18,7 +18,7 @@
  * THE SOFTWARE.
  *************************************************************************/
 
-#include "util/timer.h"
+#include "utils/timer.h"
 
 #include <glog/logging.h>
 

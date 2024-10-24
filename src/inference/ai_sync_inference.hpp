@@ -26,16 +26,17 @@
 #include <mutex>
 #include <string>
 
-#include "cnis/processor.h"
-#include "cnis/infer_server.h"
+#include "inference/processor.h"
+#include "inference/infer_server.h"
 
-#include "easy_module.hpp"
+#include "module/basic_module.hpp"
+#include "module/frame.h"
 
 
-class SampleSyncInference : public EasyModule {
+class SampleSyncInference : public ai::module::BasicModule {
  public:
   SampleSyncInference(std::string name, int parallelism, int device_id, const std::string& model_path,
-                      const std::string& model_name) : EasyModule(name, parallelism) {
+                      const std::string& model_name) : ai::module::BasicModule(name, parallelism) {
     model_path_ = model_path;
     device_id_ = device_id;
     model_name_ = model_name;
@@ -46,7 +47,7 @@ class SampleSyncInference : public EasyModule {
 
   int Open() override;
 
-  int Process(std::shared_ptr<EdkFrame> frame) override;
+  int Process(std::shared_ptr<ai::module::Frame> frame) override;
 
   int Close() override;
 
@@ -54,8 +55,8 @@ class SampleSyncInference : public EasyModule {
   std::string model_path_;
   std::string model_name_;
   int device_id_;
-  std::shared_ptr<infer_server::IPreproc> preproc_;
-  std::shared_ptr<infer_server::IPostproc> postproc_;
+  // std::shared_ptr<infer_server::IPreproc> preproc_;
+  // std::shared_ptr<infer_server::IPostproc> postproc_;
   infer_server::CnPreprocTensorParams params_;
   std::unique_ptr<infer_server::InferServer> infer_server_;
   std::map<int, infer_server::Session_t> infer_ctx_;

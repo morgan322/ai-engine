@@ -11,14 +11,15 @@
 namespace ai {
 
 IDecoder *CreateDecoder() {
-  int dev_id = -1;
-  CNRT_SAFECALL(cnrtGetDevice(&dev_id), "CreateDecoder(): failed", nullptr);
+  // cpu sofe decode
+  // int dev_id = -1;
+  // CNRT_SAFECALL(cnrtGetDevice(&dev_id), "CreateDecoder(): failed", nullptr);
 
-  AIPlatformInfo info;
-  if (AIPlatformGetInfo(dev_id, &info) < 0) {
-    LOG(ERROR) << "[AI] CreateDecoder(): Get platform information failed";
-    return nullptr;
-  }
+  // AIPlatformInfo info;
+  // if (AIPlatformGetInfo(dev_id, &info) < 0) {
+  //   LOG(ERROR) << "[AI] CreateDecoder(): Get platform information failed";
+  //   return nullptr;
+  // }
 }
 
 class DecodeService {
@@ -91,13 +92,13 @@ class DecodeService {
       return -1;
     }
 
-    int dev_id = -1;
-    CNRT_SAFECALL(cnrtGetDevice(&dev_id), "[DecodeService] CheckParams(): failed", -1);
-    if (params->device_id != dev_id) {
-      LOG(ERROR) << "[AI] [DecodeService] CheckParams(): device id of current thread and device id in parameters"
-                 << " are different";
-      return -1;
-    }
+    // int dev_id = -1;
+    // CNRT_SAFECALL(cnrtGetDevice(&dev_id), "[DecodeService] CheckParams(): failed", -1);
+    // if (params->device_id != dev_id) {
+    //   LOG(ERROR) << "[AI] [DecodeService] CheckParams(): device id of current thread and device id in parameters"
+    //              << " are different";
+    //   return -1;
+    // }
 
     // TODO(gaoyujia)
     return 0;

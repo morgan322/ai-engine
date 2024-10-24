@@ -18,7 +18,7 @@
  * THE SOFTWARE.
  *************************************************************************/
 
-#include "cnis/infer_server.h"
+#include "inference/infer_server.h"
 
 #include <glog/logging.h>
 
@@ -30,12 +30,12 @@
 #include <utility>
 #include <vector>
 
-#include "cnis/processor.h"
-#include "cnis/util/any.h"
-#include "model/model.h"
+#include "inference/processor.h"
+#include "utils/any.h"
+#include "model/class_detector.h"
 #include "session.h"
-#include "util/env.h"
-#include "util/thread_pool.h"
+#include "utils/env.h"
+#include "utils/thread_pool.h"
 
 namespace infer_server {
 
@@ -70,10 +70,10 @@ class InferServerPrivate {
     std::string executor_name = ss.str();
     std::unique_lock<std::mutex> lk(executor_map_mutex_);
     if (executor_map_.count(executor_name)) {
-      VLOG(1) << "[EasyDK InferServer] CreateExecutor(): Executor already exist: " << executor_name;
+      VLOG(1) << "[AI InferServer] CreateExecutor(): Executor already exist: " << executor_name;
       return executor_map_[executor_name].get();
     }
-    VLOG(1) << "[EasyDK InferServer] CreateExecutor(): Create executor: " << executor_name;
+    VLOG(1) << "[AI InferServer] CreateExecutor(): Create executor: " << executor_name;
     try {
       SessionDesc executor_desc = desc;
       executor_desc.name = executor_name;
@@ -91,14 +91,14 @@ class InferServerPrivate {
       tp_lk.unlock();
       return executor;
     } catch (std::runtime_error& e) {
-      LOG(ERROR) << "[EasyDK InferServer] CreateExecutor(): error occurs, error message: " << e.what();
+      LOG(ERROR) << "[AI InferServer] CreateExecutor(): error occurs, error message: " << e.what();
       return nullptr;
     }
   }
 
   void CheckAndDestroyExecutor(Session_t session, Executor_t executor) noexcept {
-    CHECK(executor) << "[EasyDK InferServer] CheckAndDestroyExecutor(): Executor is null!";
-    CHECK(session) << "[EasyDK InferServer] CheckAndDestroyExecutor(): Session is null!";
+    CHECK(executor) << "[AI InferServer] CheckAndDestroyExecutor(): Executor is null!";
+    CHECK(session) << "[AI InferServer] CheckAndDestroyExecutor(): Session is null!";
     std::unique_lock<std::mutex> lk(executor_map_mutex_);
     executor->Unlink(session);
     delete session;
@@ -108,18 +108,18 @@ class InferServerPrivate {
       auto name = executor->GetName();
       if (executor_map_.count(name)) {
         auto th_num = 4 * executor->GetEngineNum();
-        VLOG(1) << "[EasyDK InferServer] CheckAndDestroyExecutor(): Destroy executor: " << name;
+        VLOG(1) << "[AI InferServer] CheckAndDestroyExecutor(): Destroy executor: " << name;
         executor_map_.erase(name);
         lk.unlock();
         // shrink to fit task load
         std::unique_lock<std::mutex> tp_lk(tp_mutex_);
         if (tp_->IdleNumber() > th_num) {
-          VLOG(1) << "[EasyDK InferServer] CheckAndDestroyExecutor(): Reduce thread in pool after destroy executor";
+          VLOG(1) << "[AI InferServer] CheckAndDestroyExecutor(): Reduce thread in pool after destroy executor";
           tp_->Resize(tp_->Size() - th_num);
         }
         tp_lk.unlock();
       } else {
-        CHECK(false) << "[EasyDK InferServer] CheckAndDestroyExecutor(): Executor does not belong to this InferServer";
+        CHECK(false) << "[AI InferServer] CheckAndDestroyExecutor(): Executor does not belong to this InferServer";
       }
     }
   }
@@ -159,12 +159,12 @@ std::string ToString(BatchStrategy s) noexcept {
 InferServer::InferServer(int device_id) noexcept { priv_ = InferServerPrivate::Instance(device_id); }
 
 Session_t InferServer::CreateSession(SessionDesc desc, std::shared_ptr<Observer> observer) noexcept {
-  CHECK(desc.model) << "[EasyDK InferServer] CreateSession(): model is null!";
-  CHECK(desc.preproc) << "[EasyDK InferServer] CreateSession(): preproc is null!";
+  CHECK(desc.model) << "[AI InferServer] CreateSession(): model is null!";
+  CHECK(desc.preproc) << "[AI InferServer] CreateSession(): preproc is null!";
 
   // won't check postproc, use empty postproc function and output ModelIO by default
   if (!desc.postproc) {
-    LOG(WARNING) << "[EasyDK InferServer] CreateSession(): Postprocessor not set, use empty postprocessor by default";
+    LOG(WARNING) << "[AI InferServer] CreateSession(): Postprocessor not set, use empty postprocessor by default";
     desc.postproc = std::make_shared<Postprocessor>();
     SetPostprocHandler(desc.model->GetKey(), nullptr);
   }
@@ -182,10 +182,10 @@ Session_t InferServer::CreateSession(SessionDesc desc, std::shared_ptr<Observer>
 }
 
 bool InferServer::DestroySession(Session_t session) noexcept {
-  CHECK(session) << "[EasyDK InferServer] DestroySession(): Session is null!";
+  CHECK(session) << "[AI InferServer] DestroySession(): Session is null!";
   Executor_t executor = session->GetExecutor();
   if (!priv_->ExistExecutor(executor)) {
-    LOG(WARNING) << "[EasyDK InferServer] DestroySession(): Session does not belong to this InferServer";
+    LOG(WARNING) << "[AI InferServer] DestroySession(): Session does not belong to this InferServer";
     return false;
   }
 
@@ -194,14 +194,14 @@ bool InferServer::DestroySession(Session_t session) noexcept {
 }
 
 bool InferServer::Request(Session_t session, PackagePtr input, any user_data, int timeout) noexcept {
-  CHECK(session) << "[EasyDK InferServer] Request(): Session is null!";
-  CHECK(input) << "[EasyDK InferServer] Request(): Input is null!";
+  CHECK(session) << "[AI InferServer] Request(): Session is null!";
+  CHECK(input) << "[AI InferServer] Request(): Input is null!";
   if (session->IsSyncLink()) {
-    LOG(ERROR) << "[EasyDK InferServer] Request(): Sync LinkHandle cannot be invoked with async api";
+    LOG(ERROR) << "[AI InferServer] Request(): Sync LinkHandle cannot be invoked with async api";
     return false;
   }
   if (!session->GetExecutor()->WaitIfCacheFull(timeout)) {
-    LOG(WARNING) << "[EasyDK InferServer] Request(): Session [" << session->GetName() << "] is busy, request timeout";
+    LOG(WARNING) << "[AI InferServer] Request(): Session [" << session->GetName() << "] is busy, request timeout";
     return false;
   }
 
@@ -211,16 +211,16 @@ bool InferServer::Request(Session_t session, PackagePtr input, any user_data, in
 
 bool InferServer::RequestSync(Session_t session, PackagePtr input, Status* status, PackagePtr output,
                               int timeout) noexcept {
-  CHECK(session) << "[EasyDK InferServer] RequestSync(): Session is null!";
-  CHECK(input) << "[EasyDK InferServer] RequestSync(): Input is null!";
-  CHECK(output) << "[EasyDK InferServer] RequestSync(): Output is null!";
-  CHECK(status) << "[EasyDK InferServer] RequestSync(): Status is null!";
+  CHECK(session) << "[AI InferServer] RequestSync(): Session is null!";
+  CHECK(input) << "[AI InferServer] RequestSync(): Input is null!";
+  CHECK(output) << "[AI InferServer] RequestSync(): Output is null!";
+  CHECK(status) << "[AI InferServer] RequestSync(): Status is null!";
   if (!session->IsSyncLink()) {
-    LOG(ERROR) << "[EasyDK InferServer] RequestSync(): Async Session cannot be invoked with sync api";
+    LOG(ERROR) << "[AI InferServer] RequestSync(): Async Session cannot be invoked with sync api";
     return false;
   }
   if (input->data.empty()) {
-    LOG(ERROR) << "[EasyDK InferServer] RequestSync(): Pass empty package is not supported";
+    LOG(ERROR) << "[AI InferServer] RequestSync(): Pass empty package is not supported";
     *status = Status::INVALID_PARAM;
     return false;
   }
@@ -230,7 +230,7 @@ bool InferServer::RequestSync(Session_t session, PackagePtr input, Status* statu
 
   auto wait_start = std::chrono::steady_clock::now();
   if (!session->GetExecutor()->WaitIfCacheFull(timeout)) {
-    LOG(WARNING) << "[EasyDK InferServer] RequestSync(): Session [" << session->GetName() << "] is busy,"
+    LOG(WARNING) << "[AI InferServer] RequestSync(): Session [" << session->GetName() << "] is busy,"
                  << " request timeout";
     *status = Status::TIMEOUT;
     return false;
@@ -240,7 +240,7 @@ bool InferServer::RequestSync(Session_t session, PackagePtr input, Status* statu
     std::chrono::duration<double, std::milli> wait_time = std::chrono::steady_clock::now() - wait_start;
     timeout = timeout - wait_time.count();
     if (timeout < 1) {
-      LOG(WARNING) << "[EasyDK InferServer] RequestSync(): Session [" << session->GetName() << "] is busy,"
+      LOG(WARNING) << "[AI InferServer] RequestSync(): Session [" << session->GetName() << "] is busy,"
                    << " request timeout";
       *status = Status::TIMEOUT;
       return false;
@@ -260,7 +260,7 @@ bool InferServer::RequestSync(Session_t session, PackagePtr input, Status* statu
     if (flag.wait_for(std::chrono::milliseconds(timeout)) == std::future_status::timeout) {
       ctrl->Discard();
       *status = Status::TIMEOUT;
-      LOG(WARNING) << "[EasyDK InferServer] RequestSync(): Process timeout, discard this request";
+      LOG(WARNING) << "[AI InferServer] RequestSync(): Process timeout, discard this request";
     }
   } else {
     flag.wait();
@@ -269,40 +269,48 @@ bool InferServer::RequestSync(Session_t session, PackagePtr input, Status* statu
 }
 
 ModelPtr InferServer::GetModel(Session_t session) noexcept {
-  CHECK(session) << "[EasyDK InferServer] GetModel(): Session is null!";
+  CHECK(session) << "[AI InferServer] GetModel(): Session is null!";
   return session->GetExecutor()->GetModel();
 }
 
 void InferServer::WaitTaskDone(Session_t session, const std::string& tag) noexcept {
-  CHECK(session) << "[EasyDK InferServer] WaitTaskDone(): Session is null!";
+  CHECK(session) << "[AI InferServer] WaitTaskDone(): Session is null!";
   session->WaitTaskDone(tag);
 }
 
 void InferServer::DiscardTask(Session_t session, const std::string& tag) noexcept {
-  CHECK(session) << "[EasyDK InferServer] DiscardTask(): Session is null!";
+  CHECK(session) << "[AI InferServer] DiscardTask(): Session is null!";
   session->DiscardTask(tag);
 }
 
 bool InferServer::SetModelDir(const std::string& model_dir) noexcept {
   // check whether model dir exist
   if (access(model_dir.c_str(), F_OK) == 0) {
-    ModelManager::Instance()->SetModelDir(model_dir);
-    return true;
+    config_v5.net_type = YOLOV5;
+    config_v5.detect_thresh = 0.5;
+    config_v5.file_model_cfg = "/media/ai/AI/technology/computer/ai-engine/"
+                              "weights/yolov5-6.0/yolov5s.cfg";
+    config_v5.file_model_weights = "/media/ai/AI/technology/computer/ai-engine/"
+                                  "weights/yolov5-6.0/yolov5s.weights";
+    config_v5.calibration_image_list_file_txt =
+        "/media/ai/AI/technology/computer/ai-engine/config/"
+        "calibration_images.txt";
+    config_v5.inference_precison = FP16; // FP32 FP16 INT8
   }
   return false;
 }
 
 ModelPtr InferServer::LoadModel(const std::string& pattern1, const std::vector<Shape>& in_shapes) noexcept {
-  return ModelManager::Instance()->Load(pattern1, in_shapes);
+  return detector->init(config_v5);
 }
 
-ModelPtr InferServer::LoadModel(void* mem_cache, size_t size, const std::vector<Shape>& in_shapes) noexcept {
-  return ModelManager::Instance()->Load(mem_cache, size, in_shapes);
-}
+// ModelPtr InferServer::LoadModel(void* mem_cache, size_t size, const std::vector<Shape>& in_shapes) noexcept {
+//   return ModelManager::Instance()->Load(mem_cache, size, in_shapes);
+// }
 
-bool InferServer::UnloadModel(ModelPtr model) noexcept { return ModelManager::Instance()->Unload(std::move(model)); }
+// bool InferServer::UnloadModel(ModelPtr model) noexcept { return ModelManager::Instance()->Unload(std::move(model)); }
 
-void InferServer::ClearModelCache() noexcept { ModelManager::Instance()->ClearCache(); }
+// void InferServer::ClearModelCache() noexcept { ModelManager::Instance()->ClearCache(); }
 
 #ifdef CNIS_RECORD_PERF
 std::map<std::string, LatencyStatistic> InferServer::GetLatency(Session_t session) const noexcept {

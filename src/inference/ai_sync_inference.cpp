@@ -1,58 +1,39 @@
-/*************************************************************************
- * Copyright (C) [2022] by Cambricon, Inc. All rights reserved
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *************************************************************************/
-
 #include <algorithm>
 #include <memory>
 #include <string>
 #include <utility>
 
-#include "sample_sync_inference.hpp"
+#include "ai_sync_inference.hpp"
 
-#include "preprocess/preprocess_yolov3.hpp"
-#include "postprocess/postprocess_yolov3.hpp"
-#include "preprocess/preprocess_classification.hpp"
-#include "postprocess/postprocess_classification.hpp"
+#include "module/frame.h"
+// #include "preprocess/preprocess_yolov3.hpp"
+// #include "postprocess/postprocess_yolov3.hpp"
+// #include "preprocess/preprocess_classification.hpp"
+// #include "postprocess/postprocess_classification.hpp"
 
 int SampleSyncInference::Open() {
   infer_server_.reset(new infer_server::InferServer(device_id_));
 
   std::string lower_model_name = model_name_;
   std::transform(lower_model_name.begin(), lower_model_name.end(), lower_model_name.begin(), ::tolower);
+  
+  // if (lower_model_name == "yolov3") {
+  //   preproc_ = std::make_shared<PreprocYolov3>();
+  //   postproc_ = std::make_shared<PostprocYolov3>();
+  // } else if (lower_model_name == "resnet") {
+  //   preproc_ = std::make_shared<PreprocClassification>();
+  //   postproc_ = std::make_shared<PostprocClassification>();
+  // } else {
+  //   LOG(ERROR) << "[EasyDK Samples] [SampleSyncInference] Open: not support this model";
+  //   return -1;
+  // }
 
-  if (lower_model_name == "yolov3") {
-    preproc_ = std::make_shared<PreprocYolov3>();
-    postproc_ = std::make_shared<PostprocYolov3>();
-  } else if (lower_model_name == "resnet") {
-    preproc_ = std::make_shared<PreprocClassification>();
-    postproc_ = std::make_shared<PostprocClassification>();
-  } else {
-    LOG(ERROR) << "[EasyDK Samples] [SampleSyncInference] Open: not support this model";
-    return -1;
-  }
-
-  preproc_ = std::make_shared<PreprocYolov3>();
-  postproc_ = std::make_shared<PostprocYolov3>();
+  // preproc_ = std::make_shared<PreprocYolov3>();
+  // postproc_ = std::make_shared<PostprocYolov3>();
   return 0;
 }
 
-int SampleSyncInference::Process(std::shared_ptr<EdkFrame> frame) {
+int SampleSyncInference::Process(std::shared_ptr<ai::module::Frame> frame) {
   std::unique_lock<std::mutex> lk(ctx_mutex_);
   if (!infer_ctx_.count(frame->stream_id)) {
     infer_server::SessionDesc desc;
@@ -67,12 +48,12 @@ int SampleSyncInference::Process(std::shared_ptr<EdkFrame> frame) {
     // set preproc
     desc.preproc = infer_server::Preprocessor::Create();
 
-    infer_server::SetPreprocHandler(desc.model->GetKey(), preproc_.get());
+    // infer_server::SetPreprocHandler(desc.model->GetKey(), preproc_.get());
     desc.model_input_format = infer_server::NetworkInputFormat::RGB;
 
     // set post proc
     desc.postproc = infer_server::Postprocessor::Create();
-    infer_server::SetPostprocHandler(desc.model->GetKey(), postproc_.get());
+    // infer_server::SetPostprocHandler(desc.model->GetKey(), postproc_.get());
 
     infer_ctx_[frame->stream_id] = infer_server_->CreateSyncSession(desc);
   }

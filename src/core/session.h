@@ -38,11 +38,11 @@
 #include <queue>
 
 #include "cache.h"
-#include "cnis/infer_server.h"
+#include "inference/infer_server.h"
 #include "priority.h"
 #include "profile.h"
 #include "request_ctrl.h"
-#include "util/thread_pool.h"
+#include "utils/thread_pool.h"
 
 namespace infer_server {
 

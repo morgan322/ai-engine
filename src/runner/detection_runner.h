@@ -12,6 +12,9 @@
 #include "module/frame.h"
 #include "platform/ai_platform.h"
 
+#include "model/class_detector.h"
+#include "class_timer.hpp"
+
 struct DetectionFrame {
   AIBufSurface* surf;
   std::vector<ai::module::DetectObject> objs;
@@ -44,6 +47,7 @@ class DetectionRunner : public StreamRunner, public infer_server::IPreproc, publ
   bool save_video_;
   float threshold_ = 0.6;
   infer_server::CnPreprocTensorParams params_;
+  std::unique_ptr<Detector> detector(new Detector());
 };
 
 #endif  // EDK_SAMPLES_STREAM_APP_DETECTION_RUNNER_H_

@@ -26,12 +26,13 @@
 
 #include "infer_server.h"
 #include "module/basic_module.hpp"
+#include "module/frame.h"
 
 
-class SampleAsyncInference : public ai::module::BasecModule {
+class SampleAsyncInference : public ai::module::BasicModule {
  public:
   SampleAsyncInference(std::string name, int parallelism, int device_id, const std::string& model_path,
-                       std::string model_name) : EasyModule(name, parallelism) {
+                       std::string model_name) : BasicModule(name, parallelism) {
     model_path_ = model_path;
     device_id_ = device_id;
     model_name_ = model_name;
@@ -41,7 +42,7 @@ class SampleAsyncInference : public ai::module::BasecModule {
 
   int Open() override;
 
-  int Process(std::shared_ptr<EdkFrame> frame) override;
+  int Process(std::shared_ptr<ai::module::Frame> frame) override;
 
   int Close() override;
 
@@ -49,8 +50,8 @@ class SampleAsyncInference : public ai::module::BasecModule {
   std::string model_path_;
   int device_id_;
   std::string model_name_;
-  std::shared_ptr<infer_server::IPreproc> preproc_;
-  std::shared_ptr<infer_server::IPostproc> postproc_;
+  // std::shared_ptr<infer_server::IPreproc> preproc_;
+  // std::shared_ptr<infer_server::IPostproc> postproc_;
   infer_server::CnPreprocTensorParams params_;
   std::unique_ptr<infer_server::InferServer> infer_server_;
   infer_server::Session_t session_;

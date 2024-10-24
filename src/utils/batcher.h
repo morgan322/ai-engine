@@ -26,7 +26,7 @@
 #include <utility>
 #include <vector>
 
-#include "util/timer.h"
+#include "utils/timer.h"
 
 namespace infer_server {
 

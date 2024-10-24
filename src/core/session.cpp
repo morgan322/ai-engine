@@ -25,8 +25,8 @@
 #include <utility>
 #include <vector>
 
-#include "cnis/infer_server.h"
-#include "cnis/processor.h"
+#include "inference/infer_server.h"
+#include "inference/processor.h"
 #include "engine.h"
 #include "profile.h"
 

@@ -12,6 +12,9 @@
 #include "codec/video_decoder.h"
 #include "runner/stream_runner.h"
 
+
+// #include "codec/opencv_decoder.hpp"
+
 // #include "AI_vin_capture.h"
 // #include "AI_vout_display.h"
 // #include "AI_platform.h"
