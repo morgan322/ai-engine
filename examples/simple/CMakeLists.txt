@@ -65,11 +65,11 @@ include_directories(${GLOG_INCLUDE_DIRS})
 list(APPEND Examples_LINK_LIBS ${GLOG_LIBRARIES})
 
 # ---[ LibYuv
-list(APPEND Examples_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/3rdparty/libyuv/include)
+list(APPEND Examples_INCLUDE_DIRS ${ADK_ROOT_DIR}/3rdparty/libyuv/include)
 list(APPEND Examples_LINK_LIBS yuv)
 
 # ---[ thread
-list(APPEND E兴安盟_LINK_LIBS pthread dl)
+list(APPEND Examples_LINK_LIBS pthread dl)
 
 
 # workaround for gcc known issue

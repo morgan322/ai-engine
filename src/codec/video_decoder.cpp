@@ -1,11 +1,12 @@
 #include <glog/logging.h>
-// #include <libyuv.h>
+#include <libyuv.h>
 
 #include <algorithm>
 #include <memory>
 #include <string>
 
 
+#include "codec/buf_surface.h"
 #include "module/frame.h"
 #include "video_decoder.h"
 #include "runner/stream_runner.h"
@@ -293,7 +294,7 @@ class FFmpegDecodeImpl : public VideoDecoderImpl {
     } while (got_frame);
 
     if (handle_) {
-      handle_->OnEos();
+      handle_->OnDecodeEos();
     }
     eos_got_.store(1);
   }
@@ -331,7 +332,7 @@ class FFmpegDecodeImpl : public VideoDecoderImpl {
 #endif
     cn_frame.width = frame->width;
     cn_frame.height = frame->height;
-    cn_frame.pformat = edk::PixelFmt::NV12;
+    cn_frame.pformat = ai::module::PixelFmt::NV12;
     cn_frame.n_planes = 2;
     cn_frame.strides[0] = frame->linesize[0];
     cn_frame.strides[1] = frame->linesize[0];
@@ -377,13 +378,34 @@ class FFmpegDecodeImpl : public VideoDecoderImpl {
 
     cn_frame.device_id = device_id_;
     for (unsigned i = 0; i < cn_frame.n_planes; i++) {
-      cn_frame.ptrs[i] = mem_op.AllocMlu(plane_size[i]);
-      mem_op.MemcpyH2D(cn_frame.ptrs[i], cpu_plane[i], plane_size[i]);
+      cn_frame.ptrs[i] = cpu_plane[i];
     }
+    std::unique_ptr<uint8_t[]> nv12_buffer(new uint8_t[cn_frame.frame_size]);
+
+    // Copy the Y plane to the buffer
+    memcpy(nv12_buffer.get(), cn_frame.ptrs[0], plane_size[0]);
+
+    // Copy the UV plane to the buffer
+    memcpy(nv12_buffer.get() + plane_size[0], cn_frame.ptrs[1], plane_size[1]);
+
+    AIBufSurface surface_;
+    AIBufSurfaceParams surface_list_;
+    AIBufSurfaceMemType mem_type = AI_BUF_MEM_SYSTEM;
+    AIBufSurface *surf_ = nullptr;
+    surf_ = &surface_;
+    memset(surf_, 0, sizeof(AIBufSurface));
+    memset(&surface_list_, 0, sizeof(AIBufSurfaceParams));
+    surf_->surface_list = &surface_list_;
+    surf_->mem_type = mem_type;
+    surf_->batch_size = 1;
+    surf_->device_id = 0;
+    surf_->surface_list[0].color_format = AI_BUF_COLOR_FORMAT_NV12;
+    surf_->surface_list[0].data_ptr = nv12_buffer.release();
+    surf_->surface_list[0].data_size = cn_frame.frame_size;
 
     // Send cn_frame to handle
     if (handle_) {
-      handle_->OnDecodeFrame(cn_frame);
+      handle_->OnDecodeFrame(surf_);
     }
     return true;
   }

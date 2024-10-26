@@ -47,7 +47,7 @@ class DetectionRunner : public StreamRunner, public infer_server::IPreproc, publ
   bool save_video_;
   float threshold_ = 0.6;
   infer_server::CnPreprocTensorParams params_;
-  std::unique_ptr<Detector> detector(new Detector());
+  std::unique_ptr<Detector> detector;
 };
 
 #endif  // EDK_SAMPLES_STREAM_APP_DETECTION_RUNNER_H_

@@ -100,7 +100,7 @@ DetectionRunner::DetectionRunner(const VideoDecoder::DecoderType& decode_type, i
     }
 
     AIBufSurface* surf = frame->surf;
-    std::vector<DetectObject>& detect_objs = frame->objs;
+    std::vector<ai::module::DetectObject>& detect_objs = frame->objs;
     cv::Mat img = this->ConvertToMatAndReleaseBuf(surf);
     osd_.DrawLabel(img, detect_objs);
 
@@ -315,13 +315,13 @@ cv::Mat DetectionRunner::ConvertToMatAndReleaseBuf(AIBufSurface* surf) {
 
   uint32_t frame_stride = surf->surface_list[0].pitch;
   uint32_t frame_h = surf->surface_list[0].height;
-  cnrtMemcpy(buffer, surf->surface_list[0].data_ptr, frame_stride * frame_h, cnrtMemcpyDevToHost);
-  cnrtMemcpy(buffer + frame_stride * frame_h,
-      reinterpret_cast<void*>(reinterpret_cast<uint64_t>(surf->surface_list[0].data_ptr) + frame_stride * frame_h),
-      frame_stride * frame_h / 2, cnrtMemcpyDevToHost);
+  std::memcpy(buffer, surf->surface_list[0].data_ptr, frame_stride * frame_h);
+  std::memcpy(buffer + frame_stride * frame_h,
+              reinterpret_cast<void*>(reinterpret_cast<uint64_t>(surf->surface_list[0].data_ptr) + frame_stride * frame_h),
+              frame_stride * frame_h / 2);
 
   AIBufSurfaceColorFormat fmt = surf->surface_list[0].color_format;
-  decoder_->ReleaseFrame(surf);
+  // decoder_->ReleaseFrame(surf);
 
   // alloc memory to store image
   // yuv to bgr
@@ -350,7 +350,7 @@ void DetectionRunner::Process(AIBufSurface* surf) {
   infer_server::PackagePtr request = infer_server::Package::Create(1, stream);
   infer_server::PreprocInput tmp;
 
-  tmp.surf = std::make_shared<AI::BufSurfaceWrapper>(surf, false);
+  tmp.surf = std::make_shared<ai::BufSurfaceWrapper>(surf, false);
   tmp.has_bbox = false;
   request->data[0]->Set(std::move(tmp));
 

@@ -90,7 +90,7 @@ int main(int argc, char** argv) {
   //   return -1;
   // }
 
-  VideoDecoder::DecoderType decode_type = VideoDecoder::FFMPEG;
+  VideoDecoder::DecoderType decode_type = VideoDecoder::CAMERA;
   if (FLAGS_decode_type == "ffmpeg" || FLAGS_decode_type == "FFmpeg") {
     decode_type = VideoDecoder::FFMPEG;
   } else if (FLAGS_decode_type == "OpenCV" || FLAGS_decode_type == "opencv") {

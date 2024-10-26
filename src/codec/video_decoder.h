@@ -62,8 +62,8 @@ class VideoDecoder final : public IDemuxEventHandle {
   void OnEos() override;
   bool Running() override;
   VideoInfo& GetVideoInfo() { return info_; }
-  bool CopyFrameD2H(void *dst, AIBufSurface* surf) { return true; }
-  void ReleaseFrame(AIBufSurface* surf) { AIBufSurfaceDestroy(surf); }
+  // bool CopyFrameD2H(void *dst, AIBufSurface* surf) { return true; }
+  // void ReleaseFrame(AIBufSurface* surf) { AIBufSurfaceDestroy(surf); }
   void Destroy();
   ~VideoDecoder();
 

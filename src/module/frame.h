@@ -5,6 +5,7 @@
 #include <opencv2/opencv.hpp>
 #include <string>
 #include <vector>
+#include "codec/buf_surface_util.hpp"
 
 namespace ai {
 namespace module {
@@ -34,6 +35,7 @@ public:
   std::map<std::string, std::string>
       attributes; // add info into bbox, secondary infer classfication
   cv::Mat img;
+  ai::BufSurfWrapperPtr surf;
 };
 
 // Define pixel format enumeration

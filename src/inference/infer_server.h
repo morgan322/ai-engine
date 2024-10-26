@@ -725,8 +725,9 @@ class InferServer {
  private:
   InferServer() = delete;
   InferServerPrivate* priv_;
+ public:
   std::unique_ptr<Detector> detector;
-  Config config_v5;
+  static Config config_v5;
   
 };  // class InferServer
 
