@@ -135,9 +135,9 @@ class VideoDecodeImpl : public VideoDecoderImpl {
     stream.pts = 0;
     AIVdecSendStream(vdec_, &stream, 5000);
   }
-  void ReleaseFrame(AIBufSurface* surf) override {
-    AIBufSurfaceDestroy(surf);
-  }
+  // void ReleaseFrame(AIBufSurface* surf) override {
+    // AIBufSurfaceDestroy(surf);
+  // }
 
   void Destroy() {
     if (p_bsfc_) {

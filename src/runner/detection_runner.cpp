@@ -125,7 +125,7 @@ DetectionRunner::DetectionRunner(const VideoDecoder::DecoderType& decode_type, i
     video_writer_.reset(new cv::VideoWriter("out001.avi", CV_FOURCC('M', 'J', 'P', 'G'), 25, g_out_video_size));
 #endif
     if (!video_writer_->isOpened()) {
-      LOG(ERROR) << "[EasyDK Samples] [DetectionRunner] Create output video file failed";
+      LOG(ERROR) << "[AI Runner] [DetectionRunner] Create output video file failed";
     }
   }
 
@@ -190,7 +190,7 @@ int DetectionRunner::OnPreproc(ai::BufSurfWrapperPtr src, ai::BufSurfWrapperPtr 
     dst_desc.shape.h = params_.input_shape[2];
     dst_desc.shape.w = params_.input_shape[3];
   } else {
-    LOG(ERROR) << "[EasyDK Samples] [DetectionRunner] OnPreproc(): Unsupported input dim order";
+    LOG(ERROR) << "[AI Runner] [DetectionRunner] OnPreproc(): Unsupported input dim order";
     return -1;
   }
 
@@ -219,7 +219,7 @@ int DetectionRunner::OnPreproc(ai::BufSurfWrapperPtr src, ai::BufSurfWrapperPtr 
 
   AIBufSurfaceMemSet(dst_buf, -1, -1, 0x80);
   if (AITransform(src_buf, dst_buf, &params) < 0) {
-    LOG(ERROR) << "[EasyDK Samples] [DetectionRunner] OnPreproc(): AITransform failed";
+    LOG(ERROR) << "[AI Runner] [DetectionRunner] OnPreproc(): AITransform failed";
     return -1;
   }
 
@@ -233,11 +233,11 @@ int DetectionRunner::OnPostproc(const std::vector<infer_server::InferData*>& dat
   ai::BufSurfWrapperPtr output1 = model_output.surfs[1];  // bbox
 
   if (!output0->GetHostData(0)) {
-    LOG(ERROR) << "[EasyDK Samples] [DetectionRunner] Postprocess failed, copy data0 to host failed.";
+    LOG(ERROR) << "[AI Runner] [DetectionRunner] Postprocess failed, copy data0 to host failed.";
     return -1;
   }
   if (!output1->GetHostData(0)) {
-    LOG(ERROR) << "[EasyDK Samples] [DetectionRunner] Postprocess failed, copy data1 to host failed.";
+    LOG(ERROR) << "[AI Runner] [DetectionRunner] Postprocess failed, copy data1 to host failed.";
     return -1;
   }
 
@@ -254,7 +254,7 @@ int DetectionRunner::OnPostproc(const std::vector<infer_server::InferData*>& dat
     model_input_w = s[2];
     model_input_h = s[1];
   } else {
-    LOG(ERROR) << "[EasyDK Samples] [DetectionRunner] Postprocess failed. Unsupported dim order";
+    LOG(ERROR) << "[AI Runner] [DetectionRunner] Postprocess failed. Unsupported dim order";
     return -1;
   }
 
@@ -332,7 +332,7 @@ cv::Mat DetectionRunner::ConvertToMatAndReleaseBuf(AIBufSurface* surf) {
   } else if (fmt == AI_BUF_COLOR_FORMAT_NV21) {
     cv::cvtColor(yuv, img, cv::COLOR_YUV2BGR_NV21);
   } else {
-    LOG(ERROR) << "[EasyDK Samples] [DetectionRunner] Unsupported pixel format";
+    LOG(ERROR) << "[AI Runner] [DetectionRunner] Unsupported pixel format";
   }
   delete[] buffer;
 
@@ -358,8 +358,8 @@ void DetectionRunner::Process(AIBufSurface* surf) {
   frame->surf = surf;
   request->data[0]->SetUserData(frame);
   if (!infer_server_->Request(session_, std::move(request), frame)) {
-    LOG(ERROR) << "[EasyDK Samples] [DetectionRunner] Process(): Request infer_server do inference failed";
-    decoder_->ReleaseFrame(surf);
+    LOG(ERROR) << "[AI Runner] [DetectionRunner] Process(): Request infer_server do inference failed";
+    // decoder_->ReleaseFrame(surf);
     delete frame;
   }
 }

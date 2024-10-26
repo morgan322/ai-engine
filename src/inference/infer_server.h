@@ -659,7 +659,8 @@ class InferServer {
    * @retval true Succeeded
    * @retval false Model not exist
    */
-  static bool SetModelDir(const std::string& model_dir) noexcept;
+  // static 
+  bool SetModelDir(const std::string& model_dir) noexcept;
 
   /**
    * @brief Load model from uri, model won't be loaded again if it is already in cache
@@ -670,7 +671,8 @@ class InferServer {
    * @param in_shapes set input shape when it is mutable
    * @return ModelPtr A model
    */
-  static ModelPtr LoadModel(const std::string& model_uri, const std::vector<Shape>& in_shapes = {}) noexcept;
+  // static 
+  void LoadModel(const std::string& model_uri, const std::vector<Shape>& in_shapes = {}) noexcept;
 
   /**
    * @brief Load model from memory, model won't be loaded again if it is already in cache
@@ -680,7 +682,7 @@ class InferServer {
    * @param in_shapes set input shape when it is mutable
    * @return ModelPtr A model
    */
-  static ModelPtr LoadModel(void* ptr, size_t size, const std::vector<Shape>& in_shapes = {}) noexcept;
+  // static void LoadModel(void* ptr, size_t size, const std::vector<Shape>& in_shapes = {}) noexcept;
 
   /**
    * @brief Remove model from cache, model won't be destroyed if still in use
@@ -689,12 +691,12 @@ class InferServer {
    * @return true Succeed
    * @return false Model is not in cache
    */
-  static bool UnloadModel(ModelPtr model) noexcept;
+  // static void UnloadModel(ModelPtr model) noexcept;
 
   /**
    * @brief Clear all the models in cache, model won't be destroyed if still in use
    */
-  static void ClearModelCache() noexcept;
+  // static void ClearModelCache() noexcept;
 
   /* ----------------------- Perf API ---------------------------- */
   /**

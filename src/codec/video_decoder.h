@@ -38,7 +38,7 @@ class VideoDecoderImpl {
   virtual bool Init() = 0;
   virtual bool FeedPacket(const AVPacket* pkt) = 0;
   virtual void FeedEos() = 0;
-  virtual void ReleaseFrame(AIBufSurface* frsurfame) = 0;
+  // virtual void ReleaseFrame(AIBufSurface* frsurfame) = 0;
   // virtual bool CopyFrameD2H(void *dst, const CnBufSurface& surf) = 0;
   virtual void Destroy() = 0;
 

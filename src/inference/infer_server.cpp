@@ -264,25 +264,36 @@ void InferServer::DiscardTask(Session_t session, const std::string& tag) noexcep
 }
 
 bool InferServer::SetModelDir(const std::string& model_dir) noexcept {
-  // check whether model dir exist
-  if (access(model_dir.c_str(), F_OK) == 0) {
-    ModelManager::Instance()->SetModelDir(model_dir);
-    return true;
-  }
-  return false;
+  // // check whether model dir exist
+  // if (access(model_dir.c_str(), F_OK) == 0) {
+  //   ModelManager::Instance()->SetModelDir(model_dir);
+  //   return true;
+  // }
+  // return false;
+  config_v5.net_type = YOLOV5;
+  config_v5.detect_thresh = 0.5;
+  config_v5.file_model_cfg = "/media/ai/AI/technology/computer/ai-engine/"
+                             "weights/yolov5-6.0/yolov5s.cfg";
+  config_v5.file_model_weights = "/media/ai/AI/technology/computer/ai-engine/"
+                                 "weights/yolov5-6.0/yolov5s.weights";
+  config_v5.calibration_image_list_file_txt =
+      "/media/ai/AI/technology/computer/ai-engine/config/"
+      "calibration_images.txt";
+  config_v5.inference_precison = FP16; // FP32 FP16 INT8
 }
 
-ModelPtr InferServer::LoadModel(const std::string& pattern1, const std::vector<Shape>& in_shapes) noexcept {
-  return ModelManager::Instance()->Load(pattern1, in_shapes);
+void InferServer::LoadModel(const std::string& pattern1, const std::vector<Shape>& in_shapes) noexcept {
+  detector->init(config_v5);
+  return;
 }
 
-ModelPtr InferServer::LoadModel(void* mem_cache, size_t size, const std::vector<Shape>& in_shapes) noexcept {
-  return ModelManager::Instance()->Load(mem_cache, size, in_shapes);
-}
+// void InferServer::LoadModel(void* mem_cache, size_t size, const std::vector<Shape>& in_shapes) noexcept {
+//   return ModelManager::Instance()->Load(mem_cache, size, in_shapes);
+// }
 
-bool InferServer::UnloadModel(ModelPtr model) noexcept { return ModelManager::Instance()->Unload(std::move(model)); }
+// bool InferServer::UnloadModel(ModelPtr model) noexcept { return ModelManager::Instance()->Unload(std::move(model)); }
 
-void InferServer::ClearModelCache() noexcept { ModelManager::Instance()->ClearCache(); }
+// void InferServer::ClearModelCache() noexcept { ModelManager::Instance()->ClearCache(); }
 
 #ifdef CNIS_RECORD_PERF
 std::map<std::string, LatencyStatistic> InferServer::GetLatency(Session_t session) const noexcept {
