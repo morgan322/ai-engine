@@ -5,7 +5,7 @@ RUN sed -i 's/archive.ubuntu.com/mirrors.tuna.tsinghua.edu.cn/g' /etc/apt/source
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt update && \
-    apt install -y git pkgconf ninja-build ccache libssl-dev wget libgoogle-glog-dev && \
+    apt install -y git pkgconf ninja-build ccache libssl-dev wget libgoogle-glog-dev libglib2.0-dev && \
     rm -rf /var/lib/apt/lists/*
 
 RUN cd /tmp && \
@@ -13,8 +13,8 @@ RUN cd /tmp && \
     chmod +x cmake-3.24.0-linux-x86_64.sh && \
     ./cmake-3.24.0-linux-x86_64.sh --prefix=/usr/local --exclude-subdir --skip-license && \
     rm -rf /tmp/*
- 
-# Nvidia 编译环境
+
+# Nvidia
 RUN cd /tmp && \
     git clone -b n10.0.26.2 --depth=1 https://github.com/FFmpeg/nv-codec-headers.git && \
     cd nv-codec-headers && \
@@ -66,7 +66,7 @@ RUN apt update && \
         libnvinfer-dev libnvonnxparsers-dev libnvparsers-dev libnvinfer-plugin-dev && \
     rm -rf /var/lib/apt/lists/*
 
-# Intel 编译环境
+# Intel
 RUN cd /tmp && \
     wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB && \
     apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB && \
@@ -76,7 +76,7 @@ RUN echo "deb https://apt.repos.intel.com/openvino/2022 bionic main" | tee /etc/
     apt install -y openvino-2022.1.0 openvino-opencv && \
     rm -rf /var/lib/apt/lists/*
 RUN apt update && \
-    apt install -y libdrm-dev autoconf libtool libglib2.0-dev pkg-config && \
+    apt install -y libdrm-dev autoconf libtool pkg-config && \
     rm -rf /var/lib/apt/lists/*
 RUN cd /tmp && \
     git clone -b 2.15.0 --depth=1 https://github.com/intel/libva.git && cd libva && \
