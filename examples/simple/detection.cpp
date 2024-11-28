@@ -38,7 +38,7 @@ bool g_exit = false;
 void HandleSignal(int sig) {
   g_runner->Stop();
   g_exit = true;
-  LOG(INFO) << "[AI Examples] [Detection] Got INT signal, ready to exit!";
+  LOG(INFO) << "[AI Simple] [Detection] Got INT signal, ready to exit!";
 }
 
 int main(int argc, char** argv) {
@@ -48,13 +48,13 @@ int main(int argc, char** argv) {
   FLAGS_colorlogtostderr = true;
 
   // check params
-  CHECK(FLAGS_data_path. size() != 0u) << "[AI Examples] [Detection] data path is empty";  // NOLINT
-  CHECK(FLAGS_model_path.size() != 0u) << "[AI Examples] [Detection] model path is empty";  // NOLINT
-  CHECK(FLAGS_label_path.size() != 0u) << "[AI Examples] [Detection] label path is empty";  // NOLINT
-  CHECK(FLAGS_wait_time >= 0) << "[AI Examples] [Detection] wait time should be >= 0";    // NOLINT
-  CHECK(FLAGS_repeat_time >= 0) << "[AI Examples] [Detection] repeat time should be >= 0";  // NOLINT
-  CHECK(FLAGS_dev_id >= 0) << "[AI Examples] [Detection] device id should be >= 0";       // NOLINT
-  CHECK(FLAGS_codec_id_start >= 0) "[AI Examples] [Detection] codec start id should be >= 0"; // NOLINT
+  CHECK(FLAGS_data_path. size() != 0u) << "[AI Simple] [Detection] data path is empty";  // NOLINT
+  CHECK(FLAGS_model_path.size() != 0u) << "[AI Simple] [Detection] model path is empty";  // NOLINT
+  CHECK(FLAGS_label_path.size() != 0u) << "[AI Simple] [Detection] label path is empty";  // NOLINT
+  CHECK(FLAGS_wait_time >= 0) << "[AI Simple] [Detection] wait time should be >= 0";    // NOLINT
+  CHECK(FLAGS_repeat_time >= 0) << "[AI Simple] [Detection] repeat time should be >= 0";  // NOLINT
+  CHECK(FLAGS_dev_id >= 0) << "[AI Simple] [Detection] device id should be >= 0";       // NOLINT
+  CHECK(FLAGS_codec_id_start >= 0) "[AI Simple] [Detection] codec start id should be >= 0"; // NOLINT
 
 
   AISensorParams sensor_params[4];
@@ -86,7 +86,7 @@ int main(int argc, char** argv) {
   // }
 
   // if (AIPlatformInit(&config) < 0) {
-  //   LOG(ERROR) << "[AI Examples] [Detection] Init platform failed";
+  //   LOG(ERROR) << "[AI Simple] [Detection] Init platform failed";
   //   return -1;
   // }
 
@@ -101,7 +101,7 @@ int main(int argc, char** argv) {
                                                  FLAGS_model_path, FLAGS_label_path,
                                                  FLAGS_data_path, FLAGS_show, FLAGS_save_video);
   } catch (...) {
-    LOG(ERROR) << "[AI Examples] [Detection] Create stream runner failed";
+    LOG(ERROR) << "[AI Simple] [Detection] Create stream runner failed";
     return -1;
   }
 
@@ -122,7 +122,7 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  LOG(INFO) << "[AI Examples] [Detection] Run SUCCEED!!!";
+  LOG(INFO) << "[AI Simple] [Detection] Run SUCCEED!!!";
   google::ShutdownGoogleLogging();
   return 0;
 }

@@ -11,22 +11,22 @@ int main(int argc, char *argv[]) {
   Config config_v5;
   config_v5.net_type = YOLOV5;
   config_v5.detect_thresh = 0.5;
-  config_v5.file_model_cfg = "/media/ai/AI/technology/computer/ai-engine/"
+  config_v5.file_model_cfg = "/workspace/"
                              "weights/yolov5-6.0/yolov5s.cfg";
-  config_v5.file_model_weights = "/media/ai/AI/technology/computer/ai-engine/"
+  config_v5.file_model_weights = "/workspace/"
                                  "weights/yolov5-6.0/yolov5s.weights";
   config_v5.calibration_image_list_file_txt =
-      "/media/ai/AI/technology/computer/ai-engine/config/"
+      "/workspace/config/"
       "calibration_images.txt";
   config_v5.inference_precison = FP16; // FP32 FP16 INT8
 
   std::unique_ptr<Detector> detector(new Detector());
   detector->init(config_v5);
   cv::Mat image0 =
-      cv::imread("/media/ai/AI/technology/computer/ai-engine/data/dog.jpg",
+      cv::imread("/workspace/data/dog.jpg",
                  cv::IMREAD_UNCHANGED);
   cv::Mat image1 =
-      cv::imread("/media/ai/AI/technology/computer/ai-engine/data/person.jpg",
+      cv::imread("/workspace/data/person.jpg",
                  cv::IMREAD_UNCHANGED);
   std::vector<BatchResult> batch_res;
   // Timer timer;
