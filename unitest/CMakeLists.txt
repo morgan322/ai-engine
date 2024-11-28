@@ -66,6 +66,7 @@ add_executable(tests_ai ${test_srcs})
 add_sanitizers(tests_ai)
 
 target_include_directories(tests_ai PRIVATE
+                           ${FFMPEG_INCLUDE_DIR}
                            ${OpenCV_INCLUDE_DIRS}
                            ${CMAKE_CURRENT_SOURCE_DIR}/include
                            ${CMAKE_CURRENT_SOURCE_DIR}/src/codec

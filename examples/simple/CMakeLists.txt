@@ -34,8 +34,7 @@ list(APPEND Examples_LINK_LIBS ${OpenCV_LIBS})
 
 find_package(FFmpeg REQUIRED)
 if (FFMPEG_FOUND)
-  include_directories(${FFMPEG_INCLUDE_DIR})
-  list(APPEND 3RDPARTY_LIBS ${FFMPEG_LIBRARIES})
+  list(APPEND Examples_INCLUDE_DIRS ${FFMPEG_INCLUDE_DIR})
   list(APPEND Examples_LINK_LIBS ${FFMPEG_LIBRARIES})
   set(HAVE_FFMPEG true)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DHAVE_FFMPEG")
@@ -58,11 +57,6 @@ endif ()
 
 set(ADK_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../..)
 
-
-# ---[ glog
-include(${ADK_ROOT_DIR}/cmake/FindGlog.cmake)
-include_directories(${GLOG_INCLUDE_DIRS})
-list(APPEND Examples_LINK_LIBS ${GLOG_LIBRARIES})
 
 # ---[ LibYuv
 list(APPEND Examples_INCLUDE_DIRS ${ADK_ROOT_DIR}/3rdparty/libyuv/include)

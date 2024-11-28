@@ -5,7 +5,7 @@ RUN sed -i 's/archive.ubuntu.com/mirrors.tuna.tsinghua.edu.cn/g' /etc/apt/source
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt update && \
-    apt install -y git pkgconf ninja-build ccache libssl-dev wget && \
+    apt install -y git pkgconf ninja-build ccache libssl-dev wget libgoogle-glog-dev && \
     rm -rf /var/lib/apt/lists/*
 
 RUN cd /tmp && \
@@ -76,7 +76,7 @@ RUN echo "deb https://apt.repos.intel.com/openvino/2022 bionic main" | tee /etc/
     apt install -y openvino-2022.1.0 openvino-opencv && \
     rm -rf /var/lib/apt/lists/*
 RUN apt update && \
-    apt install -y libdrm-dev autoconf libtool pkg-config && \
+    apt install -y libdrm-dev autoconf libtool libglib2.0-dev pkg-config && \
     rm -rf /var/lib/apt/lists/*
 RUN cd /tmp && \
     git clone -b 2.15.0 --depth=1 https://github.com/intel/libva.git && cd libva && \
