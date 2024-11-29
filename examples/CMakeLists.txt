@@ -1,2 +1,2 @@
 # add_subdirectory(pipeline)
-# add_subdirectory(simple)
+add_subdirectory(simple)

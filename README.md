@@ -4,9 +4,7 @@ cd ~
 
 git clone https://github.com/morgan322/ai-engine.git
 
-git submodule init
-
-git submodule update
+cd ai-engine && git submodule init && git submodule update
 
 # build
 
