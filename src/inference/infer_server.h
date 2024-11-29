@@ -15,7 +15,7 @@
 #include "utils/any.h"
 #include "utils/base_object.h"
 
-#include "model/class_detector.h"
+#include "model/trt_yolo/class_detector.h"
 
 namespace infer_server {
 
@@ -672,7 +672,7 @@ class InferServer {
    * @return ModelPtr A model
    */
   // static 
-  void LoadModel(const std::string& model_uri, const std::vector<Shape>& in_shapes = {}) noexcept;
+  static void LoadModel() noexcept;
 
   /**
    * @brief Load model from memory, model won't be loaded again if it is already in cache
@@ -728,7 +728,7 @@ class InferServer {
   InferServer() = delete;
   InferServerPrivate* priv_;
  public:
-  std::unique_ptr<Detector> detector;
+  static std::unique_ptr<Detector> detector;
   static Config config_v5;
   
 };  // class InferServer

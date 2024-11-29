@@ -75,7 +75,7 @@ class AIOsd {
 
   void DrawId(Mat image, string text) const;
   void DrawFps(Mat image, float fps) const;
-  void DrawLabel(Mat image, const vector<DetectObject>& objects) const;
+  void DrawLabel(Mat image, const std::vector<DetectObject>& objects) const;
 
   void set_font(int font);
 

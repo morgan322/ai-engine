@@ -12,12 +12,12 @@
 #include "module/frame.h"
 #include "platform/ai_platform.h"
 
-#include "model/class_detector.h"
+#include "model/trt_yolo/class_detector.h"
 #include "class_timer.hpp"
 
 struct DetectionFrame {
   AIBufSurface* surf;
-  std::vector<ai::module::DetectObject> objs;
+  std::vector<DetectObject> objs;
 };
 
 class DetectionRunner : public StreamRunner, public infer_server::IPreproc, public infer_server::IPostproc {

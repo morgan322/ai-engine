@@ -282,7 +282,7 @@ bool InferServer::SetModelDir(const std::string& model_dir) noexcept {
   config_v5.inference_precison = FP16; // FP32 FP16 INT8
 }
 
-void InferServer::LoadModel(const std::string& pattern1, const std::vector<Shape>& in_shapes) noexcept {
+void InferServer::LoadModel() noexcept {
   detector->init(config_v5);
   return;
 }

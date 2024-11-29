@@ -84,7 +84,8 @@ DetectionRunner::DetectionRunner(const VideoDecoder::DecoderType& decode_type, i
   desc.name = "detection session";
 
   // load offline model
-  desc.model = infer_server::InferServer::LoadModel(model_path);
+  infer_server::InferServer::LoadModel();
+  // desc.model = infer_server::InferServer::LoadModel();
   // set preproc
   desc.preproc = infer_server::Preprocessor::Create();
   infer_server::SetPreprocHandler(desc.model->GetKey(), this);
@@ -100,7 +101,7 @@ DetectionRunner::DetectionRunner(const VideoDecoder::DecoderType& decode_type, i
     }
 
     AIBufSurface* surf = frame->surf;
-    std::vector<ai::module::DetectObject>& detect_objs = frame->objs;
+    std::vector<DetectObject>& detect_objs = frame->objs;
     cv::Mat img = this->ConvertToMatAndReleaseBuf(surf);
     osd_.DrawLabel(img, detect_objs);
 

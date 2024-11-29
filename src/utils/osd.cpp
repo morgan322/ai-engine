@@ -133,7 +133,7 @@ void AIOsd::DrawFps(Mat image, float fps) const {
 // tl: top left
 // br: bottom right
 // bl: bottom left
-void AIOsd::DrawLabel(Mat image, const vector<DetectObject>& objects) const {
+void AIOsd::DrawLabel(Mat image, const  std::vector<DetectObject>& objects) const {
   // check input data
   if (image.rows * image.cols == 0) {
     return;

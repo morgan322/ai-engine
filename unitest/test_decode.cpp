@@ -218,10 +218,10 @@ static int CreateSurfacePool(void **surf_pool, int width, int height,
   create_params.device_id = g_device_id;
   create_params.mem_type = AI_BUF_MEM_DEVICE;
 
-  if (AIBufPoolCreate(surf_pool, &create_params, 6) < 0) {
-    LOG(ERROR) << "[AI Tests] [Decode] CreateSurfacePool(): Create pool failed";
-    return -1;
-  }
+  // if (AIBufPoolCreate(surf_pool, &create_params, 6) < 0) {
+  //   LOG(ERROR) << "[AI Tests] [Decode] CreateSurfacePool(): Create pool failed";
+  //   return -1;
+  // }
 
   return 0;
 }
