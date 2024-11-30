@@ -35,7 +35,7 @@ list(APPEND Examples_LINK_LIBS pthread dl)
 message(STATUS "@@@@@@@@@@@ Target : detection")
 
 # ---[ Detection executable
-file(GLOB detection_srcs "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
+file(GLOB detection_srcs "${CMAKE_CURRENT_SOURCE_DIR}/detection.cpp")
 file(GLOB_RECURSE detection_srcs_sub "${CMAKE_CURRENT_SOURCE_DIR}/../../src/**/*.cpp")
 
 list(APPEND detection_srcs ${detection_srcs_sub})

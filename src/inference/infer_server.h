@@ -15,8 +15,6 @@
 #include "utils/any.h"
 #include "utils/base_object.h"
 
-#include "model/trt_yolo/class_detector.h"
-
 namespace infer_server {
 
 enum class InferType { kAsync, kSync };
@@ -727,10 +725,6 @@ class InferServer {
  private:
   InferServer() = delete;
   InferServerPrivate* priv_;
- public:
-  static std::unique_ptr<Detector> detector;
-  static Config config_v5;
-  
 };  // class InferServer
 
 }  // namespace infer_server

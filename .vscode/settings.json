@@ -77,7 +77,11 @@
         "iomanip": "cpp",
         "list": "cpp",
         "codecvt": "cpp",
-        "queue": "cpp"
+        "queue": "cpp",
+        "forward_list": "cpp",
+        "unordered_set": "cpp",
+        "typeindex": "cpp",
+        "*.in": "cpp"
     },
    
 

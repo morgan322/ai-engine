@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 3.10)
-project(mssd)
 find_package(OpenCV REQUIRED)
 set(SOURCE_FILES SSDModel.cpp)
 add_executable(mssd ${SOURCE_FILES})

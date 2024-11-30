@@ -21,7 +21,7 @@
 #ifndef INFER_SERVER_MODEL_H_
 #define INFER_SERVER_MODEL_H_
 
-#include <cnrt.h>
+// #include <cnrt.h>
 #include <glog/logging.h>
 #include <algorithm>
 #include <map>
@@ -31,9 +31,9 @@
 #include <unordered_map>
 #include <vector>
 
-#include "cnis/infer_server.h"
-#include "cnis/processor.h"
-#include "cnis/shape.h"
+#include "inference/infer_server.h"
+#include "inference/processor.h"
+#include "inference/shape.h"
 
 // for magicmind
 #ifdef HAVE_MM_COMMON_HEADER

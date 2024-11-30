@@ -1,23 +1,3 @@
-/*************************************************************************
- * Copyright (C) [2020] by Cambricon, Inc. All rights reserved
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *************************************************************************/
-
 #ifndef INFER_SERVER_CORE_SESSION_H_
 #define INFER_SERVER_CORE_SESSION_H_
 
@@ -53,21 +33,6 @@ class Session {
  public:
   Session(const std::string& name, Executor_t executor, bool sync_link, bool show_perf) noexcept
       : name_(name), executor_(executor), running_(true), is_sync_link_(sync_link), show_perf_(show_perf) {
-#ifdef CNIS_RECORD_PERF
-    profiler_.SetSelfUpdate(false);
-    // update and print performance information every 2 second
-    perf_timer_.NotifyEvery(2000, [this, show_perf]() {
-      profiler_.Update();
-      if (show_perf) {
-        LOG(INFO) << "[EasyDK InferServer] [" << name_ << "] Session rps (total): " << profiler_.RequestPerSecond();
-        LOG(INFO) << "[EasyDK InferServer] [" << name_ << "] Session ups (total): " << profiler_.UnitPerSecond();
-        LOG(INFO) << "[EasyDK InferServer] [" << name_ << "] Session rps (realtime): "
-                  << profiler_.RequestThroughoutRealtime();
-        LOG(INFO) << "[EasyDK InferServer] [" << name_ << "] Session ups (realtime): "
-                  << profiler_.UnitThroughoutRealtime();
-      }
-    });
-#endif
   }
 
   ~Session() {
@@ -77,18 +42,10 @@ class Session {
     auto check = [this]() { return request_list_.empty() && !in_response_.load(); };
     std::unique_lock<std::mutex> lk(request_mutex_);
     if (!check()) {
-      VLOG(1) << "[EasyDK InferServer] [Session] session " << name_ << " wait all task done in destructor";
+      VLOG(1) << "[AI InferServer] [Session] session " << name_ << " wait all task done in destructor";
       sync_cond_.wait(lk, check);
     }
     lk.unlock();
-
-#ifdef CNIS_RECORD_PERF
-    // stop print perf
-    if (!perf_timer_.Idle()) {
-      perf_timer_.Cancel();
-      if (show_perf_) recorder_.PrintPerformance(name_);
-    }
-#endif
   }
 
   /* ---------------- Observer -------------------*/
@@ -145,17 +102,17 @@ class Executor {
 
   void Link(Session_t session) noexcept {
     std::unique_lock<std::mutex> lk(link_mutex_);
-    VLOG(1) << "[EasyDK InferServer] [Session] Executor " << desc_.name << "] link session " << session->GetName();
+    VLOG(1) << "[AI InferServer] [Session] Executor " << desc_.name << "] link session " << session->GetName();
     link_set_.insert(session);
   }
 
   void Unlink(Session_t session) noexcept {
     std::unique_lock<std::mutex> lk(link_mutex_);
     if (link_set_.count(session)) {
-      VLOG(1) << "[EasyDK InferServer] [Session] Executor " << desc_.name << "] unlink session " << session->GetName();
+      VLOG(1) << "[AI InferServer] [Session] Executor " << desc_.name << "] unlink session " << session->GetName();
       link_set_.erase(session);
     } else {
-      LOG(WARNING) << "[EasyDK InferServer] [Session] Unlink session, but it is not found in this executor";
+      LOG(WARNING) << "[AI InferServer] [Session] Unlink session, but it is not found in this executor";
     }
   }
 
@@ -168,9 +125,9 @@ class Executor {
       if (timeout > 0) {
         return limit_cond_.wait_for(lk, std::chrono::milliseconds(timeout), idle_pred);
       } else {
-        VLOG(2) << "[EasyDK InferServer] [WaitIfCacheFull] Wait for cache not full";
+        VLOG(2) << "[AI InferServer] [WaitIfCacheFull] Wait for cache not full";
         limit_cond_.wait(lk, idle_pred);
-        VLOG(2) << "[EasyDK InferServer] [WaitIfCacheFull] Wait for cache not full done";
+        VLOG(2) << "[AI InferServer] [WaitIfCacheFull] Wait for cache not full done";
       }
     }
     return true;

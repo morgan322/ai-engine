@@ -1,21 +1,5 @@
-/*************************************************************************
- * Copyright (C) 2020 by Cambricon, Inc. All rights reserved
- *
- * This source code is licensed under the Apache-2.0 license found in the
- * LICENSE file in the root directory of this source tree.
- *
- * A part of this source code is referenced from ctpl project.
- * https://github.com/vit-vit/CTPL/blob/master/ctpl_stl.h
- *
- * Copyright (C) 2014 by Vitaliy Vitsentiy
- *
- * This source code is licensed under the Apache-2.0 license found in the
- * LICENSE file in the root directory of this source tree.
- *
- *************************************************************************/
-
-#ifndef INFER_SERVER_UTIL_THREAD_POOL_H_
-#define INFER_SERVER_UTIL_THREAD_POOL_H_
+#ifndef  AI_UTILS_THREAD_POOL_H_
+#define AI_UTILS_THREAD_POOL_H_
 
 #include <glog/logging.h>
 

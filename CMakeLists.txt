@@ -1,6 +1,4 @@
 cmake_minimum_required(VERSION 3.10)
-project(adk C CXX)
-
 set(ADK_VERSION_MAJOR 0)
 set(ADK_VERSION_MINOR 1)
 set(ADK_VERSION_PATCH 0)
