@@ -58,7 +58,7 @@ Status Postprocessor::Init() noexcept {
   constexpr const char* params[] = {"model_info", "device_id"};
   for (auto p : params) {
     if (!HaveParam(p)) {
-      LOG(ERROR) << "[EasyDK InferServer] [Postprocessor] " << p << " has not been set";
+      LOG(ERROR) << "[AI InferServer] [Postprocessor] " << p << " has not been set";
       return Status::INVALID_PARAM;
     }
   }
@@ -67,14 +67,14 @@ Status Postprocessor::Init() noexcept {
     priv_->model = GetParam<ModelPtr>("model_info");
     priv_->handler = GetPostprocHandler(priv_->model->GetKey());
     if (!priv_->handler) {
-      LOG(WARNING) << "[EasyDK InferServer] [Postprocessor] The IPostproc handler has not been set,"
+      LOG(WARNING) << "[AI InferServer] [Postprocessor] The IPostproc handler has not been set,"
                    << " postprocessor will output ModelIO directly";
     }
     int device_id = GetParam<int>("device_id");
 
     if (!SetCurrentDevice(device_id)) return Status::ERROR_BACKEND;
   } catch (bad_any_cast&) {
-    LOG(ERROR) << "[EasyDK InferServer] [Postprocessor] Unmatched param type";
+    LOG(ERROR) << "[AI InferServer] [Postprocessor] Unmatched param type";
     return Status::WRONG_TYPE;
   }
 
@@ -97,9 +97,9 @@ class HostDataDeleter : public cnedk::IBufDeleter {
 };
 
 Status Postprocessor::Process(PackagePtr pack) noexcept {
-  CHECK(pack) << "[EasyDK InferServer] [Postprocessor] Process pack. It should not be nullptr";
+  CHECK(pack) << "[AI InferServer] [Postprocessor] Process pack. It should not be nullptr";
   if (!pack->predict_io || !pack->predict_io->HasValue()) {
-    LOG(ERROR) << "[EasyDK InferServer] [Postprocessor] Can process continuous data only";
+    LOG(ERROR) << "[AI InferServer] [Postprocessor] Can process continuous data only";
     return Status::INVALID_PARAM;
   }
 
@@ -125,7 +125,7 @@ Status Postprocessor::Process(PackagePtr pack) noexcept {
   if (priv_->handler) {
     priv_->handler->OnPostproc(datav, outputs, priv_->model.get());
   } else {
-    VLOG(4) << "[EasyDK InferServer] [Postprocessor] do not have IPostproc handler, output ModelIO directly";
+    VLOG(4) << "[AI InferServer] [Postprocessor] do not have IPostproc handler, output ModelIO directly";
     for (size_t batch_idx = 0; batch_idx < batch_size; ++batch_idx) {
       ModelIO out;
       for (size_t out_idx = 0; out_idx < out_mlu.surfs.size(); ++out_idx) {
