@@ -8,10 +8,10 @@ from PIL import Image,ImageEnhance
 src_dir = '/home/morgan/ubt/data/0722'
 
 frame_flag = 0
-plot_flag = 0
+plot_flag = 1
 gamma_flag = 0
 rename_flag = 0
-color_flag = 1
+color_flag = 0
 EXTRACT_FREQUENCY = 40
 
 image_dir = src_dir + '/JPEGImages/'
@@ -19,6 +19,7 @@ annotation_dir = src_dir + '/Annotations/'
 VIDEO_PATH = src_dir + '/saveImgs/'
 save_dir =src_dir +  "/plot/"
 os.makedirs(image_dir, exist_ok=True)
+os.makedirs(annotation_dir, exist_ok=True)
 os.makedirs(save_dir, exist_ok=True)
 
 current_date = datetime.datetime.now()
@@ -148,64 +149,82 @@ if gamma_flag:
         # 保存修改后的 XML 文件
         tree.write(annotation_dir + new_name )
 
+
+def adjust_white_balance(image, temp=5000):
+    # 将图像转换为 RGB
+    img_array = np.array(image.convert("RGB"))
+
+    # 设定色温的加权比例，这里假设色温越高，红色通道更强，蓝色通道更弱
+    r, g, b = img_array[..., 0], img_array[..., 1], img_array[..., 2]
+
+    # 色温和 RGB 通道的关系，5000K 作为基准
+    scale_r = temp / 5500
+    scale_b = 5500 / temp
+    
+    # 调整 R 和 B 通道
+    r = np.clip(r * scale_r, 0, 255)
+    b = np.clip(b * scale_b, 0, 255)
+    
+    # 合并 RGB 通道
+    img_array[..., 0] = r
+    img_array[..., 2] = b
+
+    # 返回调整后的图像
+    return Image.fromarray(img_array.astype(np.uint8))
+
+
 if color_flag:
+    for filename in os.listdir(annotation_dir):
+        tree = ET.parse(annotation_dir + filename)
+        root = tree.getroot()
+        if os.path.exists(image_dir +filename.replace('xml','png')):
+            exname = 'png'
+        else:
+            exname = 'jpg'
+    
+        image = Image.open(image_dir +filename.replace('xml',exname) )
+        contrast = ImageEnhance.Contrast(image)
+        image_contrast = contrast.enhance(1.6)  
+        image_low = contrast.enhance(0.7)
+        saturation = ImageEnhance.Color(image)
+        image_saturation = saturation.enhance(1.4)  
+        hsv_image = image.convert("HSV")
+        hsv_array = np.array(hsv_image)
+        hsv_array[..., 0] = (hsv_array[..., 0] + 50) % 256 
+        hsv_image = Image.fromarray(hsv_array, "HSV")
+        image_hue = hsv_image.convert("RGB") 
+        image_white_balance = adjust_white_balance(image, temp=5000)
 
-    # 加载图像
-    image_path = "/home/morgan/ubt/data/test/img/20241101-174241.jpg"  # 替换为你的图片路径
-    image = Image.open(image_path)
+        new_low_name  = os.path.splitext(filename)[0] + '_' +  str(9) + '.jpg'
+        new_contrast_name = os.path.splitext(filename)[0] + '_' +  str(10) + '.jpg'
+        new_saturation_name = os.path.splitext(filename)[0] + '_' +  str(11) + '.jpg'
+        new_hue_name = os.path.splitext(filename)[0] + '_' +  str(12) + '.jpg'
+        new_white_name = os.path.splitext(filename)[0] + '_' +  str(13) + '.jpg'
+        new_xml_low_name  = os.path.splitext(filename)[0] + '_' +  str(9) + '.xml'
+        new_xml_contrast_name =  os.path.splitext(filename)[0] + '_' +  str(10) + '.xml'
+        new_xml_saturation_name =  os.path.splitext(filename)[0] + '_' +  str(11) + '.xml'
+        new_xml_hue_name =  os.path.splitext(filename)[0] + '_' +  str(12) + '.xml'
+        new_xml_white_name =  os.path.splitext(filename)[0] + '_' +  str(13) + '.xml'
 
-    # 1. 调整对比度（Contrast）
-    contrast = ImageEnhance.Contrast(image)
-    image_contrast = contrast.enhance(1.5)  # 增加对比度到1.5倍
-    image_contrast.show(title="Contrast Adjusted")
+        image_low.save(os.path.join(image_dir,new_low_name))
+        image_contrast.save(os.path.join(image_dir,new_contrast_name))
+        image_saturation.save(os.path.join(image_dir,new_saturation_name))
+        image_hue.save(os.path.join(image_dir,new_hue_name))
+        image_white_balance.save(os.path.join(image_dir,new_white_name))
+        for filename_elem in root.iter('filename'):
+            filename_elem.text = new_low_name
+        tree.write(annotation_dir + new_xml_low_name)
+        for filename_elem in root.iter('filename'):
+            filename_elem.text = new_contrast_name
+        tree.write(annotation_dir + new_xml_contrast_name)
+        for filename_elem in root.iter('filename'):
+            filename_elem.text = new_saturation_name
+        tree.write(annotation_dir + new_xml_saturation_name)
+        for filename_elem in root.iter('filename'):
+            filename_elem.text = new_hue_name
+        tree.write(annotation_dir + new_xml_hue_name)
+        for filename_elem in root.iter('filename'):
+            filename_elem.text = new_white_name
+        tree.write(annotation_dir + new_xml_white_name)
 
-    # 2. 调整饱和度（Saturation）
-    saturation = ImageEnhance.Color(image)
-    image_saturation = saturation.enhance(1.2)  # 增加饱和度到1.2倍
-    image_saturation.show(title="Saturation Adjusted")
-
-    # 3. 调整色调（Hue）
-    # 将图像转换为 HSV 色彩空间，调整色调
-    hsv_image = image.convert("HSV")
-    hsv_array = np.array(hsv_image)
-    hsv_array[..., 0] = (hsv_array[..., 0] + 50) % 256  # 偏移色调
-    hsv_image = Image.fromarray(hsv_array, "HSV")
-    image_hue = hsv_image.convert("RGB")  # 转回 RGB
-    image_hue.show(title="Hue Adjusted")
-
-    # 4. 调整白平衡（White Balance）
-    # 白平衡调整需要更复杂的算法，这里简化处理，通过调整色温
-    def adjust_white_balance(image, temp=5000):
-        # 将图像转换为 RGB
-        img_array = np.array(image.convert("RGB"))
-
-        # 设定色温的加权比例，这里假设色温越高，红色通道更强，蓝色通道更弱
-        r, g, b = img_array[..., 0], img_array[..., 1], img_array[..., 2]
-
-        # 色温和 RGB 通道的关系，5000K 作为基准
-        scale_r = temp / 5500
-        scale_b = 5500 / temp
-        
-        # 调整 R 和 B 通道
-        r = np.clip(r * scale_r, 0, 255)
-        b = np.clip(b * scale_b, 0, 255)
-        
-        # 合并 RGB 通道
-        img_array[..., 0] = r
-        img_array[..., 2] = b
-
-        # 返回调整后的图像
-        return Image.fromarray(img_array.astype(np.uint8))
-
-
-    # 调整色温，示例值：5000（白光）
-    image_white_balance = adjust_white_balance(image, temp=5000)
-    image_white_balance.show(title="White Balance Adjusted")
-
-    # 保存调整后的图像
-    image_contrast.save("image_contrast.jpg")
-    image_saturation.save("image_saturation.jpg")
-    image_hue.save("image_hue.jpg")
-    image_white_balance.save("image_white_balance.jpg")
-
-    print("图像已调整并保存。")
+        print("图像已调整并保存:",annotation_dir + filename)
