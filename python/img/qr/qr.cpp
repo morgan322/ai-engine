@@ -252,7 +252,6 @@ vector<vector<Point>> merge_contours(const vector<vector<Point>> &square_merged_
 
 void mainFunc(const string &image_path)
 {
-
     Mat image = imread(image_path);
     if (image.empty())
     {
@@ -319,7 +318,6 @@ void mainFunc(const string &image_path)
     int id = 0;
     for (const auto &box : boxs)
     {
-
         vector<Point> expanded_box = expandRectPoints(box, 7);
         Mat mask = Mat::zeros(gray.size(), CV_8UC1);
         vector<vector<Point>> poly{expanded_box};
