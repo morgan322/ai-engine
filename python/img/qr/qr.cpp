@@ -1,4 +1,5 @@
 #include <iostream>
+#include <numeric>
 #include <opencv2/opencv.hpp>
 
 using namespace std;
@@ -72,18 +73,49 @@ double closestDistance(const vector<Point> &contour1, const vector<Point> &conto
     return min_dist;
 }
 
+double compute_iou(const vector<Point> &box1, const vector<Point> &box2)
+{
+    // 计算矩形的凸包
+    vector<Point> poly1, poly2;
+    convexHull(box1, poly1);
+    convexHull(box2, poly2);
+
+    // 获取交集
+    vector<Point> intersection;
+    double intersection_area = 0.0;
+    if (intersectConvexConvex(poly1, poly2, intersection) > 0)
+    {
+        // 交集区域的面积
+        intersection_area = contourArea(intersection);
+    }
+
+    // 计算两个矩形的面积
+    double area1 = contourArea(poly1);
+    double area2 = contourArea(poly2);
+
+    // 计算并集的面积（并集面积 = area1 + area2 - intersection_area）
+    double union_area = area1 + area2 - intersection_area;
+
+    // 计算IoU
+    double iou = intersection_area / union_area;
+    return iou;
+}
+
 // 扩展矩形的顶点
-vector<Point> expandRectPoints(const vector<Point>& points, int expand_pixels) {
+vector<Point> expandRectPoints(const vector<Point> &points, int expand_pixels)
+{
     vector<Point> expanded_points = points;
     // Calculate center of the rectangle
     Point center(0, 0);
-    for (const auto& p : points) {
+    for (const auto &p : points)
+    {
         center += p;
     }
     center /= static_cast<float>(points.size());
 
     // Expand each point
-    for (size_t i = 0; i < points.size(); ++i) {
+    for (size_t i = 0; i < points.size(); ++i)
+    {
         Point direction = points[i] - center;
         direction *= (expand_pixels / norm(direction));
         expanded_points[i] += direction;
@@ -92,9 +124,135 @@ vector<Point> expandRectPoints(const vector<Point>& points, int expand_pixels) {
     return expanded_points;
 }
 
+vector<vector<Point>> filter_boxes(const vector<vector<Point>> &boxes)
+{
+    vector<vector<Point>> filtered_boxes;
+    for (const auto &box : boxes)
+    {
+        bool to_add = true;
+        for (const auto &box0 : filtered_boxes)
+        {
+            if (compute_iou(box0, box) > 0.1)
+            {
+                to_add = false;
+                break;
+            }
+        }
+        if (to_add)
+        {
+            filtered_boxes.push_back(box);
+        }
+    }
+    return filtered_boxes;
+}
+
+vector<Point> getRotatedRectBox(const vector<Point>& contour) {
+    RotatedRect rect = minAreaRect(contour);
+    vector<Point2f> box(4);
+    rect.points(box.data());
+
+    vector<Point> box_points;
+    for (const auto& pt : box) {
+        box_points.push_back(Point(pt.x, pt.y));
+    }
+    return box_points;
+}
+
+vector<vector<Point>> merge_contours(const vector<vector<Point>> &square_merged_contours)
+{
+    int n_contours = square_merged_contours.size();
+    UnionFind uf(n_contours);
+    vector<vector<double>> distances(n_contours, vector<double>(n_contours, 0.0));
+    for (int i = 0; i < n_contours; ++i)
+    {
+        for (int j = i + 1; j < n_contours; ++j)
+        {
+            distances[i][j] = closestDistance(square_merged_contours[i], square_merged_contours[j]);
+            distances[j][i] = distances[i][j];
+        }
+    }
+    vector<double> distances_flat;
+    for (int i = 0; i < n_contours; i++)
+    {
+        for (int j = i + 1; j < n_contours; j++)
+        {
+            distances_flat.push_back(distances[i][j]);
+        }
+    }
+    double threshold = 15.0;
+    if (distances_flat.size() > 24)
+    {
+        partial_sort(distances_flat.begin(), distances_flat.begin() + 24, distances_flat.end());
+        double average_min_distance = std::accumulate(distances_flat.begin(), distances_flat.begin() + 24, 0.0) / 24.0;
+        double min_distance = distances_flat[0];
+        threshold = average_min_distance * 2.5;
+    }
+
+    for (int i = 0; i < n_contours; ++i)
+    {
+        for (int j = i + 1; j < n_contours; ++j)
+        {
+            if (distances[i][j] < threshold)
+            {
+                uf.union_set(i, j);
+            }
+        }
+    }
+
+    unordered_map<int, vector<int>> clusters;
+    for (int i = 0; i < n_contours; ++i)
+    {
+        int root = uf.find(i);
+        clusters[root].push_back(i);
+    }
+
+    vector<vector<Point>> boxs;
+    for (const auto &cluster : clusters)
+    {
+        const vector<int> &indices = cluster.second;
+        vector<vector<Point>> contours_to_merge;
+        for (int idx : indices)
+        {
+            contours_to_merge.push_back(square_merged_contours[idx]);
+        }
+
+        vector<Point> points;
+        for (const auto &contour : contours_to_merge)
+        {
+            points.insert(points.end(), contour.begin(), contour.end());
+        }
+        vector<Point> box_points = getRotatedRectBox(points);
+        double area = contourArea(box_points);
+        if (area < 80 * 80 * 3 && indices.size() < 3)
+        {
+            continue;
+        }
+
+        bool flag = false;
+        for (int idx : indices)
+        {
+            vector<Point> point0 = square_merged_contours[idx];
+            vector<Point> box_points0 = getRotatedRectBox(point0);;
+            double area0 = contourArea(box_points0);
+            if (area0 > 10000)
+            {
+                boxs.push_back(box_points0);
+                flag = true;
+            }
+        }
+
+        if (!flag)
+        {
+            boxs.push_back(box_points);
+        }
+    }
+
+    return filter_boxes(boxs);
+}
+
 void mainFunc(const string &image_path)
 {
-    // 读取图像
+
     Mat image = imread(image_path);
     if (image.empty())
     {
@@ -102,94 +260,44 @@ void mainFunc(const string &image_path)
         return;
     }
 
-    // 转换为灰度图像
     Mat gray;
     cvtColor(image, gray, COLOR_BGR2GRAY);
-
-    // 使用Canny边缘检测
     Mat edges;
-    Canny(gray, edges, 100, 200);
-
-    // 查找图像中的轮廓
+    Canny(gray, edges, 150, 200);
     vector<vector<Point>> contours;
     vector<Vec4i> hierarchy;
     findContours(edges, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
-
-    // // 筛选并排序轮廓（面积大于100）
-    // vector<vector<Point>> filtered_contours;
-    // for (const auto &contour : contours)
-    // {
-    //     if (contourArea(contour) > 100)
-    //     {
-    //         filtered_contours.push_back(contour);
-    //     }
-    // }
-    // sort(filtered_contours.begin(), filtered_contours.end(), [](const vector<Point> &a, const vector<Point> &b)
-    //      { return contourArea(a) > contourArea(b); });
-
-    // 存储合并后的轮廓
+    vector<vector<Point>> hulls;
+    for (size_t i = 0; i < contours.size(); ++i)
+    {
+        vector<cv::Point> hull;
+        convexHull(contours[i], hull);
+        hulls.push_back(hull);
+    }
+    contours = hulls;
     vector<vector<Point>> merged_contours;
-
-    // 处理每个轮廓
     for (const auto &contour : contours)
     {
         if (contourArea(contour) < 100)
         {
             continue;
         }
-        // 近似轮廓
         double perimeter = arcLength(contour, true);
         double epsilon = 0.02 * perimeter;
         vector<Point> approx;
         approxPolyDP(contour, approx, epsilon, true);
-
-        // 如果近似轮廓有四个顶点，则考虑合并
         if (approx.size() == 4)
         {
-            // // 合并接近的轮廓
-            // if (!merged_contours.empty())
-            // {
-            //     Moments M1 = moments(approx);
-            //     Point2f center1(M1.m10 / M1.m00, M1.m01 / M1.m00);
-
-            //     Moments M2 = moments(merged_contours.back());
-            //     Point2f center2(M2.m10 / M2.m00, M2.m01 / M2.m00);
-
-            //     float distance = sqrt(pow(center1.x - center2.x, 2) + pow(center1.y - center2.y, 2));
-
-            //     // Adjust this threshold based on your image scale
-            //     if (distance < 50)
-            //     {
-            //         // Concatenate 'approx' with the last contour in 'merged_contours'
-            //         vector<Point> merged_points;
-            //         merged_points.reserve(merged_contours.back().size() + approx.size());
-            //         merged_points.insert(merged_points.end(), merged_contours.back().begin(), merged_contours.back().end());
-            //         merged_points.insert(merged_points.end(), approx.begin(), approx.end());
-
-            //         // Update the last contour in 'merged_contours'
-            //         merged_contours.back() = merged_points;
-            //     }
-            //     else
-            //     {
-            //         merged_contours.push_back(approx);
-            //     }
-            // }
-            // else
-            // {
             merged_contours.push_back(approx);
-            // }
         }
     }
     vector<vector<Point>> square_merged_contours;
-
     for (const auto &contour : merged_contours)
     {
         int max_x = contour[0].x;
         int min_x = contour[0].x;
         int max_y = contour[0].y;
         int min_y = contour[0].y;
-
-        // Find the bounding box coordinates of the contour
         for (const auto &point : contour)
         {
             if (point.x > max_x)
@@ -201,96 +309,29 @@ void mainFunc(const string &image_path)
             if (point.y < min_y)
                 min_y = point.y;
         }
-
-        // Check if the contour forms a nearly square shape
         if (abs(max_x - min_x - max_y + min_y) < 100)
         {
             square_merged_contours.push_back(contour);
         }
     }
 
-    // 创建并查集实例
-    int n_contours = square_merged_contours.size();
-    UnionFind uf(n_contours);
-
-    // 构建轮廓之间的距离矩阵
-    vector<vector<double>> distances(n_contours, vector<double>(n_contours, 0.0));
-    for (int i = 0; i < n_contours; ++i)
+    vector<vector<Point>> boxs = merge_contours(square_merged_contours);
+    int id = 0;
+    for (const auto &box : boxs)
     {
-        for (int j = i + 1; j < n_contours; ++j)
-        {
-            distances[i][j] = closestDistance(square_merged_contours[i], square_merged_contours[j]);
-            distances[j][i] = distances[i][j];
-        }
-    }
 
-    // 合并轮廓成团
-    for (int i = 0; i < n_contours; ++i)
-    {
-        for (int j = i + 1; j < n_contours; ++j)
-        {
-            if (distances[i][j] < 20.0)
-            { // 根据距离阈值合并
-                uf.union_set(i, j);
-            }
-        }
-    }
-
-    // 输出结果
-    unordered_map<int, vector<int>> clusters;
-    for (int i = 0; i < n_contours; ++i)
-    {
-        int root = uf.find(i);
-        clusters[root].push_back(i);
-    }
-
-    // 使用OpenCV绘制最小旋转外接矩形
-    for (const auto &kv : clusters)
-    {
-        vector<vector<Point>> contours_to_merge;
-        for (int idx : kv.second)
-        {
-            contours_to_merge.push_back(square_merged_contours[idx]);
-        }
-
-        // 计算最小外接矩形
-        vector<Point> points;
-        for (const auto &contour : contours_to_merge)
-        {
-            points.insert(points.end(), contour.begin(), contour.end());
-        }
-        RotatedRect rect = minAreaRect(points);
-     
-        // 获取最小外接矩形的四个顶点
-        vector<Point2f> box(4);
-        rect.points(box.data());
-
-        // 转换box为Point类型
-        vector<Point> box_points;
-        for (const auto &pt : box)
-        {
-            box_points.push_back(Point(pt.x, pt.y));
-        }
-       
-        // 扩展矩形顶点
-        vector<Point> expanded_box = expandRectPoints(box_points, 7);
-     
-        // 创建与原始图像大小相同的掩模
+        vector<Point> expanded_box = expandRectPoints(box, 7);
         Mat mask = Mat::zeros(gray.size(), CV_8UC1);
-
-        // 在掩模上绘制扩展的矩形区域（填充白色，255）
         vector<vector<Point>> poly{expanded_box};
         fillPoly(mask, poly, Scalar(255));
-
-        // 创建结果图像
         Mat result_image = Mat::zeros(image.size(), image.type());
         image.copyTo(result_image, mask);
-
-        // 保存结果图像
-        imwrite("./mask/" + to_string(kv.first) + ".jpg", result_image);
+        id++;
+        string filename = "./mask/" + to_string(id) + ".jpg";
+        imwrite(filename, result_image);
     }
 }
-//g++ -o qr_exe qr.cpp `pkg-config --cflags --libs opencv`
+// g++ -o qr_exe qr.cpp `pkg-config --cflags --libs opencv`
 int main(int argc, char **argv)
 {
     if (argc != 2)
