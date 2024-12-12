@@ -1,7 +1,6 @@
 [submodule "python/alg/cv/yolov5"]
 	path = python/alg/cv/yolov5
 	url = https://github.com/ultralytics/yolov5.git
-	branch = v6.0
 [submodule "3rdparty/easydk"]
 	path = 3rdparty/easydk
 	url = https://github.com/Cambricon/easydk.git
