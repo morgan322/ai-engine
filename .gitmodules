@@ -13,3 +13,6 @@
 [submodule "3rdparty/TensorRT"]
 	path = 3rdparty/TensorRT
 	url = https://github.com/NVIDIA/TensorRT.git
+[submodule "3rdparty/openvino"]
+	path = 3rdparty/openvino
+	url = https://github.com/openvinotoolkit/openvino.git
