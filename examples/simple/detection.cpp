@@ -8,10 +8,9 @@
 #include <memory>
 #include <utility>
 
-#include "runner/detection_runner.h"
 #include "codec/video_decoder.h"
+#include "runner/detection_runner.h"
 #include "runner/stream_runner.h"
-
 
 // #include "codec/opencv_decoder.hpp"
 
@@ -48,14 +47,13 @@ int main(int argc, char** argv) {
   FLAGS_colorlogtostderr = true;
 
   // check params
-  CHECK(FLAGS_data_path. size() != 0u) << "[AI Simple] [Detection] data path is empty";  // NOLINT
-  CHECK(FLAGS_model_path.size() != 0u) << "[AI Simple] [Detection] model path is empty";  // NOLINT
-  CHECK(FLAGS_label_path.size() != 0u) << "[AI Simple] [Detection] label path is empty";  // NOLINT
-  CHECK(FLAGS_wait_time >= 0) << "[AI Simple] [Detection] wait time should be >= 0";    // NOLINT
-  CHECK(FLAGS_repeat_time >= 0) << "[AI Simple] [Detection] repeat time should be >= 0";  // NOLINT
-  CHECK(FLAGS_dev_id >= 0) << "[AI Simple] [Detection] device id should be >= 0";       // NOLINT
-  CHECK(FLAGS_codec_id_start >= 0) "[AI Simple] [Detection] codec start id should be >= 0"; // NOLINT
-
+  CHECK(FLAGS_data_path.size() != 0u) << "[AI Simple] [Detection] data path is empty";       // NOLINT
+  CHECK(FLAGS_model_path.size() != 0u) << "[AI Simple] [Detection] model path is empty";     // NOLINT
+  CHECK(FLAGS_label_path.size() != 0u) << "[AI Simple] [Detection] label path is empty";     // NOLINT
+  CHECK(FLAGS_wait_time >= 0) << "[AI Simple] [Detection] wait time should be >= 0";         // NOLINT
+  CHECK(FLAGS_repeat_time >= 0) << "[AI Simple] [Detection] repeat time should be >= 0";     // NOLINT
+  CHECK(FLAGS_dev_id >= 0) << "[AI Simple] [Detection] device id should be >= 0";            // NOLINT
+  CHECK(FLAGS_codec_id_start >= 0) "[AI Simple] [Detection] codec start id should be >= 0";  // NOLINT
 
   AISensorParams sensor_params[4];
   memset(sensor_params, 0, sizeof(AISensorParams) * 4);
@@ -97,8 +95,7 @@ int main(int argc, char** argv) {
     decode_type = VideoDecoder::OPENCV;
   }
   try {
-    g_runner = std::make_shared<DetectionRunner>(decode_type, FLAGS_dev_id,
-                                                 FLAGS_model_path, FLAGS_label_path,
+    g_runner = std::make_shared<DetectionRunner>(decode_type, FLAGS_dev_id, FLAGS_model_path, FLAGS_label_path,
                                                  FLAGS_data_path, FLAGS_show, FLAGS_save_video);
   } catch (...) {
     LOG(ERROR) << "[AI Simple] [Detection] Create stream runner failed";
