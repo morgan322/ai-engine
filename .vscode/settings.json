@@ -81,7 +81,13 @@
         "forward_list": "cpp",
         "unordered_set": "cpp",
         "typeindex": "cpp",
-        "*.in": "cpp"
+        "*.in": "cpp",
+        "bitset": "cpp",
+        "cfenv": "cpp",
+        "complex": "cpp",
+        "regex": "cpp",
+        "shared_mutex": "cpp",
+        "variant": "cpp"
     },
    
 

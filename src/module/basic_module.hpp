@@ -38,7 +38,6 @@ class BasicModule {
   std::function<int(std::shared_ptr<ai::module::Frame>)> callback_;
   std::shared_ptr<BasicModule> next_module_ = nullptr;
 };
-
 }  // namespace module
 }  // namespace ai
 #endif  // BASIC_MODULE_HPP_
