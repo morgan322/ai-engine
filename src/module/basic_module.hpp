@@ -13,18 +13,15 @@ namespace module {
 class BasicModule {
  public:
   BasicModule(std::string name, int parallelism) : module_name_(name), parallelism_(parallelism) {}
-
   ~BasicModule() = default;
 
   void SetProcessDoneCallback(std::function<int(std::shared_ptr<ai::module::Frame>)> callback) { callback_ = callback; }
-
   virtual int Transmit(std::shared_ptr<ai::module::Frame> frame) final {  // NOLINT
     if (callback_) return callback_(frame);
     return 0;
   }
 
   int GetParallelism() { return parallelism_; }
-
   std::string GetModuleName() { return module_name_; }
 
  public:
