@@ -1,6 +1,9 @@
 [submodule "python/alg/cv/yolov5"]
 	path = python/alg/cv/yolov5
 	url = https://github.com/ultralytics/yolov5.git
+[submodule "python/alg/cv/computervision-recipes"]
+	path = python/alg/cv/computervision-recipes
+	url = https://github.com/microsoft/computervision-recipes.git
 [submodule "python/alg/nlp/nlp-tutorial"]
 	path = python/alg/nlp/nlp-tutorial
 	url = https://github.com/graykode/nlp-tutorial.git
