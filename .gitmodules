@@ -24,4 +24,3 @@
 [submodule "tools/ov/openvino_notebooks"]
 	path = tools/ov/openvino_notebooks
 	url = https://github.com/openvinotoolkit/openvino_notebooks.git
-
