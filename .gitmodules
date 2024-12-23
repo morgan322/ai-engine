@@ -21,6 +21,6 @@
 [submodule "tools/trt/tensorrtx"]
 	path = tools/trt/tensorrtx
 	url = https://github.com/wang-xinyu/tensorrtx.git
-[submodule "tools/ov/openvino_notebooks"]
-	path = tools/ov/openvino_notebooks
+[submodule "tools/ov/openvinotoolkit"]
+	path = tools/ov/openvinotoolkit
 	url = https://github.com/openvinotoolkit/openvino_notebooks.git
