@@ -87,7 +87,7 @@ Status Postprocessor::Init() noexcept {
   return Status::SUCCESS;
 }
 
-class HostDataDeleter : public cnedk::IBufDeleter {
+class HostDataDeleter : public ai::IBufDeleter {
  public:
   explicit HostDataDeleter(void* data) : data_(data) {}
   ~HostDataDeleter() { free(data_); }
@@ -134,7 +134,7 @@ Status Postprocessor::Process(PackagePtr pack) noexcept {
         void* data = malloc(len);
         memcpy(data, host_data, len);
         HostDataDeleter* deleter = new HostDataDeleter(data);
-        auto surf = std::make_shared<cnedk::BufSurfaceWrapper>(data, len, CNEDK_BUF_MEM_SYSTEM, -1, deleter);
+        auto surf = std::make_shared<ai::BufSurfaceWrapper>(data, len, AI_BUF_MEM_SYSTEM, -1, deleter);
         out.surfs.emplace_back(surf);
         auto shape = out_mlu.shapes[out_idx];
         shape[0] = 1;

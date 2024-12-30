@@ -1,5 +1,7 @@
 # Set the root directory for the ADK project
 set(ADK_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../..)
+include_directories(/usr/local/cuda/include)
+link_directories(/usr/local/cuda/lib64)
 
 # ---[ Google-gflags
 find_package(GFlags REQUIRED)

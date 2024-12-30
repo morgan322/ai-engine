@@ -270,20 +270,12 @@ bool InferServer::SetModelDir(const std::string& model_dir) noexcept {
   //   return true;
   // }
   // return false;
-  config_v5.net_type = YOLOV5;
-  config_v5.detect_thresh = 0.5;
-  config_v5.file_model_cfg = "/media/ai/AI/technology/computer/ai-engine/"
-                             "weights/yolov5-6.0/yolov5s.cfg";
-  config_v5.file_model_weights = "/media/ai/AI/technology/computer/ai-engine/"
-                                 "weights/yolov5-6.0/yolov5s.weights";
-  config_v5.calibration_image_list_file_txt =
-      "/media/ai/AI/technology/computer/ai-engine/config/"
-      "calibration_images.txt";
-  config_v5.inference_precison = FP16; // FP32 FP16 INT8
 }
 
 void InferServer::LoadModel() noexcept {
-  detector->init(config_v5);
+  std::string modelTxt = "/workspace/weights/mssd/MobileNetSSD_deploy.prototxt";
+  std::string modelBin = "/workspace/weights/mssd/MobileNetSSD_deploy.caffemodel";
+  net = cv::dnn::readNetFromCaffe(modelTxt, modelBin);
   return;
 }
 

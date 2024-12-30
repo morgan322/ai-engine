@@ -52,7 +52,7 @@ class RequestControl {
   bool IsProcessFinished() const noexcept { return process_finished_.load(); }
   /* -------------------------- Observer END ------------------------------*/
 
-#ifdef CNIS_RECORD_PERF
+// #ifdef CNIS_RECORD_PERF
   void BeginRecord() noexcept { start_time_ = std::chrono::steady_clock::now(); }
 
   float EndRecord() noexcept {
@@ -66,7 +66,7 @@ class RequestControl {
 
   // invoked only before response
   const std::map<std::string, float>& Performance() const noexcept { return output_->perf; }
-#endif
+// #endif
 
   void Response() noexcept {
     output_->tag = tag_;
@@ -97,9 +97,9 @@ class RequestControl {
   std::atomic<Status> status_{Status::SUCCESS};
   std::atomic<bool> is_discarded_{false};
   std::atomic<bool> process_finished_{false};
-#ifdef CNIS_RECORD_PERF
+// #ifdef CNIS_RECORD_PERF
   std::chrono::time_point<std::chrono::steady_clock> start_time_;
-#endif
+// #endif
 };
 
 }  // namespace infer_server

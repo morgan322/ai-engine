@@ -5,14 +5,13 @@
 #include <utility>
 #include <vector>
 
-#include "cnrt.h"
+// #include "cnrt.h"
 
-#include "cnedk_platform.h"
-#include "cnedk_buf_surface_util.hpp"
-#include "cnis/processor.h"
+#include "platform/ai_platform.h"
+#include "codec/buf_surface_util.hpp"
 #include "core/data_type.h"
-#include "model/model.h"
-#include "../common/utils.hpp"
+#include "model/manager/model.h"
+
 
 using std::shared_ptr;
 using std::vector;
@@ -21,7 +20,7 @@ namespace infer_server {
 
 struct PredictorPrivate {
   ModelPtr model{nullptr};
-  vector<std::shared_ptr<cnedk::BufPool>> output_pools;
+  vector<std::shared_ptr<ai::BufPool>> output_pools;
   std::shared_ptr<ModelRunner> runner;
   // output layouts of model output on device
   vector<DataLayout> layouts;
@@ -60,8 +59,8 @@ Status Predictor::Init() noexcept {
     return Status::INVALID_PARAM;
   }
 
-  CnedkPlatformInfo platform_info;
-  if (CnedkPlatformGetInfo(device_id, &platform_info) < 0) {
+  AIPlatformInfo platform_info;
+  if (AIPlatformGetInfo(device_id, &platform_info) < 0) {
     return Status::INVALID_PARAM;
   }
   std::string platform_name(platform_info.name);
@@ -74,15 +73,12 @@ Status Predictor::Init() noexcept {
     for (size_t i = 0; i < o_num; ++i) {
       priv_->layouts.emplace_back(priv_->model->OutputLayout(i));
       // FIXME(dmh): 3 buffer?
-      std::shared_ptr<cnedk::BufPool> pool = std::make_shared<cnedk::BufPool>();
-      CnedkBufSurfaceCreateParams create_params;
+      std::shared_ptr<ai::BufPool> pool = std::make_shared<ai::BufPool>();
+      AIBufSurfaceCreateParams create_params;
       memset(&create_params, 0, sizeof(create_params));
-      if (cnedk::IsEdgePlatform(platform_name)) {
-        create_params.mem_type = CNEDK_BUF_MEM_UNIFIED_CACHED;
-      } else {
-        create_params.mem_type = CNEDK_BUF_MEM_DEVICE;
-      }
-      create_params.color_format = CNEDK_BUF_COLOR_FORMAT_TENSOR;
+    
+      create_params.mem_type = AI_BUF_MEM_DEVICE;
+      create_params.color_format = AI_BUF_COLOR_FORMAT_TENSOR;
       create_params.device_id = device_id;
       create_params.batch_size = priv_->model->BatchSize();
       create_params.force_align_1 = 1;  // to meet mm's requirement

@@ -40,11 +40,11 @@
 #include "mm_common.h"
 #include "mm_runtime.h"
 #else
-#include "common.h"
-#include "interface_runtime.h"
+// #include "common.h"
+// #include "interface_runtime.h"
 #endif
 
-#include "mm_helper.h"
+#include "imodel.h"
 
 namespace infer_server {
 
@@ -82,7 +82,7 @@ class ModelRunner {
   std::vector<DataLayout> o_layouts_;
   bool fixed_input_shape_{true};
   bool fixed_output_shape_{true};
-  cnrtQueue_t task_queue_{nullptr};
+  std::queue task_queue_{nullptr};
 #ifdef PERF_HARDWARE_TIME
   cnrtNotifier_t notifier_start_{nullptr}, notifier_end_{nullptr};
 #endif

@@ -26,15 +26,12 @@
 #include <utility>
 #include <vector>
 
-#include "cnrt.h"
-
-#include "cnedk_buf_surface.h"
-#include "cnis/processor.h"
-#include "cnedk_platform.h"
-#include "cnedk_transform.h"
-#include "cnedk_buf_surface_util.hpp"
+// #include "cnrt.h"
+#include "codec/buf_surface.h"
+#include "platform/ai_platform.h"
+#include "codec/buf_surface_util.hpp"
 #include "core/data_type.h"
-#include "../common/utils.hpp"
+#include "model/manager/model.h"
 
 namespace infer_server {
 

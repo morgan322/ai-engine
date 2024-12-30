@@ -29,7 +29,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "util/env.h"
+#include "utils/env.h"
 
 namespace infer_server {
 
