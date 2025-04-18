@@ -20,7 +20,7 @@ def manual_pca(X, n_components):
 
     # 对特征值进行排序，并获取对应的索引
     sorted_indices = np.argsort(eigenvalues)[::-1]
-    sorted_eigenvalues = eigenvalues[sorted_indices]
+    # sorted_eigenvalues = eigenvalues[sorted_indices]
     sorted_eigenvectors = eigenvectors[:, sorted_indices]
 
     # 选择前 n_components 个特征向量
