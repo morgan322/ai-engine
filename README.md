@@ -8,7 +8,7 @@
 
 # build
 
-> cd ~
+> cd ~/ai-engine
 >
 > docker build -t ai-engine-image -f docker/Dockerfile .
 >
