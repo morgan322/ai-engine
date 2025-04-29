@@ -1,0 +1,16 @@
+// E - R Diagram
+digraph {
+	"用户管理" [shape=rect]
+	"姓名" [shape=ellipse]
+	"用户管理" -> "姓名"
+	"性别" [shape=ellipse]
+	"用户管理" -> "性别"
+	"头像" [shape=ellipse]
+	"用户管理" -> "头像"
+	"手机" [shape=ellipse]
+	"用户管理" -> "手机"
+	"用户名" [shape=ellipse]
+	"用户管理" -> "用户名"
+	"身份证" [shape=ellipse]
+	"用户管理" -> "身份证"
+}

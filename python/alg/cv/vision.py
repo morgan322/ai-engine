@@ -86,7 +86,7 @@ class ObjectDetector:
         detection_scores = expr.convert(output_var[1], expr.NHWC)
         num_boxes = expr.convert(output_var[2], expr.NHWC)
         detection_classes= expr.convert(output_var[3], expr.NHWC)
-        result = []
+        # result = []
         for i in range(int(num_boxes[0])):
             confidence = detection_scores[0][i]
             if(detection_scores[0][i]>0.55):
@@ -95,8 +95,8 @@ class ObjectDetector:
                 y2 = int(detection_boxes[0][2][i]* raw_image_height)
                 x2 = int(detection_boxes[0][3][i]* raw_image_width)
                 class_id = int(detection_classes[0][i])
-                if class_id == 1:
-                    result.append([x1, y1, x2 - x1, y2 - y1])
+                # if class_id == 1:
+                #     result.append([x1, y1, x2 - x1, y2 - y1])
         # with open('anchors.txt', 'w') as f:
         #     f.write("float anchors[{}][4] = {{".format(anchors_var.shape[0]))
         #     for i in range(anchors_var.shape[0]):
@@ -110,8 +110,8 @@ class ObjectDetector:
         #             f.write(",")
         #         f.write("\n")
         #     f.write("};")
-        # box_img = self.darw_lite(image, output_var)
-        return result
+        box_img = self.darw_lite(image, output_var)
+        return box_img
     def darw_lite(self, image, output_var):
         clone_image = image.copy()
         raw_image_height = image.shape[0]
@@ -174,6 +174,7 @@ class ObjectDetector:
             ret, frame = cap.read()
             if not ret:
                 break
+
             img_mnn = self.infer_image(frame)
             img_lite = self.infer_lite(frame)
             combined_image = np.vstack((img_lite,img_mnn))
@@ -200,7 +201,7 @@ parser.add_argument("--video", help="path to video file. ")
 parser.add_argument("--img",help='source img path ' )
 parser.add_argument("--img_dir",help='source img path ' )
 parser.add_argument("--save_dir", default="./test/save_mnn/",help='save img path ')
-parser.add_argument("--model", default="/home/morgan/ubt/alg/deploy/MNN/build-x86/model/mobilnetssd_wqint8.mnn",help='Path to model')
+parser.add_argument("--model", default="/home/morgan/ubt/alg/deploy/MNN/build-x86/model/mobilenetssd_fp16.mnn",help='Path to model')
 parser.add_argument("--lite_model", default="/home/morgan/ubt/program/project/ai-4-qcm2290-no-snpe/file-copy/data/ai/grass/tflite_mssdint8_grass.mnn",help='Path to model')
 parser.add_argument("--prototxt", default="/home/morgan/ubt/alg/cv/export/MobileNet-SSD/example/MobileNetSSD_deploy.prototxt",help='Path to prototxt')
 parser.add_argument("--weights", default="/home/morgan/ubt/alg/cv/export/MobileNet-SSD/snapshot_5/mobilenet_iter_110000.caffemodel",help='Path to weights')

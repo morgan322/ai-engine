@@ -1,0 +1,223 @@
+// ID3 Decision Tree
+digraph {
+	rankdir=TB size="8,8"
+	"petal length (cm)
+IG: 1.4463"
+	0
+	"petal length (cm)
+IG":" 1.4463" -> 0 [label=1.7]
+	0
+	"petal length (cm)
+IG":" 1.4463" -> 0 [label=1.4]
+	0
+	"petal length (cm)
+IG":" 1.4463" -> 0 [label=1.6]
+	0
+	"petal length (cm)
+IG":" 1.4463" -> 0 [label=1.3]
+	0
+	"petal length (cm)
+IG":" 1.4463" -> 0 [label=1.5]
+	0
+	"petal length (cm)
+IG":" 1.4463" -> 0 [label=1.1]
+	0
+	"petal length (cm)
+IG":" 1.4463" -> 0 [label=1.2]
+	0
+	"petal length (cm)
+IG":" 1.4463" -> 0 [label=1.0]
+	0
+	"petal length (cm)
+IG":" 1.4463" -> 0 [label=1.9]
+	1
+	"petal length (cm)
+IG":" 1.4463" -> 1 [label=4.7]
+	"sepal length (cm)
+IG: 0.5436"
+	"petal length (cm)
+IG":" 1.4463" -> "sepal length (cm)
+IG":" 0.5436" [label=4.5]
+	2
+	"sepal length (cm)
+IG":" 0.5436" -> 2 [label=4.9]
+	1
+	"sepal length (cm)
+IG":" 0.5436" -> 1 [label=5.6]
+	1
+	"sepal length (cm)
+IG":" 0.5436" -> 1 [label=6.0]
+	1
+	"sepal length (cm)
+IG":" 0.5436" -> 1 [label=5.7]
+	1
+	"sepal length (cm)
+IG":" 0.5436" -> 1 [label=6.4]
+	1
+	"sepal length (cm)
+IG":" 0.5436" -> 1 [label=6.2]
+	1
+	"sepal length (cm)
+IG":" 0.5436" -> 1 [label=5.4]
+	"sepal width (cm)
+IG: 0.9710"
+	"petal length (cm)
+IG":" 1.4463" -> "sepal width (cm)
+IG":" 0.9710" [label=4.9]
+	1
+	"sepal width (cm)
+IG":" 0.9710" -> 1 [label=2.5]
+	2
+	"sepal width (cm)
+IG":" 0.9710" -> 2 [label=3.0]
+	1
+	"sepal width (cm)
+IG":" 0.9710" -> 1 [label=3.1]
+	2
+	"sepal width (cm)
+IG":" 0.9710" -> 2 [label=2.8]
+	2
+	"sepal width (cm)
+IG":" 0.9710" -> 2 [label=2.7]
+	1
+	"petal length (cm)
+IG":" 1.4463" -> 1 [label=4.0]
+	"sepal length (cm)
+IG: 0.8113"
+	"petal length (cm)
+IG":" 1.4463" -> "sepal length (cm)
+IG":" 0.8113" [label=5.0]
+	2
+	"sepal length (cm)
+IG":" 0.8113" -> 2 [label=6.3]
+	2
+	"sepal length (cm)
+IG":" 0.8113" -> 2 [label=5.7]
+	1
+	"sepal length (cm)
+IG":" 0.8113" -> 1 [label=6.7]
+	2
+	"sepal length (cm)
+IG":" 0.8113" -> 2 [label=6.0]
+	2
+	"petal length (cm)
+IG":" 1.4463" -> 2 [label=6.0]
+	1
+	"petal length (cm)
+IG":" 1.4463" -> 1 [label=3.5]
+	1
+	"petal length (cm)
+IG":" 1.4463" -> 1 [label=3.0]
+	1
+	"petal length (cm)
+IG":" 1.4463" -> 1 [label=4.6]
+	1
+	"petal length (cm)
+IG":" 1.4463" -> 1 [label=4.4]
+	1
+	"petal length (cm)
+IG":" 1.4463" -> 1 [label=4.1]
+	"sepal length (cm)
+IG: 0.5436"
+	"petal length (cm)
+IG":" 1.4463" -> "sepal length (cm)
+IG":" 0.5436" [label=5.1]
+	2
+	"sepal length (cm)
+IG":" 0.5436" -> 2 [label=5.8]
+	2
+	"sepal length (cm)
+IG":" 0.5436" -> 2 [label=6.9]
+	2
+	"sepal length (cm)
+IG":" 0.5436" -> 2 [label=6.3]
+	1
+	"sepal length (cm)
+IG":" 0.5436" -> 1 [label=6.0]
+	2
+	"sepal length (cm)
+IG":" 0.5436" -> 2 [label=6.5]
+	2
+	"sepal length (cm)
+IG":" 0.5436" -> 2 [label=5.9]
+	2
+	"petal length (cm)
+IG":" 1.4463" -> 2 [label=5.9]
+	2
+	"petal length (cm)
+IG":" 1.4463" -> 2 [label=5.6]
+	2
+	"petal length (cm)
+IG":" 1.4463" -> 2 [label=5.5]
+	2
+	"petal length (cm)
+IG":" 1.4463" -> 2 [label=5.4]
+	2
+	"petal length (cm)
+IG":" 1.4463" -> 2 [label=6.6]
+	2
+	"petal length (cm)
+IG":" 1.4463" -> 2 [label=6.1]
+	2
+	"petal length (cm)
+IG":" 1.4463" -> 2 [label=6.9]
+	2
+	"petal length (cm)
+IG":" 1.4463" -> 2 [label=6.4]
+	1
+	"petal length (cm)
+IG":" 1.4463" -> 1 [label=3.6]
+	1
+	"petal length (cm)
+IG":" 1.4463" -> 1 [label=3.3]
+	1
+	"petal length (cm)
+IG":" 1.4463" -> 1 [label=3.8]
+	1
+	"petal length (cm)
+IG":" 1.4463" -> 1 [label=3.7]
+	1
+	"petal length (cm)
+IG":" 1.4463" -> 1 [label=4.2]
+	"sepal length (cm)
+IG: 1.0000"
+	"petal length (cm)
+IG":" 1.4463" -> "sepal length (cm)
+IG":" 1.0000" [label=4.8]
+	2
+	"sepal length (cm)
+IG":" 1.0000" -> 2 [label=6.0]
+	1
+	"sepal length (cm)
+IG":" 1.0000" -> 1 [label=5.9]
+	1
+	"sepal length (cm)
+IG":" 1.0000" -> 1 [label=6.8]
+	2
+	"sepal length (cm)
+IG":" 1.0000" -> 2 [label=6.2]
+	1
+	"petal length (cm)
+IG":" 1.4463" -> 1 [label=4.3]
+	2
+	"petal length (cm)
+IG":" 1.4463" -> 2 [label=5.8]
+	2
+	"petal length (cm)
+IG":" 1.4463" -> 2 [label=5.3]
+	2
+	"petal length (cm)
+IG":" 1.4463" -> 2 [label=5.7]
+	2
+	"petal length (cm)
+IG":" 1.4463" -> 2 [label=5.2]
+	2
+	"petal length (cm)
+IG":" 1.4463" -> 2 [label=6.3]
+	2
+	"petal length (cm)
+IG":" 1.4463" -> 2 [label=6.7]
+	1
+	"petal length (cm)
+IG":" 1.4463" -> 1 [label=3.9]
+}

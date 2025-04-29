@@ -224,7 +224,6 @@ cm_softmax = confusion_matrix(y_test, y_pred_softmax)
 # 明确Softmax回归的分类结果是几类
 num_classes_softmax = len(np.unique(y))
 print(f"Softmax回归的分类结果是 {num_classes_softmax} 类")
-
 print(f"Softmax回归 - 多分类：参数形状: {theta_softmax.shape}，损失值: {loss_softmax}，准确率: {accuracy_softmax}，召回率: {recall_softmax}，F1值: {f1_softmax}")
 
 # 绘制混淆矩阵
