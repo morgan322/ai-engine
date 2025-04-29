@@ -1,0 +1,47 @@
+// C4.5 Decision Tree for Iris Dataset
+digraph {
+	rankdir=TB size="8,8"
+	"petal length (cm)"
+	0.0
+	"petal length (cm)" -> 0.0 [label=1.0]
+	"petal width (cm)"
+	"petal length (cm)" -> "petal width (cm)" [label=2.0]
+	1.0
+	"petal width (cm)" -> 1.0 [label=2.0]
+	"sepal width (cm)"
+	"petal width (cm)" -> "sepal width (cm)" [label=3.0]
+	2.0
+	"sepal width (cm)" -> 2.0 [label=1.0]
+	"sepal length (cm)"
+	"sepal width (cm)" -> "sepal length (cm)" [label=2.0]
+	2.0
+	"sepal length (cm)" -> 2.0 [label=2.0]
+	"petal width (cm)"
+	"petal length (cm)" -> "petal width (cm)" [label=3.0]
+	"sepal length (cm)"
+	"petal width (cm)" -> "sepal length (cm)" [label=2.0]
+	"sepal width (cm)"
+	"sepal length (cm)" -> "sepal width (cm)" [label=2.0]
+	2.0
+	"sepal width (cm)" -> 2.0 [label=1.0]
+	2.0
+	"sepal length (cm)" -> 2.0 [label=3.0]
+	"sepal length (cm)"
+	"petal width (cm)" -> "sepal length (cm)" [label=3.0]
+	2.0
+	"sepal length (cm)" -> 2.0 [label=2.0]
+	"sepal width (cm)"
+	"sepal length (cm)" -> "sepal width (cm)" [label=3.0]
+	2.0
+	"sepal width (cm)" -> 2.0 [label=1.0]
+	2.0
+	"sepal width (cm)" -> 2.0 [label=2.0]
+	2.0
+	"sepal width (cm)" -> 2.0 [label=3.0]
+	2.0
+	"sepal length (cm)" -> 2.0 [label=4.0]
+	2.0
+	"petal width (cm)" -> 2.0 [label=4.0]
+	2.0
+	"petal length (cm)" -> 2.0 [label=4.0]
+}
