@@ -1,0 +1,71 @@
+# Licensed under the MIT License.
+# docker run -it computervision:cpu pytests tests/unit
+# DOCKER_BUILDKIT=1 docker build -t computervision:gpu --build-arg ENV="gpu" -f docker/Dockerfile.cv .
+ARG ENV="cpu"
+ARG HOME="/root"
+
+FROM ubuntu:18.04 AS cpu
+
+ARG HOME
+ENV HOME="${HOME}"
+WORKDIR ${HOME}
+RUN sed -i 's/archive.ubuntu.com/mirrors.tuna.tsinghua.edu.cn/g' /etc/apt/sources.list
+# Install base dependencies
+RUN apt-get update && \
+    apt-get install -y curl git build-essential
+
+# 使用 bash 作为默认 shell
+SHELL ["/bin/bash", "-c"]
+
+# Install Anaconda
+ARG ANACONDA="https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
+RUN curl ${ANACONDA} -o anaconda.sh && \
+    /bin/bash anaconda.sh -b -p conda && \
+    rm anaconda.sh 
+
+
+# Clone Computer Vision repo
+ARG BRANCH="master"
+RUN git clone --depth 1 --single-branch -b ${BRANCH} https://github.com/microsoft/computervision
+
+# Setup Jupyter notebook configuration
+ENV NOTEBOOK_CONFIG="${HOME}/.jupyter/jupyter_notebook_config.py"
+RUN mkdir ${HOME}/.jupyter && \
+    echo "c.NotebookApp.token = ''" >> ${NOTEBOOK_CONFIG} && \
+    echo "c.NotebookApp.ip = '0.0.0.0'" >> ${NOTEBOOK_CONFIG} && \
+    echo "c.NotebookApp.allow_root = True" >> ${NOTEBOOK_CONFIG} && \
+    echo "c.NotebookApp.open_browser = False" >> ${NOTEBOOK_CONFIG} && \
+    echo "c.MultiKernelManager.default_kernel_name = 'python3'" >> ${NOTEBOOK_CONFIG}
+
+
+# GPU Stage
+FROM nvcr.io/nvidia/cuda:9.0-base AS gpu
+
+ARG HOME
+WORKDIR ${HOME}
+
+COPY --from=cpu ${HOME} .
+
+ENV PATH="${HOME}/conda/envs/cv/bin:${PATH}"
+ENV PATH="/root/conda/bin:$PATH"
+
+# Final Stage
+FROM $ENV AS final
+
+# 修改 conda 镜像源
+RUN conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/ && \
+    conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main/ && \
+    conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/ && \
+    conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/pytorch/ && \
+    conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/fastai/ && \
+    conda config --set show_channel_urls yes
+# Install Conda dependencies
+RUN conda env create -f computervision/environment.yml && \
+    conda clean -fay && \
+    python -m ipykernel install --user --name 'cv' --display-name 'python3'
+
+ARG HOME
+WORKDIR ${HOME}/computervision
+
+EXPOSE 8888
+CMD ["jupyter", "notebook"]

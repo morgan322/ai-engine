@@ -162,7 +162,7 @@ class ObjectDetector:
         frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         fps = cap.get(cv2.CAP_PROP_FPS)
-        out = cv2.VideoWriter(save_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (frame_width , frame_height * 2))
+        out = cv2.VideoWriter(save_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (frame_width , frame_height))
         cap_flap = 0
         if not (video_path.endswith('.mp4') or video_path.endswith('.avi') or video_path.endswith('.mov')):
             filename = os.path.basename(save_path)
@@ -175,20 +175,20 @@ class ObjectDetector:
             if not ret:
                 break
 
-            img_mnn = self.infer_image(frame)
+            # img_mnn = self.infer_image(frame)
             img_lite = self.infer_lite(frame)
-            combined_image = np.vstack((img_lite,img_mnn))
-            out.write(combined_image)
+            # combined_image = np.vstack((img_lite,img_mnn))
+            out.write(img_lite)
             if(cap_flap == 1):
                 src_out.write(frame)
 
-            screen_width = 600
-            scale_factor = screen_width / combined_image.shape[1]  
-            height = int(combined_image.shape[0] * scale_factor)  
-            resized_image = cv2.resize(combined_image, (screen_width, height))  
-            cv2.imshow('output', resized_image)   
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
+            # screen_width = 600
+            # scale_factor = screen_width / combined_image.shape[1]  
+            # height = int(combined_image.shape[0] * scale_factor)  
+            # resized_image = cv2.resize(combined_image, (screen_width, height))  
+            # cv2.imshow('output', img_lite)   
+            # if cv2.waitKey(1) & 0xFF == ord('q'):
+            #     break
 
         cap.release()
         out.release()
