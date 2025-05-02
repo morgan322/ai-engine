@@ -18,7 +18,6 @@
 // #include "AI_vout_display.h"
 // #include "AI_platform.h"
 
-
 DEFINE_bool(show, false, "show image");
 DEFINE_bool(save_video, true, "save output to local video file");
 DEFINE_int32(repeat_time, 0, "process repeat time");
