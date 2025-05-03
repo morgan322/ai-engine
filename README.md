@@ -4,7 +4,7 @@
 >
 > git clone https://github.com/morgan322/ai-engine.git
 >
-> cd ai-engine && git submodule init && git submodule update
+> cd ~/ai-engine && git submodule init && git submodule update
 
 # build
 
@@ -17,7 +17,3 @@
 > mkdir build && cd build
 >
 > cmake .. && make -j8
->
-> git clone https://github.com/morgan322/ai-engine.git
->
-> cd ai-engine && git submodule init && git submodule update
