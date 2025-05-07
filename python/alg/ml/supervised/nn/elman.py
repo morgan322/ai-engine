@@ -36,7 +36,6 @@ class ElmanNetwork(nn.Module):
         packed_output, hidden = self.rnn(packed_embedded, h0)
         output, _ = pad_packed_sequence(packed_output, batch_first=True)
 
-        # 移除与 attention 相关的操作
         out = hidden[-1]
         out = self.fc1(out)
         out = self.relu(out)
