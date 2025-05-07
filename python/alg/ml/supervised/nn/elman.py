@@ -18,56 +18,31 @@ nltk.download('stopwords')
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
 
-# 定义注意力机制模块
-class Attention(nn.Module):
-    def __init__(self, hidden_size):
-        super(Attention, self).__init__()
-        self.hidden_size = hidden_size
-        self.attn = nn.Linear(self.hidden_size * 2, hidden_size)
-        self.v = nn.Parameter(torch.rand(hidden_size))
-        stdv = 1. / torch.sqrt(self.v.size(0))
-        self.v.data.uniform_(-stdv, stdv)
 
-    def forward(self, hidden, encoder_outputs):
-        timestep = encoder_outputs.size(1)
-        hidden = hidden.repeat(timestep, 1, 1).transpose(0, 1)
-        encoder_outputs = encoder_outputs.transpose(0, 1)
-        attn_energies = self.score(hidden, encoder_outputs)
-        return torch.softmax(attn_energies, dim=1).unsqueeze(1)
-
-    def score(self, hidden, encoder_outputs):
-        energy = torch.tanh(self.attn(torch.cat([hidden, encoder_outputs], 2)))
-        energy = energy.transpose(1, 2)
-        v = self.v.repeat(encoder_outputs.size(0), 1).unsqueeze(1)
-        energy = torch.bmm(v, energy)
-        return energy.squeeze(1)
-
-# 定义 Elman 网络类，增加层数和调整结构
+# 定义 Elman 网络类，移除 attention 模块并调整结构
 class ElmanNetwork(nn.Module):
     def __init__(self, vocab_size, embedding_dim, hidden_size, output_size, num_layers=3, dropout_rate=0.2):
         super(ElmanNetwork, self).__init__()
         self.embedding = nn.Embedding(vocab_size, embedding_dim)
         self.rnn = nn.GRU(embedding_dim, hidden_size, num_layers, batch_first=True, dropout=dropout_rate)
-        self.attention = Attention(hidden_size)
-        self.fc1 = nn.Linear(hidden_size * 2, hidden_size * 2)
+        self.fc1 = nn.Linear(hidden_size, hidden_size)
         self.relu = nn.ReLU()
-        self.fc2 = nn.Linear(hidden_size * 2, output_size)
+        self.fc2 = nn.Linear(hidden_size, output_size)
 
     def forward(self, inputs, lengths):
         embedded = self.embedding(inputs)
-        packed_embedded = pack_padded_sequence(embedded, lengths, batch_first=True, enforce_sorted=False)
+        packed_embedded = pack_padded_sequence(embedded, lengths.cpu(), batch_first=True, enforce_sorted=False)
         h0 = torch.zeros(self.rnn.num_layers, inputs.size(0), self.rnn.hidden_size).to(inputs.device)
         packed_output, hidden = self.rnn(packed_embedded, h0)
         output, _ = pad_packed_sequence(packed_output, batch_first=True)
 
-        attn_weights = self.attention(hidden[-1].unsqueeze(0), output)
-        context = torch.bmm(attn_weights, output).squeeze(1)
-
-        out = torch.cat([context, hidden[-1]], 1)
+        # 移除与 attention 相关的操作
+        out = hidden[-1]
         out = self.fc1(out)
         out = self.relu(out)
         out = self.fc2(out)
         return out
+
 
 # 定义分词器
 tokenizer = get_tokenizer('basic_english')
@@ -101,8 +76,8 @@ def text_pipeline(x):
     tokens = tokenizer(x)
     stop_words = set(stopwords.words('english'))
     tokens = [token for token in tokens if token not in stop_words]
-    vectorized = [glove[token] for token in tokens]
-    return torch.stack(vectorized)
+    indices = [vocab[token] for token in tokens]
+    return torch.tensor(indices, dtype=torch.long)
 
 # 确保标签从 0 开始
 label_pipeline = lambda x: int(x) - 1
@@ -115,9 +90,11 @@ def collate_batch(batch):
         processed_text = text_pipeline(_text)
         text_list.append(processed_text)
         lengths.append(processed_text.size(0))
-    label_list = torch.tensor(label_list, dtype=torch.int64)
-    text_list = nn.utils.rnn.pad_sequence(text_list, batch_first=True)
+
+    label_list = torch.tensor(label_list, dtype=torch.int64).to(device)
+    text_list = nn.utils.rnn.pad_sequence(text_list, batch_first=True).to(device)
     lengths = torch.tensor(lengths, dtype=torch.long)
+
     return label_list, text_list, lengths
 
 # 重新加载训练集
@@ -140,15 +117,11 @@ optimizer = optim.Adam(model.parameters(), lr=0.001, weight_decay=0.00001)
 scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer,'min')
 
 # 训练网络，增加训练轮数
-num_epochs = 200
+num_epochs = 20
 for epoch in range(num_epochs):
     model.train()
     total_loss = 0
     for labels, texts, lengths in train_dataloader:
-        # 将数据移动到 GPU
-        labels = labels.to(device)
-        texts = texts.to(device)
-        lengths = lengths.to(device)
         optimizer.zero_grad()
         outputs = model(texts, lengths)
         loss = criterion(outputs, labels)
@@ -167,9 +140,6 @@ for epoch in range(num_epochs):
     total = 0
     with torch.no_grad():
         for test_labels, test_texts, test_lengths in test_dataloader:
-            test_labels = test_labels.to(device)
-            test_texts = test_texts.to(device)
-            test_lengths = test_lengths.to(device)
             test_outputs = model(test_texts, test_lengths)
             test_loss += criterion(test_outputs, test_labels).item()
             predicted = torch.argmax(test_outputs, dim=1)
