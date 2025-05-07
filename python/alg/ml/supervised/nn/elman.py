@@ -19,7 +19,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
 
 
-# 定义 Elman 网络类，移除 attention 模块并调整结构
+# 定义 Elman 网络类
 class ElmanNetwork(nn.Module):
     def __init__(self, vocab_size, embedding_dim, hidden_size, output_size, num_layers=3, dropout_rate=0.2):
         super(ElmanNetwork, self).__init__()
