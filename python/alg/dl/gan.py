@@ -61,7 +61,12 @@ transform = transforms.Compose([
     transforms.Normalize((0.5,), (0.5,))
 ])
 
-dataset = datasets.MNIST(root='/home/morgan/ubt/data/ml', train=True,
+import argparse
+parser = argparse.ArgumentParser(description='MNIST Dataset Path')
+parser.add_argument('--data_root', type=str, default='/home/morgan/ubt/data/ml', help='Path to MNIST dataset')
+args = parser.parse_args()
+
+dataset = datasets.MNIST(root=args.data_root, train=True,
                          transform=transform, download=True)
 dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 

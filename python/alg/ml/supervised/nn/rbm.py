@@ -52,8 +52,13 @@ class RBM:
         return self.sample_visible(hidden_states).T
 
 
+import argparse
+parser = argparse.ArgumentParser(description='MNIST Dataset Path')
+parser.add_argument('--data_root', type=str, default='/home/morgan/ubt/data/ml/mnist_784.npz', help='Path to MNIST dataset')
+args = parser.parse_args()
+
 # 检查本地是否存在 MNIST 数据文件
-data_file = '/home/morgan/ubt/data/ml/mnist_784.npz'
+data_file = args.data_root
 if os.path.exists(data_file):
     data = np.load(data_file)
     X = data['data']

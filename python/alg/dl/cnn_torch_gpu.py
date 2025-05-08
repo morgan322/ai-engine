@@ -30,10 +30,15 @@ class SimpleCNN(nn.Module):
         x = self.fc2(x)
         return x
 
+import argparse
+parser = argparse.ArgumentParser(description='MNIST Dataset Path')
+parser.add_argument('--data_root', type=str, default='/home/morgan/ubt/data/ml', help='Path to MNIST dataset')
+args = parser.parse_args()
+
 # 加载 MNIST 数据集
 transform = transforms.Compose([transforms.ToTensor()])
-train_dataset = MNIST(root='/home/morgan/ubt/data/ml', train=True, transform=transform, download=True)
-test_dataset = MNIST(root='/home/morgan/ubt/data/ml', train=False, transform=transform, download=True)
+train_dataset = MNIST(root=args.data_root, train=True, transform=transform, download=True)
+test_dataset = MNIST(root=args.data_root, train=False, transform=transform, download=True)
 
 # 减少数据集规模
 train_dataset.data = train_dataset.data[:5000]
