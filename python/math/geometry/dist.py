@@ -112,3 +112,67 @@ if __name__ == "__main__":
     calculator = DistanceCalculator(point1, point2)
     calculator.plot_distances()
     
+
+from scipy.stats import norm
+
+# Define parameters for real and generated distributions
+mu_r = 1
+sigma_r = 0.3
+mu_g = 3
+sigma_g = 0.3
+
+# Generate sample points
+x = np.linspace(-2, 6, 1000)
+pr = norm.pdf(x, mu_r, sigma_r)
+pg = norm.pdf(x, mu_g, sigma_g)
+
+# Plot distributions
+plt.figure(figsize=(10, 6))
+plt.plot(x, pr, label='Real Distribution $P_r$')
+plt.plot(x, pg, label='Generated Distribution $P_g$')
+plt.xlabel('x')
+plt.ylabel('Probability Density')
+plt.title('Example of 1D Normal Distributions')
+plt.legend()
+plt.grid(True, linestyle='--', alpha=0.7)
+plt.tight_layout()
+plt.show()
+
+# Discretize into bins
+bins = 20
+hist_r, bin_edges_r = np.histogram(x, bins=bins, weights=pr)
+hist_g, bin_edges_g = np.histogram(x, bins=bins, weights=pg)
+bin_centers = (bin_edges_r[:-1] + bin_edges_r[1:]) / 2
+
+# Simple transport plan (approximate, not optimal)
+wasserstein_distance_approx = 0
+for i in range(bins):
+    for j in range(bins):
+        distance = np.abs(bin_centers[i] - bin_centers[j])
+        # Simplified transport mass as product of bin probabilities
+        mass_transported = hist_r[i] * hist_g[j]
+        wasserstein_distance_approx += distance * mass_transported
+
+print(f'Approximate Wasserstein Distance: {wasserstein_distance_approx:.4f}')
+
+# Visualize transport plan (partial connections for clarity)
+plt.figure(figsize=(12, 6))
+plt.bar(bin_centers, hist_r, width=0.2, alpha=0.5, label='Real Distribution (discretized)')
+plt.bar(bin_centers, hist_g, width=0.2, alpha=0.5, label='Generated Distribution (discretized)')
+
+# Plot partial connections to avoid clutter
+for i in range(0, bins, 2):  # Plot connections for every other bin
+    for j in range(0, bins, 2):
+        if hist_r[i] > 0 and hist_g[j] > 0:
+            # Fix: Scale alpha to be within 0-1 range
+            alpha = min(1.0, min(hist_r[i], hist_g[j]) * 10)  # Ensure alpha is between 0 and 1
+            plt.plot([bin_centers[i], bin_centers[j]], [hist_r[i]/2, hist_g[j]/2], 
+                     'k-', alpha=alpha, linewidth=0.5)
+
+plt.xlabel('x')
+plt.ylabel('Probability Density (discretized)')
+plt.title('Visualization of Wasserstein Distance Transport Plan')
+plt.legend()
+plt.grid(True, linestyle='--', alpha=0.7)
+plt.tight_layout()
+plt.show()    
