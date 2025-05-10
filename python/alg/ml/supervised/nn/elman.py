@@ -10,7 +10,7 @@ import pickle
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 import nltk
 from nltk.corpus import stopwords
-
+#export LD_LIBRARY_PATH=$(echo $LD_LIBRARY_PATH | sed 's|/usr/local/cuda/lib64||g')
 # 下载停用词（如果尚未下载）
 nltk.download('stopwords')
 
@@ -116,7 +116,7 @@ optimizer = optim.Adam(model.parameters(), lr=0.001, weight_decay=0.00001)
 scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer,'min')
 
 # 训练网络，增加训练轮数
-num_epochs = 20
+num_epochs = 5
 for epoch in range(num_epochs):
     model.train()
     total_loss = 0
