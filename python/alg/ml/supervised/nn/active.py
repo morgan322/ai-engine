@@ -162,6 +162,4 @@ for i, (func, derivative, name) in enumerate(activation_functions):
     # 调整布局
     plt.tight_layout(pad=4.0)
     plt.savefig(f'../../../../../data/result/activate/activation_{name.replace(" (α = 0.1)", "").replace(" (α = 0.25)", "").replace(" (α = 0.229)", "").replace(" (β = 1.0)", "").replace(" (α = 1.67326, scale = 1.0507)", "").lower()}.png', bbox_inches='tight', dpi=300)
-    plt.close()  # 关闭当前画布，避免内存占用
-
-print("已生成10张图片，分别包含各激活函数及其导函数图像")    
+    plt.close() 
