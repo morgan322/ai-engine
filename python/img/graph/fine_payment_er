@@ -1,0 +1,22 @@
+// E - R Diagram
+digraph {
+	"缴纳罚金管理" [shape=rect]
+	"罚款说明" [shape=ellipse]
+	"缴纳罚金管理" -> "罚款说明"
+	"罚款金额" [shape=ellipse]
+	"缴纳罚金管理" -> "罚款金额"
+	"罚款日期" [shape=ellipse]
+	"缴纳罚金管理" -> "罚款日期"
+	"图书名称" [shape=ellipse]
+	"缴纳罚金管理" -> "图书名称"
+	"图书编号" [shape=ellipse]
+	"缴纳罚金管理" -> "图书编号"
+	"借阅单号" [shape=ellipse]
+	"缴纳罚金管理" -> "借阅单号"
+	"用户名" [shape=ellipse]
+	"缴纳罚金管理" -> "用户名"
+	"手机" [shape=ellipse]
+	"缴纳罚金管理" -> "手机"
+	"是否支付" [shape=ellipse]
+	"缴纳罚金管理" -> "是否支付"
+}
