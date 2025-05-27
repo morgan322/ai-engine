@@ -44,6 +44,8 @@ git clone https://github.com/graykode/nlp-tutorial.git
 
 ## 1.5 ml
 
+git clone https://github.com/josephmisiti/awesome-machine-learning.git
+
 # 2 code
 
 ## 2.1 c/cpp
@@ -56,8 +58,18 @@ git clone https://github.com/TheAlgorithms/Python.git
 
 # 3 backend
 
+## 3.1 x86
+
 git clone https://github.com/openvinotoolkit/openvino.git
 
 git clone https://github.com/NVIDIA/TensorRT.git
 
 git clone https://github.com/openvinotoolkit/openvino_notebooks.git
+
+git clone https://github.com/wang-xinyu/tensorrtx.git
+
+## 3.2 arm
+
+git clone https://github.com/alibaba/MNN.git
+
+git clone https://github.com/Tencent/ncnn.git
