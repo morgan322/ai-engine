@@ -59,3 +59,5 @@ git clone https://github.com/TheAlgorithms/Python.git
 git clone https://github.com/openvinotoolkit/openvino.git
 
 git clone https://github.com/NVIDIA/TensorRT.git
+
+git clone https://github.com/openvinotoolkit/openvino_notebooks.git

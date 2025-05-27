@@ -1,12 +1,3 @@
 [submodule "3rdparty/easydk"]
 	path = 3rdparty/easydk
 	url = https://github.com/Cambricon/easydk.git
-[submodule "3rdparty/TensorRT"]
-	path = 3rdparty/TensorRT
-	url = https://github.com/NVIDIA/TensorRT.git
-[submodule "tools/trt/tensorrtx"]
-	path = tools/trt/tensorrtx
-	url = https://github.com/wang-xinyu/tensorrtx.git
-[submodule "tools/ov/openvinotoolkit"]
-	path = tools/ov/openvinotoolkit
-	url = https://github.com/openvinotoolkit/openvino_notebooks.git
