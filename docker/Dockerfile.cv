@@ -40,6 +40,7 @@ RUN mkdir ${HOME}/.jupyter && \
 
 # GPU Stage
 FROM nvcr.io/nvidia/cuda:9.0-base AS gpu
+RUN apt-get update && apt-get install -y git
 
 ARG HOME
 WORKDIR ${HOME}
