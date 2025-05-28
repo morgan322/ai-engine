@@ -47,22 +47,39 @@ WORKDIR ${HOME}
 
 COPY --from=cpu ${HOME} .
 
-ENV PATH="${HOME}/conda/envs/cv/bin:${PATH}"
-ENV PATH="/root/conda/bin:$PATH"
+ENV PATH="${HOME}/conda/bin:${HOME}/conda/envs/cv/bin:${PATH}"
 
-# Final Stage
+
 FROM $ENV AS final
+SHELL ["/bin/bash", "-c"]
+RUN conda config --remove-key channels && \
+    conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main && \
+    conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/r && \
+    conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/msys2 && \
+    conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge && \
+    conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/pytorch && \
+    conda config --add channels defaults && \
+    conda config --set show_channel_urls yes && \
+    conda clean -fay
+RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 
-# 修改 conda 镜像源
-RUN conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/ && \
-    conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main/ && \
-    conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/ && \
-    conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/pytorch/ && \
-    conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/fastai/ && \
-    conda config --set show_channel_urls yes
-# Install Conda dependencies
-RUN conda env create -f computervision/environment.yml && \
-    conda clean -fay && \
+# # Install Conda dependencies
+# RUN conda env create -f computervision/environment.yml && \
+#     conda clean -fay && \
+#     python -m ipykernel install --user --name 'cv' --display-name 'python3'
+RUN conda config --remove-key channels && \
+    conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main && \
+    conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge && \
+    conda clean -fay
+
+# 配置pip镜像源
+RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+
+# 可选：如果Jupyter未安装，手动安装
+RUN conda install -y jupyter notebook
+
+# 注册内核（确保在激活的环境中执行）
+RUN source ~/.bashrc && \
     python -m ipykernel install --user --name 'cv' --display-name 'python3'
 
 ARG HOME
