@@ -16,6 +16,10 @@
         "-DDOWNLOAD_EXTRACT_TIMESTAMP=true"
     ],
     //"C_Cpp.intelliSenseEngine": "Tag Parser",
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.formatOnSave": true
+    },
     "cmake.buildDirectory": "${workspaceRoot}/build",
     "files.associations": {
         "array": "cpp",
