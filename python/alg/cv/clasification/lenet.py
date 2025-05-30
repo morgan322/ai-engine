@@ -66,6 +66,7 @@ def main(args):
     optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
 
     if args.train:
+        acc = 0
         for epoch in range(args.epochs):
             model.train()  
             for i, (images, labels) in enumerate(train_loader):
@@ -78,21 +79,31 @@ def main(args):
                 if (i + 1) % 100 == 0:
                     accuracy = 100 * (outputs.argmax(dim=1) == labels).sum().item() / labels.size(0)
                     print(f'Epoch [{epoch+1}/{args.epochs}], Step [{i+1}/{len(train_loader)}], Loss: {loss.item():.4f},Accuracy: {accuracy:.2f}%')
-        torch.save(model.state_dict(), args.model_path)
+            model.eval()
+            correct = 0
+            total = 0
+            with torch.no_grad():
+                for images, labels in test_loader:
+                    outputs = model(images)
+                    _, predicted = torch.max(outputs.data, 1)
+                    total += labels.size(0)
+                    correct += (predicted == labels).sum().item()
+            accuracy = 100 * correct / total
+            if accuracy > acc:
+                acc = accuracy
+                print(f'Test Accuracy: {100 * correct / total:.2f}%')
+                torch.save(model.state_dict(), args.model_path)
     else:
         print('Loaded model from', args.model_path)
         model.load_state_dict(torch.load(args.model_path))
-        model.eval()
-        correct = 0
-        total = 0
-        with torch.no_grad():
-            for images, labels in test_loader:
-                outputs = model(images)
-                _, predicted = torch.max(outputs.data, 1)
-                total += labels.size(0)
-                correct += (predicted == labels).sum().item()
-
-        print(f'Test Accuracy: {100 * correct / total:.2f}%')
+        for i in range(10):
+            img, label = next(iter(test_loader))
+            img = img[i].unsqueeze(0)
+            model.eval()
+            with torch.no_grad():
+                output = model(img)
+            pred = output.argmax(dim=1).item()
+            print(f'Predicted class: {pred}, actual value: {label[i]}')
 
 import argparse
 parser = argparse.ArgumentParser(description='Script Description')
