@@ -28,6 +28,10 @@ git clone https://github.com/computerhistory/AlexNet-Source-Code.git
 
 git clone https://github.com/aaron-xichen/pytorch-playground.git
 
+git clone https://github.com/Cadene/pretrained-models.pytorch.git
+
+git clone https://github.com/weiaicunzai/pytorch-cifar100.git
+
 ### 1.2.3 detection
 
 git clone https://github.com/ultralytics/yolov5.git
@@ -37,6 +41,8 @@ git clone https://github.com/ultralytics/yolov5.git
 git clone https://github.com/huggingface/transformers.git
 
 git clone https://github.com/hyunwoongko/transformer.git
+
+git clone https://github.com/google-deepmind/alphafold.git
 
 ## 1.4 nlp
 
