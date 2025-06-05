@@ -34,6 +34,8 @@ git clone https://github.com/weiaicunzai/pytorch-cifar100.git
 
 ### 1.2.3 detection
 
+git clone https://github.com/pjreddie/darknet.git
+
 git clone https://github.com/ultralytics/yolov5.git
 
 ## 1.3 bm
@@ -43,6 +45,8 @@ git clone https://github.com/huggingface/transformers.git
 git clone https://github.com/hyunwoongko/transformer.git
 
 git clone https://github.com/google-deepmind/alphafold.git
+
+git clone https://github.com/deepseek-ai/DeepSeek-R1.git
 
 ## 1.4 nlp
 
@@ -62,7 +66,7 @@ git clone https://github.com/fffaraz/awesome-cpp.git
 
 git clone https://github.com/TheAlgorithms/Python.git
 
-# 3 backend
+# 3 platform
 
 ## 3.1 x86
 

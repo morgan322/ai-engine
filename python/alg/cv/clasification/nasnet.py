@@ -315,3 +315,7 @@ def nasnet():
 
     #stem filters must be 44, it's a pytorch workaround, cant change to other number
     return NasNetA(4, 2, 44, 44)
+
+
+net = nasnet()
+print(net)
