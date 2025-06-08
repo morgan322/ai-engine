@@ -1,152 +1,220 @@
 import numpy as np
 
-def conv2d(input_data, kernel, stride=1, padding=0):
-    """实现标准二维卷积"""
-    if len(input_data.shape) == 2:
-        input_data = np.expand_dims(input_data, 0)
-    if len(kernel.shape) == 2:
-        kernel = np.expand_dims(np.expand_dims(kernel, 0), 0)
+def conv2d(inputs, filters, stride=1, padding=0, dilation=1):
+    """
+    实现标准2D卷积操作: 单个输出通道的结果通过对所有输入通道的卷积结果求和得到；
+    """
+    batch_size, in_channels, in_height, in_width = inputs.shape
+    out_channels, _, kernel_h, kernel_w = filters.shape
     
-    C, H, W = input_data.shape
-    out_channels, in_channels, k, _ = kernel.shape
-    assert in_channels == C, f"输入通道数不匹配: {in_channels} != {C}"
+    # 计算输出尺寸
+    out_height = (in_height + 2 * padding - dilation * (kernel_h - 1) - 1) // stride + 1
+    out_width = (in_width + 2 * padding - dilation * (kernel_w - 1) - 1) // stride + 1
     
-    H_out = (H + 2 * padding - k) // stride + 1
-    W_out = (W + 2 * padding - k) // stride + 1
+    # 填充输入
+    padded = np.pad(inputs, ((0, 0), (0, 0), (padding, padding), (padding, padding)), mode='constant')
     
-    padded = np.pad(input_data, ((0, 0), (padding, padding), (padding, padding)), mode='constant')
-    output = np.zeros((out_channels, H_out, W_out))
+    # 初始化输出
+    output = np.zeros((batch_size, out_channels, out_height, out_width))
     
-    for oc in range(out_channels):
-        for ic in range(in_channels):
-            for i in range(H_out):
-                for j in range(W_out):
-                    window = padded[ic, i*stride:i*stride+k, j*stride:j*stride+k]
-                    output[oc, i, j] += np.sum(window * kernel[oc, ic])
-    
-    return output if out_channels > 1 else output[0]
+    # 执行卷积
+    for b in range(batch_size):
+        for oc in range(out_channels):
+            for ic in range(in_channels):
+                for i in range(out_height):
+                    for j in range(out_width):
+                        # 计算卷积窗口
+                        window = padded[b, ic, 
+                                      i*stride:i*stride+dilation*kernel_h:dilation, 
+                                      j*stride:j*stride+dilation*kernel_w:dilation]
+                        # 执行卷积操作
+                        output[b, oc, i, j] += np.sum(window * filters[oc, ic])
+    return output
 
-def conv2d_transpose(input_data, in_channels, out_channels, kernel_size, stride=1, padding=0):
-    """实现转置卷积"""
-    kernel = np.random.rand(out_channels, in_channels, kernel_size, kernel_size)
-    if len(input_data.shape) == 2:
-        input_data = np.expand_dims(input_data, 0)
+def conv2d_transpose(inputs, filters, stride=1, padding=0, output_padding=0):
+    """
+    实现2D转置卷积操作
+    """
+    batch_size, in_channels, in_height, in_width = inputs.shape
+    out_channels, _, kernel_h, kernel_w = filters.shape
     
-    C, H, W = input_data.shape
-    out_channels_k, in_channels_k, k, _ = kernel.shape
-    assert in_channels_k == C, f"输入通道数不匹配: {in_channels_k} != {C}"
+    # 计算输出尺寸
+    out_height = (in_height - 1) * stride - 2 * padding + kernel_h + output_padding
+    out_width = (in_width - 1) * stride - 2 * padding + kernel_w + output_padding
     
-    H_out = (H - 1) * stride - 2 * padding + k
-    W_out = (W - 1) * stride - 2 * padding + k
+    # 初始化输出
+    output = np.zeros((batch_size, out_channels, out_height, out_width))
     
-    output = np.zeros((out_channels_k, H_out, W_out))
+    # 对每个样本执行转置卷积
+    for b in range(batch_size):
+        for oc in range(out_channels):
+            for ic in range(in_channels):
+                # 对输入的每个位置
+                for i in range(in_height):
+                    for j in range(in_width):
+                        # 计算在输出中的位置
+                        out_i_start = i * stride
+                        out_j_start = j * stride
+                        
+                        # 获取卷积核并翻转
+                        flipped_kernel = np.flip(filters[oc, ic], axis=(0, 1))
+                        
+                        # 将卷积核的值添加到输出的相应位置
+                        for ki in range(kernel_h):
+                            for kj in range(kernel_w):
+                                out_i = out_i_start + ki
+                                out_j = out_j_start + kj
+                                
+                                # 检查是否在有效范围内
+                                if 0 <= out_i < out_height and 0 <= out_j < out_width:
+                                    output[b, oc, out_i, out_j] += inputs[b, ic, i, j] * flipped_kernel[ki, kj]
+    return output
+
+
+def depthwise_separable_conv2d(input_tensor, depthwise_filter, pointwise_filter, stride=1, padding=0):
+    """
+    实现深度可分离二维卷积
     
-    for oc in range(out_channels_k):
-        for ic in range(in_channels_k):
-            dilated = np.zeros((H * stride, W * stride))
-            dilated[::stride, ::stride] = input_data[ic]
+    参数:
+    input_tensor: 输入张量，形状为 [batch_size, in_channels, height, width]
+    depthwise_filter: 深度卷积滤波器，形状为 [in_channels, filter_height, filter_width]
+    pointwise_filter: 逐点卷积滤波器，形状为 [out_channels, in_channels]
+    stride: 步长，默认为1
+    padding: 填充大小，默认为0
+    
+    返回:
+    输出张量，形状为 [batch_size, out_channels, out_height, out_width]
+    """
+    # 获取输入尺寸
+    batch_size, in_channels, in_height, in_width = input_tensor.shape
+    _, filter_height, filter_width = depthwise_filter.shape
+    out_channels, _ = pointwise_filter.shape
+    
+    # 计算输出尺寸
+    out_height = (in_height + 2 * padding - filter_height) // stride + 1
+    out_width = (in_width + 2 * padding - filter_width) // stride + 1
+    
+    # 填充输入（为每个样本添加填充）
+    padded_input = np.pad(
+        input_tensor, 
+        ((0, 0), (0, 0), (padding, padding), (padding, padding)), 
+        mode='constant'
+    )
+    
+    # 初始化深度卷积输出张量 [batch_size, in_channels, out_height, out_width]
+    depthwise_output = np.zeros((batch_size, in_channels, out_height, out_width))
+    
+    # 深度卷积: 每个通道使用独立的滤波器
+    for b in range(batch_size):
+        for c in range(in_channels):
+            # 获取当前批次和通道的输入
+            channel_input = padded_input[b, c]
+            # 获取当前通道的滤波器
+            channel_filter = depthwise_filter[c]
             
-            flipped_kernel = np.flip(np.flip(kernel[oc, ic], 0), 1)
-            padded_dilated = np.pad(dilated, ((k-1, k-1), (k-1, k-1)), mode='constant')
-            
-            for i in range(H_out):
-                for j in range(W_out):
-                    window = padded_dilated[i:i+k, j:j+k]
-                    output[oc, i, j] += np.sum(window * flipped_kernel)
+            for i in range(out_height):
+                for j in range(out_width):
+                    # 提取当前窗口
+                    window = channel_input[
+                        i*stride:i*stride+filter_height, 
+                        j*stride:j*stride+filter_width
+                    ]
+                    # 应用滤波器并存储结果
+                    depthwise_output[b, c, i, j] = np.sum(window * channel_filter)
     
-    return output if out_channels_k > 1 else output[0]
-
-def dilated_conv2d(input_data, kernel, dilation=1, padding=0):
-    """实现空洞卷积（扩张卷积）"""
-    if len(input_data.shape) == 2:
-        input_data = np.expand_dims(input_data, 0)
-    if len(kernel.shape) == 2:
-        kernel = np.expand_dims(np.expand_dims(kernel, 0), 0)
+    # 逐点卷积: 1x1卷积，合并通道
+    output = np.zeros((batch_size, out_channels, out_height, out_width))
     
-    C, H, W = input_data.shape
-    out_channels, in_channels, k, _ = kernel.shape
-    assert in_channels == C, f"输入通道数不匹配: {in_channels} != {C}"
-    
-    # 有效卷积核大小
-    k_effective = k + (k - 1) * (dilation - 1)
-    H_out = (H + 2 * padding - k_effective) + 1
-    W_out = (W + 2 * padding - k_effective) + 1
-    
-    padded = np.pad(input_data, ((0, 0), (padding, padding), (padding, padding)), mode='constant')
-    output = np.zeros((out_channels, H_out, W_out))
-    
-    for oc in range(out_channels):
-        for ic in range(in_channels):
-            for i in range(H_out):
-                for j in range(W_out):
-                    # 采样窗口，考虑dilation
-                    window = np.zeros((k, k))
-                    for ki in range(k):
-                        for kj in range(k):
-                            window[ki, kj] = padded[ic, i+ki*dilation, j+kj*dilation]
-                    output[oc, i, j] += np.sum(window * kernel[oc, ic])
-    
-    return output if out_channels > 1 else output[0]
-
-def depthwise_separable_conv2d(input_data, depthwise_kernel, pointwise_kernel, stride=1, padding=0):
-    """实现深度可分离卷积"""
-    # 深度卷积
-    depthwise_output = conv2d(input_data, depthwise_kernel, stride, padding)
-    # 逐点卷积
-    pointwise_output = conv2d(depthwise_output, pointwise_kernel, 1, 0)
-    return pointwise_output
-
-def group_conv2d(input_data, kernel, groups=1, stride=1, padding=0):
-    """实现分组卷积"""
-    if len(input_data.shape) == 2:
-        input_data = np.expand_dims(input_data, 0)
-    if len(kernel.shape) == 2:
-        kernel = np.expand_dims(np.expand_dims(kernel, 0), 0)
-    
-    C, H, W = input_data.shape
-    out_channels, in_channels, k, _ = kernel.shape
-    assert in_channels % groups == 0, f"输入通道数必须能被组数整除: {in_channels} % {groups} != 0"
-    assert out_channels % groups == 0, f"输出通道数必须能被组数整除: {out_channels} % {groups} != 0"
-    
-    group_in_channels = in_channels // groups
-    group_out_channels = out_channels // groups
-    
-    output = np.zeros((out_channels, (H + 2 * padding - k) // stride + 1, (W + 2 * padding - k) // stride + 1))
-    
-    for g in range(groups):
-        group_input = input_data[g*group_in_channels:(g+1)*group_in_channels]
-        group_kernel = kernel[g*group_out_channels:(g+1)*group_out_channels, g*group_in_channels:(g+1)*group_in_channels]
-        group_output = conv2d(group_input, group_kernel, stride, padding)
-        output[g*group_out_channels:(g+1)*group_out_channels] = group_output
+    for b in range(batch_size):
+        for oc in range(out_channels):
+            for ic in range(in_channels):
+                # 逐点卷积：对每个输出通道，将所有输入通道加权求和
+                output[b, oc] += depthwise_output[b, ic] * pointwise_filter[oc, ic]
     
     return output
 
-# 示例用法
-if __name__ == "__main__":
-    # 创建测试输入
-    x = np.random.rand(3, 32, 32)  # 3通道，32x32图像
+def grouped_conv2d(inputs, filters, kernel_size, stride=1, padding=0, groups=1):
+    """
+    实现分组卷积操作
+    """
+    batch_size, in_channels, in_height, in_width = inputs.shape
+    out_channels, _, kernel_h, kernel_w = filters.shape
     
-    # 标准卷积
-    kernel = np.random.rand(16, 3, 3, 3)  # 16个3x3卷积核
-    conv_output = conv2d(x, kernel, stride=1, padding=1)
+    # 检查输入通道数和输出通道数是否能被组数整除
+    assert in_channels % groups == 0, "输入通道数必须能被组数整除"
+    assert out_channels % groups == 0, "输出通道数必须能被组数整除"
+    
+    # 每组的输入和输出通道数
+    channels_per_group_in = in_channels // groups
+    channels_per_group_out = out_channels // groups
+    
+    # 计算输出尺寸
+    out_height = (in_height + 2 * padding - (kernel_h - 1) - 1) // stride + 1
+    out_width = (in_width + 2 * padding - (kernel_w - 1) - 1) // stride + 1
+    
+    # 填充输入
+    padded = np.pad(inputs, ((0, 0), (0, 0), (padding, padding), (padding, padding)), mode='constant')
+    
+    # 初始化输出
+    output = np.zeros((batch_size, out_channels, out_height, out_width))
+    
+    # 执行分组卷积
+    for g in range(groups):
+        # 计算当前组的输入和输出通道范围
+        in_start = g * channels_per_group_in
+        in_end = (g + 1) * channels_per_group_in
+        out_start = g * channels_per_group_out
+        out_end = (g + 1) * channels_per_group_out
+        
+        # 获取当前组的输入和滤波器
+        group_input = padded[:, in_start:in_end]
+        group_filters = filters[out_start:out_end, in_start:in_end]
+        
+        # 对当前组执行卷积
+        group_output = conv2d(group_input, group_filters, stride, 0)
+        
+        # 将结果放入总输出中
+        output[:, out_start:out_end] += group_output
+    
+    return output
+
+# 示例使用
+if __name__ == "__main__":
+    # 测试用输入
+    batch_size = 1
+    in_channels = 3
+    height = 32
+    width = 32
+    out_channels = 3
+    kernel_size = 3
+    
+    inputs = np.random.rand(batch_size, in_channels, height, width)
+    print(f"输入形状: {inputs.shape}")
+    
+    # 测试标准卷积
+    filters = np.random.rand(out_channels, in_channels, kernel_size, kernel_size)
+    conv_output = conv2d(inputs, filters, stride=1, padding=1)
     print(f"标准卷积输出形状: {conv_output.shape}")
     
-    # 转置卷积
-    deconv_output = conv2d_transpose(conv_output, 16, 3, 3, stride=2, padding=1)
-    print(f"转置卷积输出形状: {deconv_output.shape}")
+    # 测试转置卷积
+    transpose_filters = np.random.rand(in_channels, out_channels, kernel_size, kernel_size)
+    transpose_output = conv2d_transpose(conv_output, transpose_filters, stride=2, padding=1)
+    print(f"转置卷积输出形状: {transpose_output.shape}")
     
-    # 空洞卷积
-    dilated_kernel = np.random.rand(16, 3, 3, 3)
-    dilated_output = dilated_conv2d(x, dilated_kernel, dilation=2, padding=2)
+    # 测试空洞卷积
+    dilation = 2
+    dilated_filters = np.random.rand(out_channels, in_channels, kernel_size, kernel_size)
+    dilated_output = conv2d(inputs, dilated_filters, stride=1, padding=dilation, dilation=dilation)
     print(f"空洞卷积输出形状: {dilated_output.shape}")
     
-    # 深度可分离卷积
-    depthwise_kernel = np.random.rand(3, 3, 3, 3)  # 每个通道一个卷积核
-    pointwise_kernel = np.random.rand(16, 3, 1, 1)  # 1x1卷积核
-    depthwise_output = depthwise_separable_conv2d(x, depthwise_kernel, pointwise_kernel, stride=1, padding=1)
-    print(f"深度可分离卷积输出形状: {depthwise_output.shape}")
+    # 测试深度可分离卷积
+    dw_filters = np.random.rand(in_channels, kernel_size, kernel_size)  # 每个输入通道一个滤波器
+    pw_filters = np.random.rand(in_channels, out_channels)  # 逐点卷积滤波器
+    ds_output = depthwise_separable_conv2d(inputs, dw_filters, pw_filters, stride=1, padding=1)
+    print(f"深度可分离卷积输出形状: {ds_output.shape}")
     
-    # 分组卷积
-    group_kernel = np.random.rand(18, 3, 3, 3)
-    group_output = group_conv2d(x, group_kernel, groups=3, stride=1, padding=1)
-    print(f"分组卷积输出形状: {group_output.shape}")    
+    # 测试分组卷积
+    groups = 3
+    grouped_filters = np.random.rand(out_channels, in_channels, kernel_size, kernel_size)
+    grouped_output = grouped_conv2d(inputs, grouped_filters, kernel_size, stride=1, padding=1, groups=groups)
+    print(f"分组卷积输出形状: {grouped_output.shape}")    
