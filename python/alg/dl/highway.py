@@ -10,7 +10,7 @@ class HighwayNet(nn.Module):
     """
 
     def __init__(self, layer_num, dim=600):
-        super(Highway, self).__init__()
+        super(HighwayNet, self).__init__()
         self.layer_num = layer_num
         self.linear = nn.ModuleList([nn.Linear(dim, dim)
                                      for _ in range(self.layer_num)])
@@ -23,3 +23,6 @@ class HighwayNet(nn.Module):
             nonlinear = F.relu(self.linear[i](x))
             x = gate * nonlinear + (1 - gate) * x
         return x
+    
+net = HighwayNet(2)
+print(net)

@@ -182,10 +182,10 @@ def grouped_conv2d(inputs, filters, kernel_size, stride=1, padding=0, groups=1):
 if __name__ == "__main__":
     # 测试用输入
     batch_size = 1
-    in_channels = 3
+    in_channels = 6
     height = 32
     width = 32
-    out_channels = 3
+    out_channels = 12
     kernel_size = 3
     
     inputs = np.random.rand(batch_size, in_channels, height, width)
