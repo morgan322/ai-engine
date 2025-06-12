@@ -1,3 +1,9 @@
 build/
 .vscode/
 python/alg/ml/supervised/nn/.vector_cache/
+
+*.h5
+*.pth
+*.pt
+*.json
+*.pyc

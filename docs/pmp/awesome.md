@@ -62,6 +62,8 @@ git clone https://github.com/josephmisiti/awesome-machine-learning.git
 
 git clone https://github.com/fffaraz/awesome-cpp.git
 
+git clone https://github.com/changkun/modern-cpp-tutorial.git
+
 ## 2.2 python
 
 git clone https://github.com/TheAlgorithms/Python.git

@@ -107,7 +107,7 @@ def main(args):
 
 import argparse
 parser = argparse.ArgumentParser(description='Script Description')
-parser.add_argument('--data_root', type=str, default='/home/morgan/ubt/data/ml', help='Path to MNIST dataset')
+parser.add_argument('--data_root', type=str, default='/home/morgan/ubt/data/ml', help='Path to dataset')
 parser.add_argument('--train', action='store_true', help='Train the model')
 parser.add_argument('--model_path', type=str, default='/home/morgan/ubt/data/ml/weights/classification/lenet.pth', help='Path to model path')
 parser.add_argument('--batch_size', type=int, default=128, help='Batch size for training')
