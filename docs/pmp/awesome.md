@@ -16,6 +16,8 @@ git clone https://github.com/WZMIAOMIAO/deep-learning-for-image-processing.git
 
 git clone https://github.com/microsoft/computervision-recipes.git
 
+git clone https://github.com/pytorch/vision.git
+
 ### 1.2.1 registration
 
 git clone https://github.com/magicleap/SuperGluePretrainedNetwork.git
@@ -34,9 +36,15 @@ git clone https://github.com/weiaicunzai/pytorch-cifar100.git
 
 ### 1.2.3 detection
 
+git clone https://github.com/rbgirshick/rcnn.git
+
 git clone https://github.com/pjreddie/darknet.git
 
 git clone https://github.com/ultralytics/yolov5.git
+
+1.2.4 
+
+git clone https://github.com/matterport/Mask_RCNN.git
 
 ## 1.3 bm
 
