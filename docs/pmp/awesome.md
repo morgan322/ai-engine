@@ -38,11 +38,15 @@ git clone https://github.com/weiaicunzai/pytorch-cifar100.git
 
 git clone https://github.com/rbgirshick/rcnn.git
 
+git clone https://github.com/rbgirshick/fast-rcnn.git
+
+git clone https://github.com/sgrvinod/a-PyTorch-Tutorial-to-Object-Detection.git
+
 git clone https://github.com/pjreddie/darknet.git
 
 git clone https://github.com/ultralytics/yolov5.git
 
-1.2.4 
+1.2.4 segmentation
 
 git clone https://github.com/matterport/Mask_RCNN.git
 
@@ -55,6 +59,8 @@ git clone https://github.com/hyunwoongko/transformer.git
 git clone https://github.com/google-deepmind/alphafold.git
 
 git clone https://github.com/deepseek-ai/DeepSeek-R1.git
+
+git clone https://github.com/OpenInterpreter/open-interpreter.git
 
 ## 1.4 nlp
 
@@ -76,6 +82,10 @@ git clone https://github.com/changkun/modern-cpp-tutorial.git
 
 git clone https://github.com/TheAlgorithms/Python.git
 
+git clone https://github.com/geekcomputers/Python.git
+
+git clone https://github.com/walter201230/Python.git
+
 # 3 platform
 
 ## 3.1 x86
@@ -96,4 +106,67 @@ git clone https://github.com/Tencent/ncnn.git
 
 # 4 develop
 
-https://github.com/gperftools/gperftools.git
+## 4.0 env
+
+## 4.0.1 compiler
+
+git clone https://github.com/Kitware/CMake.git
+
+git clone https://github.com/ttroy50/cmake-examples.git
+
+git clone https://github.com/ninja-build/ninja.git
+
+git clone https://github.com/bazelbuild/bazel.git
+
+### 4.0.2 interpreter
+
+git clone https://github.com/python/cpython.git
+
+## 4.1 kit
+
+### 4.1.1 memory
+
+git clone https://github.com/gperftools/gperftools.git
+
+git clone https://github.com/google/sanitizers.git
+
+### 4.1.2 configuration
+
+git clone https://github.com/nlohmann/json.git
+
+git clone https://github.com/ThePhD/sol2.git
+
+git clone https://github.com/leethomason/tinyxml2.git
+
+git clone https://github.com/zeux/pugixml.git
+
+git clone https://github.com/jbeder/yaml-cpp.git
+
+git clone https://github.com/benhoyt/inih.git
+
+### 4.1.3 log
+
+git clone https://github.com/google/glog.git
+
+git clone https://github.com/gabime/spdlog.git
+
+## 4.2 program
+
+### 4.2.1 protocol
+
+git clone https://github.com/curl/curl.git
+
+git clone https://github.com/ZLMediaKit/ZLMediaKit.git
+
+git clone https://github.com/zaphoyd/websocketpp.git
+
+git clone https://github.com/ithewei/libhv.git
+
+### 4.2.2 libary
+
+git clone https://github.com/microsoft/STL.git
+
+
+# 4.3 system
+
+git clone https://github.com/torvalds/linux.git
