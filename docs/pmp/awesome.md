@@ -1,5 +1,15 @@
 # 1 ai
 
+## 1.0 framework
+
+git clone https://github.com/BVLC/caffe.git
+
+git clone https://github.com/pytorch/pytorch.git
+
+git clone https://github.com/tensorflow/tensorflow.git
+
+git clone https://github.com/PaddlePaddle/Paddle.git
+
 ## 1.1 augmentation
 
 git clone https://github.com/Paperspace/DataAugmentationForObjectDetection.git
@@ -74,6 +84,8 @@ git clone https://github.com/josephmisiti/awesome-machine-learning.git
 
 ## 2.1 c/cpp
 
+git clone https://github.com/TheAlgorithms/C.git
+
 git clone https://github.com/fffaraz/awesome-cpp.git
 
 git clone https://github.com/changkun/modern-cpp-tutorial.git
@@ -85,6 +97,8 @@ git clone https://github.com/TheAlgorithms/Python.git
 git clone https://github.com/geekcomputers/Python.git
 
 git clone https://github.com/walter201230/Python.git
+
+git clone https://github.com/faif/python-patterns.git
 
 # 3 platform
 
@@ -165,6 +179,21 @@ git clone https://github.com/ithewei/libhv.git
 ### 4.2.2 libary
 
 git clone https://github.com/microsoft/STL.git
+
+### 4.2.3 codec
+
+git clone https://github.com/FFmpeg/FFmpeg.git
+
+### 4.2.4 data
+
+git clone https://github.com/opencv/opencv.git
+
+git clone https://github.com/opencv/opencv_contrib.git
+
+### 4.2.5 application
+
+git clone https://github.com/feder-cr/Jobs_Applier_AI_Agent_AIHawk.git
+
 
 
 # 4.3 system
