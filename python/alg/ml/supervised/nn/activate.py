@@ -10,10 +10,6 @@ plt.rcParams['axes.titlesize'] = 16  # 增大标题字体
 plt.rcParams['xtick.labelsize'] = 12  # 增大x轴刻度字体
 plt.rcParams['ytick.labelsize'] = 12  # 增大y轴刻度字体
 
-# 生成x值（范围扩大到-20到20）
-x = np.linspace(-20, 20, 4000)  # 增加点数使曲线更平滑
-dx = 0.001  # 用于数值计算导数的步长
-
 # 定义激活函数及其导数
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
@@ -99,8 +95,11 @@ for i, (func, derivative, name) in enumerate(activation_functions):
     # 创建更大的画布
     fig, axes = plt.subplots(1, 2, figsize=(16, 8))
     
-    # 计算函数值
-    x_range = x  # 所有函数使用相同的x范围
+    # 根据函数名称确定x轴范围，GELU 设为 -5 到 5，其他保持 -20 到 20
+    if name == "GELU":
+        x_range = np.linspace(-5, 5, 4000)
+    else:
+        x_range = np.linspace(-20, 20, 4000)
     
     y = func(x_range)
     y_derivative = derivative(x_range)
@@ -114,17 +113,20 @@ for i, (func, derivative, name) in enumerate(activation_functions):
     ax1.axvline(x=0, color='k', linewidth=1)
     
     # 设置x轴范围
-    ax1.set_xlim(-20, 20)
+    ax1.set_xlim(x_range[0], x_range[-1])
     
-    # 调整y轴范围以更好展示函数特性
-    if name.startswith("Sigmoid") or name.startswith("Tanh"):
+    # 调整y轴范围以更好展示函数特性，针对 GELU 单独调整
+    if name == "GELU":
+        # 计算 GELU 在 -5 到 5 区间的 y 范围，设置合适的显示范围
+        y_min = np.min(y)
+        y_max = np.max(y)
+        ax1.set_ylim(y_min - 0.5, y_max + 0.5)
+    elif name.startswith("Sigmoid") or name.startswith("Tanh"):
         ax1.set_ylim(-1.2, 1.2)
     elif name.startswith("ReLU") or name.startswith("Leaky") or name.startswith("PReLU") or name.startswith("RReLU"):
         ax1.set_ylim(-2, 20)  # 扩大上限
     elif name.startswith("ELU"):
         ax1.set_ylim(-2, 20)  # 扩大上限
-    elif name.startswith("GELU"):
-        ax1.set_ylim(-10, 20)  # 调整范围
     elif name.startswith("Swish"):
         ax1.set_ylim(-20, 20)  # 全范围展示
     elif name.startswith("SELU"):
@@ -139,10 +141,15 @@ for i, (func, derivative, name) in enumerate(activation_functions):
     ax2.axvline(x=0, color='k', linewidth=1)
     
     # 设置x轴范围
-    ax2.set_xlim(-20, 20)
+    ax2.set_xlim(x_range[0], x_range[-1])
     
-    # 调整导函数y轴范围
-    if name.startswith("Sigmoid"):
+    # 调整导函数y轴范围，针对 GELU 单独调整
+    if name == "GELU":
+        # 计算 GELU 导数在 -5 到 5 区间的 y 范围，设置合适的显示范围
+        y_der_min = np.min(y_derivative)
+        y_der_max = np.max(y_derivative)
+        ax2.set_ylim(y_der_min - 0.1, y_der_max + 0.1)
+    elif name.startswith("Sigmoid"):
         ax2.set_ylim(-0.1, 0.3)
     elif name.startswith("Tanh"):
         ax2.set_ylim(-0.1, 1.1)
@@ -152,8 +159,6 @@ for i, (func, derivative, name) in enumerate(activation_functions):
         ax2.set_ylim(-0.1, 1.1)
     elif name.startswith("ELU"):
         ax2.set_ylim(-0.1, 5.0)  # 扩大上限
-    elif name.startswith("GELU"):
-        ax2.set_ylim(-0.1, 1.5)  # 调整范围
     elif name.startswith("Swish"):
         ax2.set_ylim(-5, 20)  # 调整范围
     elif name.startswith("SELU"):
@@ -161,5 +166,7 @@ for i, (func, derivative, name) in enumerate(activation_functions):
     
     # 调整布局
     plt.tight_layout(pad=4.0)
-    plt.savefig(f'../../../../../data/result/activate/activation_{name.replace(" (α = 0.1)", "").replace(" (α = 0.25)", "").replace(" (α = 0.229)", "").replace(" (β = 1.0)", "").replace(" (α = 1.67326, scale = 1.0507)", "").lower()}.png', bbox_inches='tight', dpi=300)
-    plt.close() 
+    # 处理文件名，去掉特殊字符并转为小写
+    filename = name.replace(" (α = 0.1)", "").replace(" (α = 1.0)", "").replace(" (α = 0.25)", "").replace(" (α = 0.229)", "").replace(" (β = 1.0)", "").replace(" (α = 1.67326, scale = 1.0507)", "").lower()
+    plt.savefig(f'../../../../../data/result/activate/activation_{filename}.png', bbox_inches='tight', dpi=300)
+    plt.close()
