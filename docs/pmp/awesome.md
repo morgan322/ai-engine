@@ -60,6 +60,8 @@ git clone https://github.com/ultralytics/yolov5.git
 
 git clone https://github.com/matterport/Mask_RCNN.git
 
+git clone https://github.com/facebookresearch/maskrcnn-benchmark.git
+
 ## 1.3 bm
 
 git clone https://github.com/huggingface/transformers.git
@@ -193,8 +195,6 @@ git clone https://github.com/opencv/opencv_contrib.git
 ### 4.2.5 application
 
 git clone https://github.com/feder-cr/Jobs_Applier_AI_Agent_AIHawk.git
-
-
 
 # 4.3 system
 

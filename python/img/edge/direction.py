@@ -29,7 +29,8 @@ def main(image_path):
     is_qr = False
     for contour in merged_contours:
         area = cv2.contourArea(contour)
-        if area < 1000 or area > 10000:
+        print(area)
+        if area < 1000 or area > 30000:
             continue
         perimeter = cv2.arcLength(contour, True)
         epsilon = 0.02 * perimeter
@@ -126,5 +127,6 @@ if __name__ == "__main__":
     for root, dirs, files in os.walk(sys.argv[1]):
         for file in files:
             if file.endswith(".jpg"):
+                print(file)
                 image_path = os.path.join(root, file)
                 main(image_path)
