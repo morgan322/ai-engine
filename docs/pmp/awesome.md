@@ -28,6 +28,8 @@ git clone https://github.com/microsoft/computervision-recipes.git
 
 git clone https://github.com/pytorch/vision.git
 
+git clone https://github.com/sgrvinod/a-PyTorch-Tutorial-to-Object-Detection.git
+
 ### 1.2.1 registration
 
 git clone https://github.com/magicleap/SuperGluePretrainedNetwork.git
@@ -50,13 +52,15 @@ git clone https://github.com/rbgirshick/rcnn.git
 
 git clone https://github.com/rbgirshick/fast-rcnn.git
 
-git clone https://github.com/sgrvinod/a-PyTorch-Tutorial-to-Object-Detection.git
+git clone https://github.com/rbgirshick/py-faster-rcnn.git
+
+git clone https://github.com/tanjeffreyz/yolo-v1.git
 
 git clone https://github.com/pjreddie/darknet.git
 
 git clone https://github.com/ultralytics/yolov5.git
 
-1.2.4 segmentation
+### 1.2.4 segmentation
 
 git clone https://github.com/matterport/Mask_RCNN.git
 
