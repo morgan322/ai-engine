@@ -56,15 +56,40 @@ git clone https://github.com/rbgirshick/py-faster-rcnn.git
 
 git clone https://github.com/tanjeffreyz/yolo-v1.git
 
+git clone https://github.com/longcw/yolo2-pytorch.git
+
+git clone https://github.com/amdegroot/ssd.pytorch.git
+
+git clone https://github.com/ultralytics/yolov3.git
+
 git clone https://github.com/pjreddie/darknet.git
 
+git clone https://github.com/Tianxiaomo/pytorch-YOLOv4.git
+
 git clone https://github.com/ultralytics/yolov5.git
+
+git clone https://github.com/meituan/YOLOv6.git
+
+git clone https://github.com/WongKinYiu/yolov7.git
+
+git clone https://github.com/ultralytics/ultralytics.git
+
+git clone https://github.com/WongKinYiu/yolov9.git
+
+git clone https://github.com/THU-MIG/yolov10.git
+
+git clone https://github.com/sunsmarterjie/yolov12.git
 
 ### 1.2.4 segmentation
 
 git clone https://github.com/matterport/Mask_RCNN.git
 
 git clone https://github.com/facebookresearch/maskrcnn-benchmark.git
+
+### 1.2.5 toolbox
+
+git clone https://github.com/open-mmlab/mmdetection.git
+
 
 ## 1.3 bm
 
