@@ -64,6 +64,8 @@ git clone https://github.com/ultralytics/yolov3.git
 
 git clone https://github.com/pjreddie/darknet.git
 
+git clone https://github.com/yhenon/pytorch-retinanet.git
+
 git clone https://github.com/Tianxiaomo/pytorch-YOLOv4.git
 
 git clone https://github.com/ultralytics/yolov5.git
@@ -80,6 +82,8 @@ git clone https://github.com/THU-MIG/yolov10.git
 
 git clone https://github.com/sunsmarterjie/yolov12.git
 
+git clone https://github.com/facebookresearch/detr.git
+
 ### 1.2.4 segmentation
 
 git clone https://github.com/matterport/Mask_RCNN.git
@@ -89,7 +93,6 @@ git clone https://github.com/facebookresearch/maskrcnn-benchmark.git
 ### 1.2.5 toolbox
 
 git clone https://github.com/open-mmlab/mmdetection.git
-
 
 ## 1.3 bm
 
