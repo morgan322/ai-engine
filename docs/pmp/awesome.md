@@ -10,6 +10,8 @@ git clone https://github.com/tensorflow/tensorflow.git
 
 git clone https://github.com/PaddlePaddle/Paddle.git
 
+git clone https://github.com/deepspeedai/DeepSpeed.git
+
 ## 1.1 augmentation
 
 git clone https://github.com/Paperspace/DataAugmentationForObjectDetection.git
@@ -113,6 +115,11 @@ git clone https://github.com/graykode/nlp-tutorial.git
 ## 1.5 ml
 
 git clone https://github.com/josephmisiti/awesome-machine-learning.git
+
+## 1.6 llm
+
+git clone https://github.com/THUDM/ChatGLM-6B.git
+
 
 # 2 code
 
