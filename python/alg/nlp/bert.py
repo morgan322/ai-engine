@@ -174,8 +174,8 @@ if __name__ == "__main__":
     maxlen = 30
     batch_size = 6
     max_pred = 5
-    n_layers = 2  # 简化为2层便于测试
-    n_heads = 12
+    n_layers = 12  # 简化为2层便于测试
+    n_heads = 8
     d_model = 768
     d_ff = 768 * 4
     d_k = d_v = 64
@@ -188,7 +188,13 @@ if __name__ == "__main__":
         'Nice meet you too. How are you today?\n'
         'Great. My baseball team won the competition.\n'
         'Oh Congratulations, Juliet\n'
-        'Thanks you Romeo'
+        'Thanks you Romeo\n'
+        'What are you doing tomorrow?\n'
+        'I will play basketball with my friends.\n'
+        'That sounds fun! Can I join you?\n'
+        'Sure, we can meet at the park at 3 PM.\n'
+        'Perfect! See you tomorrow then.\n'
+        'See you!'
     )
     sentences = re.sub(r"[.,!?\-]", "", text.lower()).split('\n')
     word_list = ["[PAD]", "[CLS]", "[SEP]", "[MASK]"] + list(set(" ".join(sentences).split()))
@@ -213,7 +219,7 @@ if __name__ == "__main__":
     optimizer = optim.Adam(model.parameters(), lr=1e-4)
 
     # 训练循环
-    for epoch in range(100):
+    for epoch in range(500):
         batch = make_batch()
         input_ids, segment_ids, masked_tokens, masked_pos, is_next = zip(*batch)
         input_ids = torch.LongTensor(input_ids)
