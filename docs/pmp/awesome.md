@@ -130,6 +130,10 @@ git clone https://github.com/THUDM/ChatGLM-6B.git
 
 git clone https://github.com/google-research/bert.git
 
+git clone https://github.com/facebookresearch/fairseq.git
+
+git clone https://github.com/jessevig/bertviz.git
+
 # 2 code
 
 ## 2.1 c/cpp
