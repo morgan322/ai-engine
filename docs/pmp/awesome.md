@@ -12,10 +12,6 @@ git clone https://github.com/PaddlePaddle/Paddle.git
 
 git clone https://github.com/deepspeedai/DeepSpeed.git
 
-git clone https://github.com/deepspeedai/DeepSpeedExamples.git
-
-git clone https://github.com/NVIDIA/Megatron-LM.git
-
 ## 1.1 augmentation
 
 git clone https://github.com/Paperspace/DataAugmentationForObjectDetection.git
@@ -51,8 +47,6 @@ git clone https://github.com/aaron-xichen/pytorch-playground.git
 git clone https://github.com/Cadene/pretrained-models.pytorch.git
 
 git clone https://github.com/weiaicunzai/pytorch-cifar100.git
-
-git clone https://github.com/facebookresearch/mae.git
 
 ### 1.2.3 detection
 
@@ -108,13 +102,13 @@ git clone https://github.com/huggingface/transformers.git
 
 git clone https://github.com/hyunwoongko/transformer.git
 
-git clone https://github.com/NielsRogge/Transformers-Tutorials.git
-
 git clone https://github.com/google-deepmind/alphafold.git
 
 git clone https://github.com/deepseek-ai/DeepSeek-R1.git
 
 git clone https://github.com/OpenInterpreter/open-interpreter.git
+
+git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git
 
 ## 1.4 nlp
 
@@ -128,11 +122,8 @@ git clone https://github.com/josephmisiti/awesome-machine-learning.git
 
 git clone https://github.com/THUDM/ChatGLM-6B.git
 
-git clone https://github.com/google-research/bert.git
+1.7 depth
 
-git clone https://github.com/facebookresearch/fairseq.git
-
-git clone https://github.com/jessevig/bertviz.git
 
 # 2 code
 
