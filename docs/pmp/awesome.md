@@ -96,6 +96,14 @@ git clone https://github.com/facebookresearch/maskrcnn-benchmark.git
 
 git clone https://github.com/open-mmlab/mmdetection.git
 
+### 1.2.5 depth
+
+git clone https://github.com/LiheYoung/Depth-Anything.git
+
+git clone https://github.com/DepthAnything/Depth-Anything-V2.git
+
+git clone https://github.com/mrharicot/monodepth.git
+
 ## 1.3 bm
 
 git clone https://github.com/huggingface/transformers.git
@@ -122,8 +130,7 @@ git clone https://github.com/josephmisiti/awesome-machine-learning.git
 
 git clone https://github.com/THUDM/ChatGLM-6B.git
 
-1.7 depth
-
+git clone https://github.com/ymcui/Chinese-LLaMA-Alpaca-2.git
 
 # 2 code
 
