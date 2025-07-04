@@ -32,6 +32,8 @@ git clone https://github.com/pytorch/vision.git
 
 git clone https://github.com/sgrvinod/a-PyTorch-Tutorial-to-Object-Detection.git
 
+git clone https://github.com/NVlabs/MambaVision.git
+
 ### 1.2.1 registration
 
 git clone https://github.com/magicleap/SuperGluePretrainedNetwork.git
@@ -117,6 +119,8 @@ git clone https://github.com/deepseek-ai/DeepSeek-R1.git
 git clone https://github.com/OpenInterpreter/open-interpreter.git
 
 git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git
+
+git clone https://github.com/google/gemma.cpp.git
 
 ## 1.4 nlp
 
