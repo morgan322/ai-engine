@@ -1,40 +1,81 @@
 import streamlit as st
 import mysql.connector
 import os
-from langchain_google_genai import ChatGoogleGenerativeAI
+from openai import OpenAI
 import json
 import pandas as pd
 import plotly.express as px
 from datetime import datetime, timedelta
-import plotly.express as px
 import plotly.graph_objects as go
-from datetime import datetime, timedelta
-import pandas as pd
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.units import inch
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
 from io import BytesIO
-import base64
 import time
+
 # Configure API Key
-os.environ["GOOGLE_API_KEY"] = "AIzaSyC6ivZ-3UtC4R3nZxmPsJGbAEpRuY40LBc"  # Replace with your API key
+os.environ["DEEPSEEK_API_KEY"] = "sk-79e23726e1f040dbbde0925cd398b098"
 
-# pip install streamlit plotly pandas reportlab python-dotenv
+class DeepSeekAPI:
+    """DeepSeek API调用类，支持将响应日志保存为JSON文件"""
+    
+    def __init__(self, api_key=None, base_url="https://api.deepseek.com/v1", log_file="api_responses.json"):
+        self.client = OpenAI(
+            api_key=api_key or os.environ.get("DEEPSEEK_API_KEY"),
+            base_url=base_url
+        )
+        self.log_file = log_file
 
-# Initialize LLM
-llm = ChatGoogleGenerativeAI(
-    model="gemini-1.5-pro-002",
-    api_version="v1",  
-    google_api_key=os.environ.get("GOOGLE_API_KEY"),
-)
+    def invoke(self, prompt, model="deepseek-chat", temperature=0.2):
+        """调用DeepSeek API并返回响应内容"""
+        try:
+            response = self.client.chat.completions.create(
+                model=model,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=temperature
+            )
+            
+            # 提取响应内容
+            content = response.choices[0].message.content
+            
+            # 记录日志
+            self._log_response(prompt, content)
+            
+            return content
+        except Exception as e:
+            st.error(f"API调用错误: {str(e)}")
+            return None
+
+    def _log_response(self, prompt, response):
+        """记录API调用日志到JSON文件"""
+        log_entry = {
+            "timestamp": datetime.now().isoformat(),
+            "prompt": prompt,
+            "response": response
+        }
+        
+        try:
+            if os.path.exists(self.log_file):
+                with open(self.log_file, "r") as f:
+                    logs = json.load(f)
+            else:
+                logs = []
+            
+            logs.append(log_entry)
+            
+            with open(self.log_file, "w") as f:
+                json.dump(logs, f, indent=2)
+        except Exception as e:
+            st.warning(f"日志记录失败: {str(e)}")
+
+# 初始化DeepSeek LLM
+llm = DeepSeekAPI()
 
 # Database configuration
 db = mysql.connector.connect(
     host="localhost",
     user="root",
-    password="Gayathri@19",  # Replace with your password
+    password="123456",  # 替换为你的密码
     database="learning_assistant"
 )
 cursor = db.cursor(dictionary=True)
@@ -154,6 +195,7 @@ def generate_certificate(name, course, completion_date, certificate_number):
 def authenticate_user(username, password):
     cursor.execute("SELECT * FROM users WHERE username = %s AND password = %s", (username, password))
     return cursor.fetchone()
+
 def generate_assessment_questions(subject, topic):
     """Generate 5 questions for a given topic"""
     prompt = f"""
@@ -173,8 +215,9 @@ def generate_assessment_questions(subject, topic):
     
     response = llm.invoke(prompt)
     try:
-        content_str = response.content.split("```json")[-1].split("```")[0].strip()
-        return json.loads(content_str)
+        if response:  # 检查响应是否存在
+            content_str = response.split("```json")[-1].split("```")[0].strip()
+            return json.loads(content_str)
     except:
         # Fallback questions if generation fails
         return {
@@ -186,6 +229,7 @@ def generate_assessment_questions(subject, topic):
                 } for i in range(5)
             ]
         }
+
 def check_certificate_eligibility(path_id, user_id):
     """Check if user is eligible for certificate"""
     # Check progress
@@ -228,8 +272,9 @@ def evaluate_answer(topic, question, user_answer):
     
     response = llm.invoke(prompt)
     try:
-        content_str = response.content.split("```json")[-1].split("```")[0].strip()
-        return json.loads(content_str)
+        if response:  # 检查响应是否存在
+            content_str = response.split("```json")[-1].split("```")[0].strip()
+            return json.loads(content_str)
     except:
         return {
             "score": 0.5,
@@ -251,8 +296,9 @@ def generate_assessment(topic):
     
     response = llm.invoke(prompt)
     try:
-        content_str = response.content.split("```json")[-1].split("```")[0].strip()
-        return json.loads(content_str)
+        if response:  # 检查响应是否存在
+            content_str = response.split("```json")[-1].split("```")[0].strip()
+            return json.loads(content_str)
     except:
         return {
             "question": f"Explain the key concepts of {topic}",
@@ -306,24 +352,40 @@ def generate_learning_path(subject, user_interests, learning_style, target_days)
     
     response = llm.invoke(prompt)
     try:
-        content_str = response.content.split("```json")[-1].split("```")[0].strip()
-        path_content = json.loads(content_str)
-        
-        # Ensure all required fields exist and provide defaults if missing
-        for topic in path_content['topics']:
-            for resource in topic['resources']:
-                if 'url' not in resource:
-                    resource['url'] = '#'
-                if 'platform' not in resource:
-                    resource['platform'] = 'General'
-                    
-            for exercise in topic['practice_exercises']:
-                if 'url' not in exercise:
-                    exercise['url'] = '#'
-        
-        return path_content
+        if response:  # 检查响应是否存在
+            content_str = response.split("```json")[-1].split("```")[0].strip()
+            path_content = json.loads(content_str)
+            
+            # Ensure all required fields exist and provide defaults if missing
+            for topic in path_content['topics']:
+                for resource in topic['resources']:
+                    if 'url' not in resource:
+                        resource['url'] = '#'
+                    if 'platform' not in resource:
+                        resource['platform'] = 'General'
+                        
+                for exercise in topic['practice_exercises']:
+                    if 'url' not in exercise:
+                        exercise['url'] = '#'
+            
+            return path_content
     except Exception as e:
         st.error(f"Failed to generate learning path: {str(e)}")
+        return None
+
+
+def extract_and_parse_json(response_str):
+    try:
+        json_start = response_str.find("```json") + len("```json")
+        json_end = response_str.rfind("```")
+        json_content = response_str[json_start:json_end].strip()
+        return json.loads(json_content)
+    
+    except (ValueError, json.JSONDecodeError) as e:
+        st.error(f"fail to extract and parse JSON: {str(e)}")
+        return None
+    except Exception as e:
+        st.error(f"fail to extract and parse JSON: {str(e)}")
         return None
 
 
@@ -345,69 +407,57 @@ def display_learning_path(path):
     
     try:
         content = json.loads(path['content'])
-        
-        # Topics and resources using tabs
+        content = extract_and_parse_json(content.get('response', []))
         topics = content.get('topics', [])
-        topic_tabs = st.tabs([f"📚 {topic.get('name', 'Unnamed Topic')}" for topic in topics])
-        
-        for i, topic in enumerate(topics):
-            with topic_tabs[i]:
-                st.write(f"**Duration:** {topic.get('duration_days', 'N/A')} days")
-                st.markdown(f"**Description:** {topic.get('description', 'No description available')}")
-                
-                st.subheader("📚 Resources")
-                resources = topic.get('resources', [])
-                if resources:
-                    for resource in resources:
-                        # Ensure resource is a dictionary
-                        if not isinstance(resource, dict):
-                            continue
-                            
-                        with st.expander(f"{resource.get('title', 'Untitled')} ({resource.get('type', 'Resource')})"):
-                            st.markdown(f"**Description:** {resource.get('description', 'No description available')}")
-                            
-                            platform = resource.get('platform')
-                            if platform:
-                                st.markdown(f"**Platform:** {platform}")
-                                
-                            resource_url = resource.get('url')
-                            if resource_url and resource_url != '#':
-                                try:
-                                    st.link_button("Open Resource", resource_url)
-                                except Exception:
-                                    st.warning("Resource link unavailable")
-                else:
-                    st.write("No resources available for this topic")
-                
-                st.subheader("💪 Practice Exercises")
-                exercises = topic.get('practice_exercises', [])
-                if exercises:
-                    for exercise in exercises:
-                        # Ensure exercise is a dictionary
-                        if not isinstance(exercise, dict):
-                            continue
-                            
-                        with st.expander(f"{exercise.get('difficulty', 'General').title()} Level Exercise"):
-                            st.markdown(exercise.get('description', 'No description available'))
-                            
-                            exercise_url = exercise.get('url')
-                            if exercise_url and exercise_url != '#':
-                                try:
-                                    st.link_button("Start Exercise", exercise_url)
-                                except Exception:
-                                    st.warning("Exercise link unavailable")
-                else:
-                    st.write("No practice exercises available for this topic")
-                
-                if st.button(f"Take Assessment: {topic.get('name', 'Unnamed Topic')}", 
-                           key=f"assess_{path['id']}_{topic.get('name', 'unnamed')}"):
-                    assessment = generate_assessment(topic.get('name', 'General Topic'))
-                    st.session_state.current_assessment1 = {
-                        'topic': topic.get('name', 'General Topic'),
-                        'question': assessment['question'],
-                        'path_id': path['id']
-                    }
-        
+        if topics:
+            st.subheader("📚 Learning Topics")
+            # Generate topic tabs
+            topic_tabs = st.tabs([f"📌 {topic.get('name', 'Unnamed Topic')}" for topic in topics])
+            
+            for i, topic in enumerate(topics):
+                with topic_tabs[i]:
+                    # Topic basic information
+                    st.write(f"**Duration:** {topic.get('duration_days', 'N/A')} days")
+                    st.markdown(f"**Description:** {topic.get('description', 'No description available')}")
+                    
+                    # Display resources (matching your resource display logic)
+                    st.subheader("📚 Resources")
+                    resources = topic.get('resources', [])
+                    if resources:
+                        for resource in resources:
+                            if not isinstance(resource, dict):
+                                continue
+                            with st.expander(f"{resource.get('title', 'Untitled')} ({resource.get('type', 'Resource')})"):
+                                st.markdown(f"**Description:** {resource.get('description', 'No description')}")
+                                st.markdown(f"**Platform:** {resource.get('platform', 'N/A')}")
+                                if resource.get('url') and resource['url'] not in [None, '#']:
+                                    st.link_button("Open Resource", resource['url'])
+                    else:
+                        st.info("No resources available")
+                    
+                    # Display practice exercises (matching your exercise display logic)
+                    st.subheader("💪 Practice Exercises")
+                    exercises = topic.get('practice_exercises', [])
+                    if exercises:
+                        for exercise in exercises:
+                            if not isinstance(exercise, dict):
+                                continue
+                            with st.expander(f"{exercise.get('difficulty', 'General').title()} Level Exercise"):
+                                st.markdown(f"**Description:** {exercise.get('description', 'No description')}")
+                                if exercise.get('url') and exercise['url'] not in [None, '#']:
+                                    st.link_button("Start Exercise", exercise['url'])
+                    else:
+                        st.info("No practice exercises available")
+                    
+                    # Assessment button (matching your assessment logic)
+                    if st.button(f"Take Assessment: {topic.get('name', 'Unnamed Topic')}",
+                            key=f"assess_{i}"):
+                        st.session_state.current_assessment = {
+                            'topic': topic.get('name', 'General Topic'),
+                            'path_id': i  # Replace with actual path_id in production
+                        }
+                        st.success("Assessment started!")
+
         # Milestones section
         milestones = content.get('milestones', [])
         if milestones:
