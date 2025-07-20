@@ -13,6 +13,7 @@ plot_flag = 1
 gamma_flag = 0
 rename_flag = 0
 color_flag = 0
+xml_flag = 0
 EXTRACT_FREQUENCY = 40
 
 image_dir = src_dir + '/JPEGImages/'
@@ -25,6 +26,10 @@ os.makedirs(save_dir, exist_ok=True)
 
 current_date = datetime.datetime.now()
 date_string = current_date.strftime("%Y-%m-%d")
+
+
+if
+
 
 if rename_flag:
 

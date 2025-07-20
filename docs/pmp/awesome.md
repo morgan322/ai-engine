@@ -122,6 +122,8 @@ git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git
 
 git clone https://github.com/google/gemma.cpp.git
 
+git clone https://github.com/openvla/openvla.git
+
 ## 1.4 nlp
 
 git clone https://github.com/graykode/nlp-tutorial.git
@@ -135,6 +137,12 @@ git clone https://github.com/josephmisiti/awesome-machine-learning.git
 git clone https://github.com/THUDM/ChatGLM-6B.git
 
 git clone https://github.com/ymcui/Chinese-LLaMA-Alpaca-2.git
+
+git clone https://github.com/unslothai/unsloth.git
+
+git clone https://github.com/google/gemma.cpp.git
+
+git clone https://github.com/google/gemma_pytorch.git
 
 # 2 code
 
