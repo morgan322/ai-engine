@@ -94,6 +94,8 @@ git clone https://github.com/matterport/Mask_RCNN.git
 
 git clone https://github.com/facebookresearch/maskrcnn-benchmark.git
 
+git clone https://github.com/facebookresearch/MaskFormer.git
+
 ### 1.2.5 toolbox
 
 git clone https://github.com/open-mmlab/mmdetection.git
@@ -105,6 +107,12 @@ git clone https://github.com/LiheYoung/Depth-Anything.git
 git clone https://github.com/DepthAnything/Depth-Anything-V2.git
 
 git clone https://github.com/mrharicot/monodepth.git
+
+### 1.2.6 generation
+
+git clone https://github.com/yfeng95/GAN.git
+
+git clone https://github.com/facebookresearch/DiT.git
 
 ## 1.3 bm
 
@@ -120,8 +128,6 @@ git clone https://github.com/OpenInterpreter/open-interpreter.git
 
 git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git
 
-git clone https://github.com/google/gemma.cpp.git
-
 git clone https://github.com/openvla/openvla.git
 
 ## 1.4 nlp
@@ -131,6 +137,8 @@ git clone https://github.com/graykode/nlp-tutorial.git
 ## 1.5 ml
 
 git clone https://github.com/josephmisiti/awesome-machine-learning.git
+
+git clone https://github.com/yfeng95/GAN.git
 
 ## 1.6 llm
 
