@@ -8,8 +8,6 @@ git clone https://github.com/pytorch/pytorch.git
 
 git clone https://github.com/tensorflow/tensorflow.git
 
-git clone https://github.com/PaddlePaddle/Paddle.git
-
 git clone https://github.com/deepspeedai/DeepSpeed.git
 
 ## 1.1 augmentation
@@ -96,9 +94,9 @@ git clone https://github.com/facebookresearch/maskrcnn-benchmark.git
 
 git clone https://github.com/facebookresearch/MaskFormer.git
 
-### 1.2.5 toolbox
+git clone https://github.com/VainF/DeepLabV3Plus-Pytorch.git
 
-git clone https://github.com/open-mmlab/mmdetection.git
+git clone https://github.com/ChaoningZhang/MobileSAM.git
 
 ### 1.2.5 depth
 
@@ -189,6 +187,19 @@ git clone https://github.com/wang-xinyu/tensorrtx.git
 git clone https://github.com/alibaba/MNN.git
 
 git clone https://github.com/Tencent/ncnn.git
+
+## 3.3 toolbox
+
+### 3.3.1 mmlab
+
+git clone https://github.com/open-mmlab/mmdetection.git
+
+### 3.3.2 paddle
+
+git clone https://github.com/PaddlePaddle/Paddle.git
+
+git clone https://github.com/PaddlePaddle/PaddleOCR.git
+
 
 # 4 develop
 
